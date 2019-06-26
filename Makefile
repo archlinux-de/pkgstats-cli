@@ -1,4 +1,7 @@
-.PHONY: install
+.PHONY: test install
+
+test:
+	bats tests.bats
 
 install:
 	install -D pkgstats.sh "$(DESTDIR)/usr/bin/pkgstats"
