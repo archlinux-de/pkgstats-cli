@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-pkgstatsver='2.4'
+pkgstatsver='@VERSION@'
 showonly=false
 quiet=false
 option='-q -s -S -L'
