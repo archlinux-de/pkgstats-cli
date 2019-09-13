@@ -1,0 +1,15 @@
+name: test
+
+on:
+  push:
+  schedule:
+    - cron: '0 1 */1 * *'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/bin/bats@master
+        with:
+          args: tests
