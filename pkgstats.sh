@@ -3,7 +3,7 @@
 pkgstatsver='@VERSION@'
 showonly=false
 quiet=false
-option='-q -s -S -L'
+option='-q -s -S -L --retry 6 --connect-timeout 3 --max-time 5'
 
 usage() {
 	echo "usage: ${0} [option]"

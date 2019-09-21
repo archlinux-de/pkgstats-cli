@@ -1,6 +1,7 @@
 [Unit]
 Description=Submit pkgstats
 After=network-online.target
+Wants=network-online.target
 
 [Service]
 Type=oneshot
