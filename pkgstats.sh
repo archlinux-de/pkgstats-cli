@@ -40,8 +40,6 @@ arch="$(uname -m)"
 if [[ -f /proc/cpuinfo ]]; then
 	if grep -qE '^flags\s*:.*\slm\s' /proc/cpuinfo; then
 		cpuarch='x86_64'
-	else
-		cpuarch='i686'
 	fi
 else
 	cpuarch=''
