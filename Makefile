@@ -6,6 +6,7 @@ build:
 	sed "s/@VERSION@/$$(git describe --tags)/g" pkgstats.sh > pkgstats
 
 test:
+	shellcheck pkgstats.sh
 	bats tests
 
 install:

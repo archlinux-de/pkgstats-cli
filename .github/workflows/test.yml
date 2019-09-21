@@ -13,3 +13,6 @@ jobs:
       - uses: actions/bin/bats@master
         with:
           args: tests
+      - uses: actions/bin/shellcheck@master
+        with:
+          args: pkgstats.sh
