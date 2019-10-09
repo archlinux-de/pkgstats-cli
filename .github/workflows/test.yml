@@ -10,9 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - uses: actions/bin/bats@master
-        with:
-          args: tests
-      - uses: actions/bin/shellcheck@master
-        with:
-          args: pkgstats.sh
+      - run: shellcheck pkgstats.sh
+      - name: Run tests
+        run: |
+          npm config set prefix ~/.npm
+          npm install -g bats
+          ~/.npm/bin/bats tests
