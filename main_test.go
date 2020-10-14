@@ -1,6 +1,21 @@
 package main
 
-import "testing"
+import (
+	"fmt"
+	"os"
+	"os/exec"
+	"testing"
+)
+
+func TestMain(t *testing.M) {
+	_, err := exec.LookPath("pacman")
+	if err == nil {
+		t.Run()
+	} else {
+		fmt.Println("Testing is only supported on Arch Linux", err)
+		os.Exit(0)
+	}
+}
 
 func Test_GetArchitecture(t *testing.T) {
 	architecture, err := getArchitecture()
