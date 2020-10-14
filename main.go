@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -14,7 +15,10 @@ import (
 )
 
 // Version pkgstats version
-var Version = "0.0.0-0-dev"
+var Version = "2.5.0-0-dev"
+
+// ApiBaseUrl pkgstats server URL
+var ApiBaseUrl = "https://pkgstats.archlinux.de"
 
 func main() {
 	version := flag.Bool("v", false, "show the version of pkgstats")
@@ -23,6 +27,10 @@ func main() {
 	quiet := flag.Bool("q", false, "be quiet except on errors")
 	flag.Usage = printUsage
 	flag.Parse()
+
+	if os.Getenv("PKGSTATS_URL") != "" {
+		ApiBaseUrl = os.Getenv("PKGSTATS_URL")
+	}
 
 	if *version {
 		fmt.Println("pkgstats, version ", Version)
@@ -89,7 +97,7 @@ func printUsage() {
 	fmt.Println("the architecture and the mirror you are using")
 	fmt.Println("to the Arch Linux project.")
 	fmt.Println("")
-	fmt.Println("Statistics are available at https://pkgstats.archlinux.de/")
+	fmt.Printf("Statistics are available at %s\n", ApiBaseUrl)
 }
 
 func getArchitecture() (string, error) {
@@ -141,16 +149,26 @@ func sendRequest(packages string, cpuArchitecture string, architecture string, m
 		Timeout: 5 * time.Second,
 	}
 
-	req, _ := http.NewRequest("POST", "https://pkgstats.archlinux.de/post", strings.NewReader(form.Encode()))
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s/post", ApiBaseUrl), strings.NewReader(form.Encode()))
+	if err != nil {
+		return "", err
+	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Set("Accept", "text/plain")
 	req.Header.Set("User-Agent", fmt.Sprintf("pkgstats/%s", Version))
 	response, err := c.Do(req)
 
 	if err != nil {
 		return "", err
 	}
+
+	if response.StatusCode != 200 && err == nil {
+		err = errors.New("Server Error")
+	}
+
 	defer response.Body.Close()
 
-	body, _ := ioutil.ReadAll(response.Body)
-	return string(body), nil
+	body, err := ioutil.ReadAll(response.Body)
+
+	return string(body), err
 }
