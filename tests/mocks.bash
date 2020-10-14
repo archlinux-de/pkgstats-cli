@@ -10,7 +10,7 @@ function pacman() {
 }
 export -f pacman
 
-function curl() {
-	echo myresponse
-}
-export -f curl
+#function curl() {
+#	echo myresponse
+#}
+#export -f curl

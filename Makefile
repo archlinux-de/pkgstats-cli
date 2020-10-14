@@ -2,11 +2,18 @@
 
 all: build
 
+#export CGO_CPPFLAGS="${CPPFLAGS}"
+#export CGO_CFLAGS="${CFLAGS}"
+#export CGO_CXXFLAGS="${CXXFLAGS}"
+#export CGO_LDFLAGS="${LDFLAGS}"
+#export GOFLAGS="-buildmode=pie -trimpath -ldflags=-linkmode=external -mod=readonly -modcacherw"
+
 build:
-	sed "s/@VERSION@/$$(git describe --tags)/g" pkgstats.sh > pkgstats
+	#sed "s/@VERSION@/$$(git describe --tags)/g" pkgstats.sh > pkgstats
+	go build -ldflags "-X main.Version=$$(git describe --tags)" -o pkgstats cmd/main.go
 
 test:
-	shellcheck pkgstats.sh
+	#shellcheck pkgstats.sh
 	bats tests
 
 install:
