@@ -2,14 +2,14 @@
 
 all: build
 
-VERSION != git describe --tags || echo 0.0.0-0-dev
+VERSION != git describe --tags || echo 2.5.0-0-dev
 
 build:
 	go build -o pkgstats -trimpath -buildmode=pie -ldflags '-linkmode external -extldflags "${LDFLAGS}" -X main.Version=${VERSION}'
 
 test:
 	go vet
-	go test
+	go test -v
 
 install:
 	install -D pkgstats -m755 "$(DESTDIR)/usr/bin/pkgstats"
