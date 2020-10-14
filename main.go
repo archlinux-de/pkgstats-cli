@@ -14,7 +14,7 @@ import (
 )
 
 // Version pkgstats version
-var Version = "0.0.0-dev"
+var Version = "0.0.0-0-dev"
 
 func main() {
 	version := flag.Bool("v", false, "show the version of pkgstats")
@@ -41,12 +41,18 @@ func main() {
 	if !*quiet {
 		fmt.Println("Submitting data...")
 	}
+
+	packages, _ := getPackages()
+	cpuArchitecture, _ := getCpuArchitecture()
+	architecture, _ := getArchitecture()
+	mirror, _ := getMirror()
+
 	if !*dryRun {
 		response, err := sendRequest(
-			getPackages(),
-			getCpuArchitecture(),
-			getArchitecture(),
-			getMirror(),
+			packages,
+			cpuArchitecture,
+			architecture,
+			mirror,
 			*quiet,
 		)
 		if err != nil {
@@ -58,14 +64,14 @@ func main() {
 		}
 	} else {
 		fmt.Println("packages=")
-		fmt.Println(getPackages())
+		fmt.Println(packages)
 
 		fmt.Println("")
 
-		fmt.Println("arch=", getArchitecture())
-		fmt.Println("cpuarch=", getCpuArchitecture())
+		fmt.Println("arch=", architecture)
+		fmt.Println("cpuarch=", cpuArchitecture)
 		fmt.Println("pkgstatsver=", Version)
-		fmt.Println("mirror=", getMirror())
+		fmt.Println("mirror=", mirror)
 		fmt.Println("quiet=", *quiet)
 	}
 }
@@ -86,22 +92,22 @@ func printUsage() {
 	fmt.Println("Statistics are available at https://pkgstats.archlinux.de/")
 }
 
-func getArchitecture() string {
-	out, _ := exec.Command("uname", "-m").Output()
-	return strings.TrimSpace(string(out))
+func getArchitecture() (string, error) {
+	out, err := exec.Command("uname", "-m").Output()
+	return strings.TrimSpace(string(out)), err
 }
 
-func getCpuArchitecture() string {
-	dat, _ := ioutil.ReadFile("/proc/cpuinfo")
+func getCpuArchitecture() (string, error) {
+	dat, err := ioutil.ReadFile("/proc/cpuinfo")
 
-	if regexp.MustCompile(`(?m)^flags\s*:.*\slm\s`).Match(dat) {
-		return "x86_64"
+	if err == nil && regexp.MustCompile(`(?m)^flags\s*:.*\slm\s`).Match(dat) {
+		return "x86_64", nil
 	}
-	return ""
+	return "", err
 }
 
-func getMirror() string {
-	out, _ := exec.Command("pacman-conf", "--repo", "extra", "Server").Output()
+func getMirror() (string, error) {
+	out, err := exec.Command("pacman-conf", "--repo", "extra", "Server").Output()
 	mirror := strings.TrimSpace(string(out))
 	url, _ := url.Parse(mirror)
 	path := regexp.MustCompile(`^(.*/)extra/os/.*`).ReplaceAllString(url.Path, "$1")
@@ -111,12 +117,12 @@ func getMirror() string {
 		port = ":" + url.Port()
 	}
 
-	return url.Scheme + "://" + url.Hostname() + port + path
+	return url.Scheme + "://" + url.Hostname() + port + path, err
 }
 
-func getPackages() string {
-	out, _ := exec.Command("pacman", "-Qq").Output()
-	return strings.TrimSpace(string(out))
+func getPackages() (string, error) {
+	out, err := exec.Command("pacman", "-Qq").Output()
+	return strings.TrimSpace(string(out)), err
 }
 
 func sendRequest(packages string, cpuArchitecture string, architecture string, mirror string, quiet bool) (string, error) {

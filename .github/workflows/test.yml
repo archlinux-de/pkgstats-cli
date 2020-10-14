@@ -11,9 +11,4 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - run: make build
-#      - run: shellcheck pkgstats.sh
-      - name: Run tests
-        run: |
-          npm config set prefix ~/.npm
-          npm install -g bats
-          ~/.npm/bin/bats tests
+      - run: make test
