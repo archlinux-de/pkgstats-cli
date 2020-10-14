@@ -3,29 +3,29 @@ package main
 import "testing"
 
 func Test_GetArchitecture(t *testing.T) {
-	architecture, _ := getArchitecture()
-	if architecture != "x86_64" {
-		t.Error("Unexptected architecture")
+	architecture, err := getArchitecture()
+	if architecture != "x86_64" || err != nil {
+		t.Error("Unexptected architecture", err)
 	}
 }
 
 func Test_GetCpuArchitecture(t *testing.T) {
-	cpuArchitecture, _ := getCpuArchitecture()
-	if cpuArchitecture != "x86_64" {
-		t.Error("Unexptected cpu architecture")
+	cpuArchitecture, err := getCpuArchitecture()
+	if cpuArchitecture != "x86_64" || err != nil {
+		t.Error("Unexptected cpu architecture", err)
 	}
 }
 
 func Test_GetMirror(t *testing.T) {
-	mirror, _ := getMirror()
-	if mirror == "" {
-		t.Error("No mirror found")
+	mirror, err := getMirror()
+	if mirror == "" || err != nil {
+		t.Error("No mirror found", err)
 	}
 }
 
 func Test_GetPackages(t *testing.T) {
-	packages, _ := getPackages()
-	if packages == "" {
-		t.Error("No packages found")
+	packages, err := getPackages()
+	if packages == "" || err != nil {
+		t.Error("No packages found", err)
 	}
 }
