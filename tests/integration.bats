@@ -2,8 +2,8 @@
 
 function setup() {
 	pushd $BATS_TEST_DIRNAME
-	load mocks
-	PKGSTATS="run ../pkgstats.sh"
+	export PKGSTATS_URL=http://localhost:8888
+	PKGSTATS="run ../pkgstats"
 }
 
 @test "show help" {
@@ -20,15 +20,15 @@ function setup() {
 	$PKGSTATS -s
 	echo "${lines[0]}" | grep -q 'Collecting data'
 	echo "${output}" | grep -q 'packages='
-	echo "${output}" | grep -q 'mypackage'
-	echo "${output}" | grep -q 'mirror=https://my.mirror/'
+	echo "${output}" | grep -q 'pacman'
+	echo "${output}" | grep -q 'mirror=https://'
 	echo "${output}" | grep -q 'quiet=false'
 }
 
 @test "set quiet mode" {
-	$PKGSTATS -sq
+	$PKGSTATS -s -q
 	echo "${output}" | grep -q 'packages='
-	echo "${output}" | grep -q 'mypackage'
+	echo "${output}" | grep -q 'pacman'
 	echo "${output}" | grep -q 'quiet=true'
 }
 
@@ -36,5 +36,5 @@ function setup() {
 	$PKGSTATS
 	echo "${lines[0]}" | grep -q 'Collecting data'
 	echo "${lines[1]}" | grep -q 'Submitting data'
-	echo "${output}" | grep -q 'myresponse'
+	echo "${output}" | grep -q 'TEST OK'
 }

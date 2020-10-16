@@ -1,2 +1,4 @@
 /.idea
 /pkgstats
+/pkgstats-cli
+*.out
