@@ -32,9 +32,9 @@ function setup() {
 }
 
 @test "send informaition" {
-	skip "This test will require a mocked pkgstats server"
-	$PKGSTATS
+#	skip "This test will require a mocked pkgstats server"
+	PKGSTATS_URL=http://localhost:8888 $PKGSTATS
 	echo "${lines[0]}" | grep -q 'Collecting data'
 	echo "${lines[1]}" | grep -q 'Submitting data'
-	echo "${output}" | grep -q 'myresponse'
+	echo "${output}" | grep -q 'TEST OK'
 }
