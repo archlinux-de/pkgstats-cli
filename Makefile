@@ -13,7 +13,6 @@ test:
 
 test-integration:
 	docker build . -t pkgstats
-	bats integration.bats
 
 install:
 	install -D pkgstats -m755 "$(DESTDIR)/usr/bin/pkgstats"

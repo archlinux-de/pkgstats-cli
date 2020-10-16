@@ -2,7 +2,7 @@
 
 function setup() {
 	pushd $BATS_TEST_DIRNAME
-	PKGSTATS="run docker run --rm pkgstats"
+	PKGSTATS="run ./pkgstats"
 }
 
 @test "show help" {
