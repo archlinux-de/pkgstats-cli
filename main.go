@@ -77,11 +77,11 @@ func main() {
 
 		fmt.Println("")
 
-		fmt.Println("arch=", architecture)
-		fmt.Println("cpuarch=", cpuArchitecture)
-		fmt.Println("pkgstatsver=", Version)
-		fmt.Println("mirror=", mirror)
-		fmt.Println("quiet=", *quiet)
+		fmt.Printf("arch=%s\n", architecture)
+		fmt.Printf("cpuarch=%s\n", cpuArchitecture)
+		fmt.Printf("pkgstatsver=%s\n", Version)
+		fmt.Printf("mirror=%s\n", mirror)
+		fmt.Printf("quiet=%t\n", *quiet)
 	}
 }
 
