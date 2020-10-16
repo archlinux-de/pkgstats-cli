@@ -1,4 +1,4 @@
-.PHONY: all build test install clean
+.PHONY: all build test test-integration install clean
 
 all: build
 
@@ -10,6 +10,10 @@ build:
 test:
 	go vet
 	go test -v
+
+test-integration:
+	docker build . -t pkgstats
+	docker run --rm pkgstats -s
 
 install:
 	install -D pkgstats -m755 "$(DESTDIR)/usr/bin/pkgstats"
