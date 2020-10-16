@@ -3,4 +3,5 @@ RUN pacman -Syu --noconfirm go make gcc git
 COPY . /app/
 WORKDIR /app
 RUN make build
-ENTRYPOINT ["/app/pkgstats"]
+RUN make DESTDIR=/ install
+ENTRYPOINT ["/usr/bin/pkgstats"]
