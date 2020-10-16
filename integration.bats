@@ -2,6 +2,7 @@
 
 function setup() {
 	pushd $BATS_TEST_DIRNAME
+	export PKGSTATS_URL=http://localhost:8888
 	PKGSTATS="run ./pkgstats"
 }
 
@@ -32,8 +33,7 @@ function setup() {
 }
 
 @test "send informaition" {
-#	skip "This test will require a mocked pkgstats server"
-	PKGSTATS_URL=http://localhost:8888 $PKGSTATS
+	$PKGSTATS
 	echo "${lines[0]}" | grep -q 'Collecting data'
 	echo "${lines[1]}" | grep -q 'Submitting data'
 	echo "${output}" | grep -q 'TEST OK'
