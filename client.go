@@ -27,7 +27,7 @@ func NewClient(baseURL string) *Client {
 	return &apiClient
 }
 
-func (api *Client) sendRequest(packages string, cpuArchitecture string, architecture string, mirror string, quiet bool) (string, error) {
+func (api *Client) SendRequest(packages string, cpuArchitecture string, architecture string, mirror string, quiet bool) (string, error) {
 	form := url.Values{}
 	form.Add("packages", packages)
 	form.Add("arch", architecture)
@@ -60,5 +60,5 @@ func (api *Client) sendRequest(packages string, cpuArchitecture string, architec
 
 	body, err := ioutil.ReadAll(response.Body)
 
-	return string(body), err
+	return strings.TrimSpace(string(body)), err
 }

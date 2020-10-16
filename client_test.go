@@ -17,7 +17,7 @@ func Test_SendRequest(t *testing.T) {
 		if req.Header.Get("Accept") != "text/plain" {
 			t.Error("Invalid Accept Header", req.Header.Get("Accept"))
 		}
-		if req.UserAgent() != "pkgstats/2.5.0-0-dev" {
+		if req.UserAgent() != "pkgstats/"+Version {
 			t.Error("Invalid User-Agent", req.UserAgent())
 		}
 
@@ -42,7 +42,7 @@ func Test_SendRequest(t *testing.T) {
 	defer server.Close()
 
 	client := Client{server.Client(), server.URL}
-	response, err := client.sendRequest(
+	response, err := client.SendRequest(
 		"pacman\nlinux",
 		"i686",
 		"x86_64",

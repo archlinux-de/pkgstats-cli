@@ -2,10 +2,10 @@
 
 all: build
 
-VERSION != git describe --tags || echo 2.5.0-0-dev
+VERSION != git describe --tags
 
 build:
-	go build -o pkgstats -trimpath -buildmode=pie -ldflags '-linkmode external -extldflags "${LDFLAGS}" -X main.Version=${VERSION}'
+	go build -o pkgstats -trimpath -buildmode=pie -ldflags '-X main.Version=${VERSION}'
 
 test:
 	go vet

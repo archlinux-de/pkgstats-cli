@@ -7,7 +7,7 @@ import (
 )
 
 // Version pkgstats version
-var Version = "2.5.0-0-dev"
+var Version = "dev"
 
 // ApiBaseUrl pkgstats server URL
 var ApiBaseUrl = "https://pkgstats.archlinux.de"
@@ -43,16 +43,21 @@ func main() {
 	}
 
 	pacman := NewPacman()
-	packages, _ := pacman.GetInstalledPackages()
-	mirror, _ := pacman.GetServer()
+	packageChannel := async(pacman.GetInstalledPackages)
+	mirrorChannel := async(pacman.GetServer)
 
 	system := NewSystem()
-	cpuArchitecture, _ := system.GetCpuArchitecture()
-	architecture, _ := system.GetArchitecture()
+	cpuArchitectureChannel := async(system.GetCpuArchitecture)
+	architectureChannel := async(system.GetArchitecture)
+
+	packages := <-packageChannel
+	mirror := <-mirrorChannel
+	cpuArchitecture := <-cpuArchitectureChannel
+	architecture := <-architectureChannel
 
 	if !*dryRun {
 		client := NewClient(ApiBaseUrl)
-		response, err := client.sendRequest(
+		response, err := client.SendRequest(
 			packages,
 			cpuArchitecture,
 			architecture,
@@ -94,4 +99,13 @@ func printUsage() {
 	fmt.Println("to the Arch Linux project.")
 	fmt.Println("")
 	fmt.Printf("Statistics are available at %s\n", ApiBaseUrl)
+}
+
+func async(f func() (string, error)) chan string {
+	c := make(chan string)
+	go func() {
+		v, _ := f()
+		c <- v
+	}()
+	return c
 }
