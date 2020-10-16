@@ -29,7 +29,6 @@ func NewPacman() Pacman {
 }
 
 func (pacman *Pacman) GetInstalledPackages() (string, error) {
-	// https://golang.org/pkg/os/exec/#CommandContext
 	ctx, cancel := context.WithTimeout(context.Background(), pacman.timeout)
 	defer cancel()
 
@@ -40,7 +39,6 @@ func (pacman *Pacman) GetInstalledPackages() (string, error) {
 	return strings.TrimSpace(string(out)), err
 }
 
-// Loop over all the mirrors and send all their hostnames only
 func (pacman *Pacman) GetServer() (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), pacman.timeout)
 	defer cancel()
