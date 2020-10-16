@@ -1,5 +1,5 @@
 FROM archlinux
-RUN pacman -Sy --noconfirm go make gcc git
+RUN pacman -Syu --noconfirm go make gcc git
 COPY . /app/
 WORKDIR /app
 RUN make build
