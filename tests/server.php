@@ -10,7 +10,7 @@ $quiet = $_POST['quiet'];
 error_log('Got request from ' . $userAgent);
 
 if (
-	strpos($userAgent, 'pkgstats/') === 0
+	strpos($userAgent, 'pkgstats/' . exec('git describe --tags')) === 0
 	&& $arch === 'x86_64'
 	&& $cpuarch === 'x86_64'
 	&& strpos($mirror, 'http') === 0

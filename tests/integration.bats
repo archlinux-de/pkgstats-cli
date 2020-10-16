@@ -3,7 +3,7 @@
 function setup() {
 	pushd $BATS_TEST_DIRNAME
 	export PKGSTATS_URL=http://localhost:8888
-	PKGSTATS="run ./pkgstats"
+	PKGSTATS="run ../pkgstats"
 }
 
 @test "show help" {

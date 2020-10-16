@@ -1,4 +1,4 @@
-package main
+package pkgstats
 
 import (
 	"errors"
@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"pkgstats-cli/internal/build"
 	"strings"
 	"time"
 )
@@ -45,7 +46,7 @@ func (api *Client) SendRequest(packages string, cpuArchitecture string, architec
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Set("Accept", "text/plain")
-	req.Header.Set("User-Agent", fmt.Sprintf("pkgstats/%s", Version))
+	req.Header.Set("User-Agent", fmt.Sprintf("pkgstats/%s", build.Version))
 	response, err := api.Client.Do(req)
 
 	if err != nil {

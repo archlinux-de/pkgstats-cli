@@ -1,12 +1,13 @@
-package main
+package pkgstats
 
 import (
 	"net/http"
 	"net/http/httptest"
+	"pkgstats-cli/internal/build"
 	"testing"
 )
 
-func Test_SendRequest(t *testing.T) {
+func TestSendRequest(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		if req.URL.String() != "/post" {
 			t.Error("/post was not called")
@@ -17,7 +18,7 @@ func Test_SendRequest(t *testing.T) {
 		if req.Header.Get("Accept") != "text/plain" {
 			t.Error("Invalid Accept Header", req.Header.Get("Accept"))
 		}
-		if req.UserAgent() != "pkgstats/"+Version {
+		if req.UserAgent() != "pkgstats/"+build.Version {
 			t.Error("Invalid User-Agent", req.UserAgent())
 		}
 

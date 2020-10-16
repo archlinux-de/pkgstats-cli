@@ -4,10 +4,11 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"pkgstats-cli/internal/build"
+	"pkgstats-cli/internal/pacman"
+	"pkgstats-cli/internal/pkgstats"
+	"pkgstats-cli/internal/system"
 )
-
-// Version pkgstats version
-var Version = "dev"
 
 // ApiBaseUrl pkgstats server URL
 var ApiBaseUrl = "https://pkgstats.archlinux.de"
@@ -25,7 +26,7 @@ func main() {
 	}
 
 	if *version {
-		fmt.Println("pkgstats, version ", Version)
+		fmt.Println("pkgstats, version ", build.Version)
 		os.Exit(0)
 	}
 
@@ -42,11 +43,11 @@ func main() {
 		fmt.Println("Submitting data...")
 	}
 
-	pacman := NewPacman()
+	pacman := pacman.NewPacman()
 	packageChannel := async(pacman.GetInstalledPackages)
 	mirrorChannel := async(pacman.GetServer)
 
-	system := NewSystem()
+	system := system.NewSystem()
 	cpuArchitectureChannel := async(system.GetCpuArchitecture)
 	architectureChannel := async(system.GetArchitecture)
 
@@ -56,7 +57,7 @@ func main() {
 	architecture := <-architectureChannel
 
 	if !*dryRun {
-		client := NewClient(ApiBaseUrl)
+		client := pkgstats.NewClient(ApiBaseUrl)
 		response, err := client.SendRequest(
 			packages,
 			cpuArchitecture,
@@ -79,7 +80,7 @@ func main() {
 
 		fmt.Printf("arch=%s\n", architecture)
 		fmt.Printf("cpuarch=%s\n", cpuArchitecture)
-		fmt.Printf("pkgstatsver=%s\n", Version)
+		fmt.Printf("pkgstatsver=%s\n", build.Version)
 		fmt.Printf("mirror=%s\n", mirror)
 		fmt.Printf("quiet=%t\n", *quiet)
 	}
