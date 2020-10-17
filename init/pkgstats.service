@@ -5,5 +5,5 @@ Wants=network-online.target
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/pkgstats -q
+ExecStart=/usr/bin/pkgstats submit --quiet
 DynamicUser=true

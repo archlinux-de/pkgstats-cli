@@ -1,26 +1,83 @@
 <?php
 
+declare(strict_types=1);
+error_reporting(E_ALL);
+
 $userAgent = $_SERVER['HTTP_USER_AGENT'];
-$arch = $_POST['arch'];
-$cpuarch = $_POST['cpuarch'];
-$mirror = $_POST['mirror'];
-$packages = explode("\n", $_POST['packages']);
-$quiet = $_POST['quiet'];
+$requestUri = $_SERVER['REQUEST_URI'];
+$requestPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
-error_log('Got request from ' . $userAgent);
+error_log('Got request from ' . $userAgent . ' on ' . $requestUri);
+if (!preg_match('#^pkgstats/[\w.-]+$#', $userAgent)) {
+	header('HTTP/1.0 400');
+	error_log('Invalid user agent');
+	exit(1);
+}
 
-if (
-	strpos($userAgent, 'pkgstats/' . exec('git describe --tags')) === 0
-	&& $arch === 'x86_64'
-	&& $cpuarch === 'x86_64'
-	&& strpos($mirror, 'http') === 0
-	&& count($packages) > 100
-	&& $quiet === 'false'
-) {
-	echo 'TEST OK';
-	error_log('Request was vaild');
-} else {
-	echo 'TEST FAILED';
-	error_log('Request was invaild');
-	error_log(print_r($_POST, true));
+switch ($requestPath) {
+	case '/api/submit':
+		if (!isset($_GET['redirect'])) {
+			error_log('Testing redirect');
+			header('HTTP/1.0 308');
+			header('Location: /api/submit?redirect=1');
+			exit();
+		}
+
+		$request = json_decode(file_get_contents('php://input'), true);
+
+		if (
+			$request['version'] === '3'
+			&& $request['os']['architecture'] === php_uname('m')
+			&& $request['system']['architecture'] === 'x86_64'
+			&& preg_match('#^https?://.+$#', $request['pacman']['mirror'])
+			&& count($request['pacman']['packages']) > 100
+			&& in_array('pacman', $request['pacman']['packages'])
+		) {
+			error_log('Request was vaild');
+			header('HTTP/1.0 204');
+		} else {
+			error_log('Request was invaild');
+			error_log(print_r($request, true));
+			header('HTTP/1.0 400');
+			echo 'TEST FAILED';
+		}
+		break;
+
+	case '/api/packages':
+		$response = json_encode([
+			'total' => 42,
+			'count' => 2,
+			'packagePopularities' => [
+				[
+					'name' => 'php',
+					'popularity' => 56.78
+				],
+				[
+					'name' => 'php-fpm',
+					'popularity' => 12.34
+				]
+			]
+		]);
+		echo $response;
+		break;
+
+	case '/api/packages/pacman':
+		$response = json_encode([
+			'name' => 'pacman',
+			'popularity' => 12.34
+		]);
+		echo $response;
+		break;
+
+	case '/api/packages/php':
+		$response = json_encode([
+			'name' => 'php',
+			'popularity' => 56.78
+		]);
+		echo $response;
+		break;
+
+	default:
+		error_log('Unknown request');
+		header('HTTP/1.0 400');
 }

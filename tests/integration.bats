@@ -2,39 +2,49 @@
 
 function setup() {
 	pushd $BATS_TEST_DIRNAME
-	export PKGSTATS_URL=http://localhost:8888
-	PKGSTATS="run ../pkgstats"
+	PKGSTATS="run ../pkgstats --base-url http://localhost:8888"
 }
 
 @test "show help" {
-	$PKGSTATS -h
-	echo "${lines[0]}" | grep -q 'usage:'
+	$PKGSTATS help
+	echo "${output}" | grep -q 'Usage:'
 }
 
 @test "show version" {
-	$PKGSTATS -v
+	$PKGSTATS version
 	echo "${lines[0]}" | grep -q 'version'
 }
 
 @test "show information to be sent" {
-	$PKGSTATS -s
-	echo "${lines[0]}" | grep -q 'Collecting data'
-	echo "${output}" | grep -q 'packages='
-	echo "${output}" | grep -q 'pacman'
-	echo "${output}" | grep -q 'mirror=https://'
-	echo "${output}" | grep -q 'quiet=false'
+	$PKGSTATS submit --dump-json
+	[ $(echo "${output}" | jq -r '.version') -eq 3 ]
+	[ $(echo "${output}" | jq -r '.system.architecture') = 'x86_64' ]
+	[ $(echo "${output}" | jq -r '.os.architecture') = 'x86_64' ]
+	echo "${output}" | jq -r '.pacman.mirror' | grep -q '^https://'
+	echo "${output}" | jq -r '.pacman.packages' | grep -q '"pacman"'
 }
 
 @test "set quiet mode" {
-	$PKGSTATS -s -q
-	echo "${output}" | grep -q 'packages='
-	echo "${output}" | grep -q 'pacman'
-	echo "${output}" | grep -q 'quiet=true'
+	$PKGSTATS submit --quiet
+	[ "$status" -eq 0 ]
+	[ "$output" = "" ]
 }
 
 @test "send informaition" {
-	$PKGSTATS
+	$PKGSTATS submit
 	echo "${lines[0]}" | grep -q 'Collecting data'
 	echo "${lines[1]}" | grep -q 'Submitting data'
-	echo "${output}" | grep -q 'TEST OK'
+	echo "${lines[2]}" | grep -q 'Data were successfully sent'
+}
+
+@test "search packages" {
+	$PKGSTATS search php
+	echo "${lines[0]}" | grep -q 'php'
+	echo "${lines[1]}" | grep -q 'php-fpm'
+}
+
+@test "show packages" {
+	$PKGSTATS show php pacman
+	echo "${lines[0]}" | grep -q 'php'
+	echo "${lines[1]}" | grep -q 'pacman'
 }

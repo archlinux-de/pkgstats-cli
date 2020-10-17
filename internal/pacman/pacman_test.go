@@ -3,6 +3,7 @@ package pacman
 import (
 	"fmt"
 	"os"
+	"strings"
 	"testing"
 	"time"
 )
@@ -46,7 +47,7 @@ func TestGetInstalledPackages(t *testing.T) {
 	if err != nil {
 		t.Error(err, out)
 	}
-	if out != "pacman\nlinux" {
+	if strings.Join(out, ",") != "pacman,linux" {
 		t.Error(out)
 	}
 }

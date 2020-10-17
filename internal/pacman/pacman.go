@@ -28,7 +28,7 @@ func NewPacman() Pacman {
 	return pacman
 }
 
-func (pacman *Pacman) GetInstalledPackages() (string, error) {
+func (pacman *Pacman) GetInstalledPackages() ([]string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), pacman.timeout)
 	defer cancel()
 
@@ -36,7 +36,7 @@ func (pacman *Pacman) GetInstalledPackages() (string, error) {
 	cmd.Env = pacman.env
 	out, err := cmd.Output()
 
-	return strings.TrimSpace(string(out)), err
+	return strings.Split(strings.TrimSpace(string(out)), "\n"), err
 }
 
 func (pacman *Pacman) GetServer() (string, error) {

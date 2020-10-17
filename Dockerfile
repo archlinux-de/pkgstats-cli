@@ -1,5 +1,5 @@
 FROM archlinux
-RUN pacman -Syu --noconfirm go make gcc git bash-bats php
+RUN pacman -Syu --noconfirm go make gcc git bash-bats php jq
 COPY . /app/
 WORKDIR /app
 RUN . /etc/makepkg.conf && export CPPFLAGS CFLAGS CXXFLAGS LDFLAGS && make build
