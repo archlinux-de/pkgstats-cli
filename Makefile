@@ -7,17 +7,16 @@ VERSION != git describe --tags
 export CGO_CPPFLAGS=${CPPFLAGS}
 export CGO_CFLAGS=${CFLAGS}
 export CGO_CXXFLAGS=${CXXFLAGS}
-export CGO_LDFLAGS=${LDFLAGS}
 
 build:
-	go build -a -o pkgstats -trimpath -buildmode=pie -mod=readonly -modcacherw -ldflags '-s -w -X pkgstats-cli/internal/build.Version=${VERSION} -linkmode external -extldflags "${LDFLAGS}"'
+	go build -a -o pkgstats -trimpath -buildmode=pie -mod=readonly -modcacherw -ldflags '-s -w -X pkgstats-cli/internal/build.Version=${VERSION}'
 
 test:
 	go vet
 	go test -v ./...
 
 test-integration:
-	docker build . -t pkgstats
+	docker build --pull . -t pkgstats
 
 install:
 	# cli
