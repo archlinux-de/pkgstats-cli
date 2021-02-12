@@ -1,5 +1,6 @@
 FROM archlinux
-RUN mkdir -p /var/lib/pacman
+RUN ls-ahl /var/lib/pacman
+RUN id
 RUN pacman -Syu --noconfirm go make gcc git bash-bats php jq
 COPY . /app/
 WORKDIR /app
