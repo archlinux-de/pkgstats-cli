@@ -21,7 +21,7 @@ function setup() {
 	[ $(echo "${output}" | jq -r '.system.architecture') = 'x86_64' ]
 	[ $(echo "${output}" | jq -r '.os.architecture') = 'x86_64' ]
 	echo "${output}" | jq -r '.pacman.mirror' | grep -q '^https://'
-	echo "${output}" | jq -r '.pacman.packages' | grep -q '"pacman"'
+	echo "${output}" | jq -r '.pacman.packages' | grep -q '"pacman-mirrorlist"'
 }
 
 @test "set quiet mode" {

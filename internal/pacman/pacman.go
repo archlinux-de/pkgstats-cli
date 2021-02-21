@@ -22,8 +22,8 @@ type Pacman struct {
 func NewPacman() Pacman {
 	pacman := Pacman{}
 	pacman.timeout = 10 * time.Second
-	pacman.pacman = "/usr/bin/pacman"
-	pacman.pacmanConf = "/usr/bin/pacman-conf"
+	pacman.pacman = "pacman"
+	pacman.pacmanConf = "pacman-conf"
 	pacman.repository = "core"
 	return pacman
 }

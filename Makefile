@@ -23,9 +23,11 @@ install:
 	install -D pkgstats -m755 "$(DESTDIR)/usr/bin/pkgstats"
 
 	# systemd timer
-	install -Dt "$(DESTDIR)/usr/lib/systemd/system" -m644 init/pkgstats.{timer,service}
+	for service in pkgstats.service pkgstats.timer; do \
+		install -Dt "$(DESTDIR)/usr/lib/systemd/system" -m644 init/$${service} ; \
+	done
 	install -d "$(DESTDIR)/usr/lib/systemd/system/timers.target.wants"
-	ln -st "$(DESTDIR)/usr/lib/systemd/system/timers.target.wants" ../pkgstats.timer
+	cd "$(DESTDIR)/usr/lib/systemd/system/timers.target.wants" && ln -s ../pkgstats.timer
 
 	# bash completions
 	install -d "$(DESTDIR)/usr/share/bash-completion/completions"

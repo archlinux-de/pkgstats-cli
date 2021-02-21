@@ -15,7 +15,7 @@ type System struct {
 
 func NewSystem() System {
 	system := System{}
-	system.uname = "/usr/bin/uname"
+	system.uname = "uname"
 	system.cpuInfo = "/proc/cpuinfo"
 	return system
 }

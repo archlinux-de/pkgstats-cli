@@ -30,8 +30,8 @@ switch ($requestPath) {
 			&& $request['os']['architecture'] === php_uname('m')
 			&& $request['system']['architecture'] === 'x86_64'
 			&& preg_match('#^https?://.+$#', $request['pacman']['mirror'])
-			&& count($request['pacman']['packages']) > 100
-			&& in_array('pacman', $request['pacman']['packages'])
+			&& count($request['pacman']['packages']) > 1
+			&& in_array('pacman-mirrorlist', $request['pacman']['packages'])
 		) {
 			error_log('Request was vaild');
 			header('HTTP/1.0 204');
