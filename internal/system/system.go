@@ -27,34 +27,28 @@ func (system *System) GetArchitecture() (string, error) {
 }
 
 func (system *System) GetCpuArchitecture() (string, error) {
-	architecture, err := system.GetArchitecture()
-
+	var architecture string
 	cpuFlags, err := system.getCPUFlags()
-	// detect a 64 bit CPU when ruinning a 32 bit OS
-	if architecture == "i686" && system.inArray("lm", cpuFlags) {
+
+	// detect different levels of x86_64
+	// https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/tree/arch/x86/include/asm/cpufeatures.h
+	// https://gitlab.com/x86-psABIs/x86-64-ABI/-/blob/master/x86-64-ABI/low-level-sys-info.tex
+	// https://unix.stackexchange.com/questions/43539/what-do-the-flags-in-proc-cpuinfo-mean/43540#43540
+	isX86_64 := system.arrayInArray([]string{"lm", "cmov", "cx8", "fpu", "fxsr", "mmx", "syscall", "sse", "sse2"}, cpuFlags)
+	isX86_64V2 := isX86_64 && system.arrayInArray([]string{"cx16", "lahf_lm", "popcnt", "pni", "sse4_1", "sse4_2", "ssse3"}, cpuFlags)
+	isX86_64V3 := isX86_64V2 && system.arrayInArray([]string{"avx", "avx2", "bmi1", "bmi2", "f16c", "fma", "abm", "movbe", "xsave"}, cpuFlags)
+	isX86_64V4 := isX86_64V3 && system.arrayInArray([]string{"avx512f", "avx512bw", "avx512cd", "avx512dq", "avx512vl"}, cpuFlags)
+
+	if isX86_64V4 {
+		architecture = "x86_64_v4"
+	} else if isX86_64V3 {
+		architecture = "x86_64_v3"
+	} else if isX86_64V2 {
+		architecture = "x86_64_v2"
+	} else if isX86_64 {
 		architecture = "x86_64"
-	}
-
-	if architecture == "x86_64" {
-		// detect different levels of x86_64
-		// https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/tree/arch/x86/include/asm/cpufeatures.h
-		// https://gitlab.com/x86-psABIs/x86-64-ABI/-/blob/master/x86-64-ABI/low-level-sys-info.tex
-		// https://unix.stackexchange.com/questions/43539/what-do-the-flags-in-proc-cpuinfo-mean/43540#43540
-		isx86_64 := system.inArray("lm", cpuFlags)
-		isx86_64_V1 := isx86_64 && system.arrayInArray([]string{"cmov", "cx8", "fpu", "fxsr", "mmx", "syscall", "sse", "sse2"}, cpuFlags)
-		isx86_64_V2 := isx86_64_V1 && system.arrayInArray([]string{"cx16", "lahf_lm", "popcnt", "pni", "sse4_1", "sse4_2", "ssse3"}, cpuFlags)
-		isx86_64_V3 := isx86_64_V2 && system.arrayInArray([]string{"avx", "avx2", "bmi1", "bmi2", "f16c", "fma", "abm", "movbe", "xsave"}, cpuFlags)
-		isx86_64_V4 := isx86_64_V3 && system.arrayInArray([]string{"avx512f", "avx512bw", "avx512cd", "avx512dq", "avx512vl"}, cpuFlags)
-
-		if isx86_64_V4 {
-			architecture = "x86_64_v4"
-		} else if isx86_64_V3 {
-			architecture = "x86_64_v3"
-		} else if isx86_64_V2 {
-			architecture = "x86_64_v2"
-		} else if isx86_64_V1 {
-			architecture = "x86_64"
-		}
+	} else {
+		architecture, err = system.GetArchitecture()
 	}
 
 	return architecture, err
