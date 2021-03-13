@@ -15,6 +15,12 @@ test:
 	go vet
 	go test -v ./...
 
+test-build:
+	@for arch in amd64 386 arm64 arm; do \
+		echo "Building for $${arch}"; \
+		CGO_ENABLED=0 GOARCH=$${arch} go build -a -o pkgstats-build-$${arch}; \
+	done
+
 test-integration:
 	docker build --pull . -t pkgstats
 
