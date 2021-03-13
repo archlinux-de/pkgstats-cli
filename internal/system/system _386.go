@@ -1,16 +1,18 @@
 package system
 
 import (
-	"golang.org/x/sys/cpu"
+	. "golang.org/x/sys/cpu"
 )
 
 func (system *System) GetCpuArchitecture() (architecture string, err error) {
 	architecture = "i686"
 
-	isX86_64 := cpu.X86.HasSSE2
-	isX86_64V2 := isX86_64 && cpu.X86.HasPOPCNT && cpu.X86.HasSSE3 && cpu.X86.HasSSE41 && cpu.X86.HasSSE42 && cpu.X86.HasSSSE3
-	isX86_64V3 := isX86_64V2 && cpu.X86.HasAVX && cpu.X86.HasAVX2 && cpu.X86.HasBMI1 && cpu.X86.HasBMI2 && cpu.X86.HasFMA && cpu.X86.HasOSXSAVE
-	isX86_64V4 := isX86_64V3 && cpu.X86.HasAVX512F && cpu.X86.HasAVX512BW && cpu.X86.HasAVX512CD && cpu.X86.HasAVX512DQ && cpu.X86.HasAVX512VL
+	// https://gitlab.com/x86-psABIs/x86-64-ABI/-/blob/master/x86-64-ABI/low-level-sys-info.tex
+	// We cannot use intel/cpuid on i686, so we fallback on a subset of flags that are provided by sys/cpu
+	isX86_64 := X86.HasSSE2
+	isX86_64V2 := isX86_64 && X86.HasPOPCNT && X86.HasSSE3 && X86.HasSSE41 && X86.HasSSE42 && X86.HasSSSE3
+	isX86_64V3 := isX86_64V2 && X86.HasAVX && X86.HasAVX2 && X86.HasBMI1 && X86.HasBMI2 && X86.HasFMA && X86.HasOSXSAVE
+	isX86_64V4 := isX86_64V3 && X86.HasAVX512F && X86.HasAVX512BW && X86.HasAVX512CD && X86.HasAVX512DQ && X86.HasAVX512VL
 
 	if isX86_64V4 {
 		architecture = "x86_64_v4"
