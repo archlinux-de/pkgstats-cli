@@ -1,9 +1,6 @@
 package system
 
 import (
-	"bufio"
-	"errors"
-	"os"
 	"os/exec"
 	"strings"
 )
@@ -11,13 +8,11 @@ import (
 type System struct {
 	env     []string
 	uname   string
-	cpuInfo string
 }
 
 func NewSystem() System {
 	system := System{}
 	system.uname = "uname"
-	system.cpuInfo = "/proc/cpuinfo"
 	return system
 }
 
@@ -26,80 +21,9 @@ func (system *System) GetArchitecture() (string, error) {
 	return arch, err
 }
 
-func (system *System) GetCpuArchitecture() (string, error) {
-	var architecture string
-	cpuFlags, err := system.getCPUFlags()
-
-	// detect different levels of x86_64
-	// https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/tree/arch/x86/include/asm/cpufeatures.h
-	// https://gitlab.com/x86-psABIs/x86-64-ABI/-/blob/master/x86-64-ABI/low-level-sys-info.tex
-	// https://unix.stackexchange.com/questions/43539/what-do-the-flags-in-proc-cpuinfo-mean/43540#43540
-	isX86_64 := system.arrayInArray([]string{"lm", "cmov", "cx8", "fpu", "fxsr", "mmx", "syscall", "sse", "sse2"}, cpuFlags)
-	isX86_64V2 := isX86_64 && system.arrayInArray([]string{"cx16", "lahf_lm", "popcnt", "pni", "sse4_1", "sse4_2", "ssse3"}, cpuFlags)
-	isX86_64V3 := isX86_64V2 && system.arrayInArray([]string{"avx", "avx2", "bmi1", "bmi2", "f16c", "fma", "abm", "movbe", "xsave"}, cpuFlags)
-	isX86_64V4 := isX86_64V3 && system.arrayInArray([]string{"avx512f", "avx512bw", "avx512cd", "avx512dq", "avx512vl"}, cpuFlags)
-
-	if isX86_64V4 {
-		architecture = "x86_64_v4"
-	} else if isX86_64V3 {
-		architecture = "x86_64_v3"
-	} else if isX86_64V2 {
-		architecture = "x86_64_v2"
-	} else if isX86_64 {
-		architecture = "x86_64"
-	} else {
-		architecture, err = system.GetArchitecture()
-	}
-
-	return architecture, err
-}
-
 func (system *System) getMachine() (string, error) {
 	cmd := exec.Command(system.uname, "-m")
 	cmd.Env = system.env
 	out, err := cmd.Output()
 	return strings.TrimSpace(string(out)), err
-}
-
-func (system *System) getCPUFlags() (info []string, err error) {
-	cpuInfo, err := os.Open(system.cpuInfo)
-	if err != nil {
-		return []string{}, err
-	}
-	defer cpuInfo.Close()
-
-	scanner := bufio.NewScanner(cpuInfo)
-	for scanner.Scan() {
-		newline := scanner.Text()
-		list := strings.Split(newline, ":")
-
-		if len(list) > 1 && strings.EqualFold(strings.TrimSpace(list[0]), "flags") {
-			return strings.Fields(list[1]), nil
-		}
-	}
-
-	err = scanner.Err()
-	if err != nil {
-		return []string{}, err
-	}
-
-	return []string{}, errors.New("No CPU flags found")
-}
-
-func (system *System) inArray(needle string, haystack []string) bool {
-	for _, item := range haystack {
-		if item == needle {
-			return true
-		}
-	}
-	return false
-}
-
-func (system *System) arrayInArray(needles []string, haystack []string) bool {
-	for _, needle := range needles {
-		if !system.inArray(needle, haystack) {
-			return false
-		}
-	}
-	return true
 }
