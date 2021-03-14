@@ -5,7 +5,8 @@ import (
 )
 
 func (system *System) GetCpuArchitecture() (architecture string, err error) {
-	isX86_64 := cpu.X86.HasSSE2
+	// We need to check for LM (Long Mode) as there are CPUs that support SSE2 but not x86_64 (e.g. Core Duo)
+	isX86_64 := system.hasLM() && cpu.X86.HasSSE2
 	isX86_64V2 := isX86_64 && cpu.X86.HasPOPCNT && cpu.X86.HasSSE3 && cpu.X86.HasSSE41 && cpu.X86.HasSSE42 && cpu.X86.HasSSSE3
 	isX86_64V3 := isX86_64V2 && cpu.X86.HasAVX && cpu.X86.HasAVX2 && cpu.X86.HasBMI1 && cpu.X86.HasBMI2 && cpu.X86.HasFMA && cpu.X86.HasOSXSAVE
 	isX86_64V4 := isX86_64V3 && cpu.X86.HasAVX512F && cpu.X86.HasAVX512BW && cpu.X86.HasAVX512CD && cpu.X86.HasAVX512DQ && cpu.X86.HasAVX512VL
@@ -23,4 +24,12 @@ func (system *System) GetCpuArchitecture() (architecture string, err error) {
 	}
 
 	return
+}
+
+// Implemented at system_386.s
+func cpuid() uint32
+
+func (system *System) hasLM() bool {
+	// If Long Mode is available the 29th bit is set
+	return cpuid()&(1<<29) != 0
 }
