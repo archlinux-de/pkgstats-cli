@@ -1,4 +1,5 @@
 /.idea
 /pkgstats
 /pkgstats-cli
+/pkgstats-build-*
 /*.out

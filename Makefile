@@ -1,4 +1,4 @@
-.PHONY: all build test test-integration install clean
+.PHONY: all build test test-build test-cpu-detection test-integration install clean
 
 all: build
 
@@ -14,6 +14,24 @@ build:
 test:
 	go vet
 	go test -v ./...
+
+test-build:
+	@for arch in amd64 386 arm64 arm; do \
+		echo "Building for $${arch}"; \
+		CGO_ENABLED=0 GOARCH=$${arch} go build -o pkgstats-build-$${arch}; \
+	done
+
+test-cpu-detection: test-build
+	@# ARM 32-Bit
+	qemu-arm -cpu arm946 ./pkgstats-build-arm submit --dump-json | jq -r '.system.architecture' | grep -q '^armv5$$'
+	qemu-arm -cpu arm1176 ./pkgstats-build-arm submit --dump-json | jq -r '.system.architecture' | grep -q '^armv6$$'
+	qemu-arm -cpu cortex-a15 ./pkgstats-build-arm submit --dump-json | jq -r '.system.architecture' | grep -q '^armv7$$'
+	qemu-arm -cpu max ./pkgstats-build-arm submit --dump-json | jq -r '.system.architecture' | grep -q '^aarch64$$'
+	@# ARM 64-Bit
+	qemu-aarch64 ./pkgstats-build-arm64 submit --dump-json | jq -r '.system.architecture' | grep -q '^aarch64$$'
+	@# x86_64
+	qemu-x86_64 -cpu Conroe pkgstats-build-amd64 submit --dump-json | jq -r '.system.architecture' | grep -q '^x86_64$$'
+	qemu-x86_64 -cpu Nehalem pkgstats-build-amd64 submit --dump-json | jq -r '.system.architecture' | grep -q '^x86_64_v2$$'
 
 test-integration:
 	docker build --pull . -t pkgstats
