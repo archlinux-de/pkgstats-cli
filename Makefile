@@ -1,4 +1,4 @@
-.PHONY: all build test test-build test-cup-detection test-integration install clean
+.PHONY: all build test test-build test-cpu-detection test-integration install clean
 
 all: build
 
@@ -21,7 +21,7 @@ test-build:
 		CGO_ENABLED=0 GOARCH=$${arch} go build -o pkgstats-build-$${arch}; \
 	done
 
-test-cup-detection: test-build
+test-cpu-detection: test-build
 	@# ARM 32-Bit
 	qemu-arm -cpu arm946 ./pkgstats-build-arm submit --dump-json | jq -r '.system.architecture' | grep -q '^armv5$$'
 	qemu-arm -cpu arm1176 ./pkgstats-build-arm submit --dump-json | jq -r '.system.architecture' | grep -q '^armv6$$'
