@@ -44,8 +44,6 @@ install:
 	for service in pkgstats.service pkgstats.timer; do \
 		install -Dt "$(DESTDIR)/usr/lib/systemd/system" -m644 init/$${service} ; \
 	done
-	install -d "$(DESTDIR)/usr/lib/systemd/system/timers.target.wants"
-	cd "$(DESTDIR)/usr/lib/systemd/system/timers.target.wants" && ln -s ../pkgstats.timer
 
 	# bash completions
 	install -d "$(DESTDIR)/usr/share/bash-completion/completions"
