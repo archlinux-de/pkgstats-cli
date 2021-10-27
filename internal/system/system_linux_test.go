@@ -21,6 +21,8 @@ func TestGetMachine(t *testing.T) {
 		expectedArch = "^armv(5|6|7)"
 	case "arm64":
 		expectedArch = "^aarch64$"
+	case "riscv64":
+		expectedArch = "^riscv64$"
 	}
 
 	if err != nil {

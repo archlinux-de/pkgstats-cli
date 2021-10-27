@@ -16,7 +16,7 @@ test:
 	go test -v ./...
 
 test-build:
-	@for arch in amd64 386 arm64 arm; do \
+	@for arch in amd64 386 arm64 arm riscv64; do \
 		echo "Building for $${arch}"; \
 		CGO_ENABLED=0 GOARCH=$${arch} go build -o pkgstats-build-$${arch}; \
 	done
@@ -29,6 +29,8 @@ test-cpu-detection: test-build
 	qemu-arm -cpu max ./pkgstats-build-arm submit --dump-json | jq -r '.system.architecture' | grep -q '^aarch64$$'
 	@# ARM 64-Bit
 	qemu-aarch64 ./pkgstats-build-arm64 submit --dump-json | jq -r '.system.architecture' | grep -q '^aarch64$$'
+	@# RISC-V 64-Bit rv64gc
+	qemu-riscv64 -cpu sifive-u54 pkgstats-build-riscv64 submit --dump-json | jq -r '.system.architecture' | grep -q '^riscv64$$'
 	@# x86_64
 	qemu-x86_64 -cpu Conroe pkgstats-build-amd64 submit --dump-json | jq -r '.system.architecture' | grep -q '^x86_64$$'
 	qemu-x86_64 -cpu Nehalem pkgstats-build-amd64 submit --dump-json | jq -r '.system.architecture' | grep -q '^x86_64_v2$$'
