@@ -1,7 +1,6 @@
 package system
 
 import (
-	"regexp"
 	"testing"
 )
 
