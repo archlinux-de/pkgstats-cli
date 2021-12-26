@@ -8,6 +8,7 @@ export CGO_CPPFLAGS=${CPPFLAGS}
 export CGO_CFLAGS=${CFLAGS}
 export CGO_CXXFLAGS=${CXXFLAGS}
 export CGO_LDFLAGS=${LDFLAGS}
+export PATH:=${PATH}:mocks
 
 build:
 	go build -a -o pkgstats -trimpath -buildmode=pie -mod=readonly -modcacherw -ldflags '-s -w -X pkgstats-cli/internal/build.Version=${VERSION}'
@@ -47,6 +48,7 @@ test-integration:
 	docker build --pull . -t pkgstats
 
 install:
+	@echo installing to $${DESTDIR}
 	# cli
 	install -D pkgstats -m755 "$(DESTDIR)/usr/bin/pkgstats"
 
