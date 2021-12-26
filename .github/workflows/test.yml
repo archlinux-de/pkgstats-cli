@@ -9,17 +9,18 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
+      - name: Checkout code
+        uses: actions/checkout@v2
         with:
           fetch-depth: 0
       - run: make build
       - run: make test
-      - run: make test-build
 
   test-integration:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
+      - name: Checkout code
+        uses: actions/checkout@v2
         with:
           fetch-depth: 0
       - run: make test-integration
@@ -27,9 +28,17 @@ jobs:
   test-cross-platform:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
-        with:
-          fetch-depth: 0
-      - run: sudo apt-get install -y qemu-user
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Install Qemu
+        run: sudo apt-get install qemu-user
       - run: make test-cross-platform
+
+  test-cpu-detection:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Install Qemu
+        run: sudo apt-get install qemu-user
       - run: make test-cpu-detection
