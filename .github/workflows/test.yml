@@ -30,6 +30,6 @@ jobs:
       - uses: actions/checkout@master
         with:
           fetch-depth: 0
-      - uses: docker/setup-qemu-action@v1
+      - run: sudo apt-get install -y qemu-user
       - run: make test-cross-platform
       - run: make test-cpu-detection
