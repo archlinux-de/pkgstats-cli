@@ -1,4 +1,4 @@
-.PHONY: all build test test-build test-cpu-detection test-integration install clean
+.PHONY: all build test test-cross-platform test-build test-cpu-detection test-integration install clean
 
 all: build
 
@@ -15,6 +15,11 @@ build:
 test:
 	go vet
 	go test -v ./...
+
+test-cross-platform:
+	CGO_ENABLED=0 GOARCH=arm go test -v -exec qemu-arm ./...
+	CGO_ENABLED=0 GOARCH=arm64 go test -v -exec qemu-aarch64 ./...
+	CGO_ENABLED=0 GOARCH=386 go test -v -exec linux32 ./...
 
 test-build:
 	@for arch in amd64 386 arm64 arm riscv64; do \
@@ -33,8 +38,10 @@ test-cpu-detection: test-build
 	@# RISC-V 64-Bit rv64gc
 	qemu-riscv64 -cpu sifive-u54 pkgstats-build-riscv64 submit --dump-json | jq -r '.system.architecture' | grep -q '^riscv64$$'
 	@# x86_64
-	qemu-x86_64 -cpu Conroe pkgstats-build-amd64 submit --dump-json | jq -r '.system.architecture' | grep -q '^x86_64$$'
-	qemu-x86_64 -cpu Nehalem pkgstats-build-amd64 submit --dump-json | jq -r '.system.architecture' | grep -q '^x86_64_v2$$'
+	qemu-x86_64 -cpu Conroe ./pkgstats-build-amd64 submit --dump-json | jq -r '.system.architecture' | grep -q '^x86_64$$'
+	qemu-x86_64 -cpu Nehalem ./pkgstats-build-amd64 submit --dump-json | jq -r '.system.architecture' | grep -q '^x86_64_v2$$'
+	@# 32-Bit on x86_64
+	linux32 ./pkgstats-build-386 submit --dump-json | jq -r '.system.architecture' | grep -q '^x86_64'
 
 test-integration:
 	docker build --pull . -t pkgstats

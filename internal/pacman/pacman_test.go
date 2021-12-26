@@ -1,3 +1,5 @@
+//go:build (amd64 && 386)
+
 package pacman
 
 import (
