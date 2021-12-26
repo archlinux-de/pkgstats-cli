@@ -4,8 +4,8 @@ go 1.17
 
 require (
 	github.com/intel-go/cpuid v0.0.0-20210602155658-5747e5cec0d9
-	github.com/spf13/cobra v1.2.1
-	golang.org/x/sys v0.0.0-20210820121016-41cdb8703e55
+	github.com/spf13/cobra v1.3.0
+	golang.org/x/sys v0.0.0-20211205182925-97ca703d548d
 )
 
 require (
