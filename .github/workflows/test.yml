@@ -13,8 +13,10 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - run: make build
-      - run: make test
+      - name: Install Just
+        uses: extractions/setup-just@v1
+      - run: just build
+      - run: just test
 
   test-integration:
     runs-on: ubuntu-latest
@@ -23,22 +25,28 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - run: make test-integration
+      - name: Install Just
+        uses: extractions/setup-just@v1
+      - run: just test-integration
 
   test-cross-platform:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+      - name: Install Just
+        uses: extractions/setup-just@v1
       - name: Install Qemu
         run: sudo apt-get install qemu-user
-      - run: make test-cross-platform
+      - run: just test-cross-platform
 
   test-cpu-detection:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+      - name: Install Just
+        uses: extractions/setup-just@v1
       - name: Install Qemu
         run: sudo apt-get install qemu-user
-      - run: make test-cpu-detection
+      - run: just test-cpu-detection
