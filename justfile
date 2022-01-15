@@ -9,7 +9,7 @@ default:
 build:
 	go build -a -o pkgstats \
 		-trimpath -buildmode=pie -mod=readonly -modcacherw \
-		-ldflags '-s -w -X pkgstats-cli/internal/build.Version={{`git describe --tags`}}'
+		-ldflags '-linkmode=external -s -w -X pkgstats-cli/internal/build.Version={{`git describe --tags`}}'
 
 test:
 	go vet
