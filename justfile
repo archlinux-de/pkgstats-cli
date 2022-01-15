@@ -2,7 +2,6 @@ export CGO_CPPFLAGS := env_var_or_default('CPPFLAGS', '')
 export CGO_CFLAGS := env_var_or_default('CFLAGS', '')
 export CGO_CXXFLAGS := env_var_or_default('CXXFLAGS', '')
 export CGO_LDFLAGS := env_var_or_default('LDFLAGS', '')
-export PATH := env_var('PATH') + ':tests/mocks'
 
 default:
 	@just --list
