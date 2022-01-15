@@ -1,4 +1,0 @@
-#!/bin/sh
-
-echo "https://mirror.rackspace.com/archlinux/core/os/x86_64"
-echo "https://mirror.pkgbuild.com/core/os/x86_64"
