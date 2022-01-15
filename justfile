@@ -32,22 +32,35 @@ test-build:
 		CGO_ENABLED=0 GOARCH=${arch} go build -o tests/build/pkgstats-${arch}; \
 	done
 
-# test system architecture detection on different CPUs
+# test cpu architecture detection on different CPUs
 test-cpu-detection:
 	@# ARM 32-Bit
-	CGO_ENABLED=0 GOARCH=arm go run -exec 'qemu-arm -cpu arm946' tests/cpu.go | grep -q '^armv5$'
-	CGO_ENABLED=0 GOARCH=arm go run -exec 'qemu-arm -cpu arm1176' tests/cpu.go | grep -q '^armv6$'
-	CGO_ENABLED=0 GOARCH=arm go run -exec 'qemu-arm -cpu cortex-a15' tests/cpu.go | grep -q '^armv7$'
-	CGO_ENABLED=0 GOARCH=arm go run -exec 'qemu-arm -cpu max' tests/cpu.go | grep -q '^aarch64$'
+	CGO_ENABLED=0 GOARCH=arm go run -exec 'qemu-arm -cpu arm946' main.go architecture system | grep -q '^armv5$'
+	CGO_ENABLED=0 GOARCH=arm go run -exec 'qemu-arm -cpu arm1176' main.go architecture system | grep -q '^armv6$'
+	CGO_ENABLED=0 GOARCH=arm go run -exec 'qemu-arm -cpu cortex-a15' main.go architecture system | grep -q '^armv7$'
+	CGO_ENABLED=0 GOARCH=arm go run -exec 'qemu-arm -cpu max' main.go architecture system | grep -q '^aarch64$'
 	@# ARM 64-Bit
-	CGO_ENABLED=0 GOARCH=arm64 go run -exec 'qemu-aarch64' tests/cpu.go | grep -q '^aarch64$'
+	CGO_ENABLED=0 GOARCH=arm64 go run -exec 'qemu-aarch64' main.go architecture system | grep -q '^aarch64$'
 	@# RISC-V 64-Bit rv64gc
-	CGO_ENABLED=0 GOARCH=riscv64 go run -exec 'qemu-riscv64 -cpu sifive-u54' tests/cpu.go | grep -q '^riscv64$'
+	CGO_ENABLED=0 GOARCH=riscv64 go run -exec 'qemu-riscv64 -cpu sifive-u54' main.go architecture system | grep -q '^riscv64$'
 	@# x86_64
-	CGO_ENABLED=0 GOARCH=amd64 go run -exec 'qemu-x86_64 -cpu Conroe' tests/cpu.go | grep -q '^x86_64$'
-	CGO_ENABLED=0 GOARCH=amd64 go run -exec 'qemu-x86_64 -cpu Nehalem' tests/cpu.go | grep -q '^x86_64_v2$'
+	CGO_ENABLED=0 GOARCH=amd64 go run -exec 'qemu-x86_64 -cpu Conroe' main.go architecture system | grep -q '^x86_64$'
+	CGO_ENABLED=0 GOARCH=amd64 go run -exec 'qemu-x86_64 -cpu Nehalem' main.go architecture system | grep -q '^x86_64_v2$'
 	@# 32-Bit on x86_64
-	CGO_ENABLED=0 GOARCH=386 go run -exec 'linux32' tests/cpu.go | grep -q '^x86_64'
+	CGO_ENABLED=0 GOARCH=386 go run -exec 'linux32' main.go architecture system | grep -q '^x86_64'
+
+# test os architecture detection on different CPUs
+test-os-detection:
+	@# ARM 32-Bit
+	CGO_ENABLED=0 GOARCH=arm go run -exec 'qemu-arm' main.go architecture os | grep -q '^armv7l$'
+	@# ARM 64-Bit
+	CGO_ENABLED=0 GOARCH=arm64 go run -exec 'qemu-aarch64' main.go architecture os | grep -q '^aarch64$'
+	@# RISC-V 64-Bit rv64gc
+	CGO_ENABLED=0 GOARCH=riscv64 go run -exec 'qemu-riscv64' main.go architecture os | grep -q '^riscv64$'
+	@# x86_64
+	CGO_ENABLED=0 GOARCH=amd64 go run -exec 'qemu-x86_64' main.go architecture os | grep -q '^x86_64$'
+	@# 32-Bit on x86_64
+	CGO_ENABLED=0 GOARCH=386 go run -exec 'linux32' main.go architecture os | grep -q '^i686$'
 
 # run integration tests with a mocked API server
 test-integration:
@@ -78,7 +91,7 @@ install *DESTDIR='':
 	./pkgstats completion fish > "{{DESTDIR}}/usr/share/fish/vendor_completions.d/pkgstats.fish"
 
 # run all available tests
-test-all: test test-build test-cpu-detection test-integration
+test-all: test test-build test-cpu-detection test-os-detection test-integration
 
 # remove any untracked and generated files
 clean:
