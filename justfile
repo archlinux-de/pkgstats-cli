@@ -69,6 +69,8 @@ install *DESTDIR='':
 	install -d "{{DESTDIR}}/usr/share/fish/vendor_completions.d"
 	./pkgstats completion fish > "{{DESTDIR}}/usr/share/fish/vendor_completions.d/pkgstats.fish"
 
+test-all: test test-build test-cpu-detection test-integration
+
 clean:
 	git clean -fdqx -e .idea
 
