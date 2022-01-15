@@ -1,5 +1,6 @@
 /.idea
 /pkgstats
 /pkgstats-cli
-/pkgstats-build-*
+/tests/build/*
+!/tests/build/.gitkeep
 /*.out

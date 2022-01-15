@@ -8,7 +8,7 @@ COPY . /app/
 WORKDIR /app
 RUN make build
 RUN make test
-RUN php -S localhost:8888 tests/server.php & sleep 2 && bats tests/integration.bats
+RUN php -S localhost:8888 tests/integration/server.php & sleep 2 && bats tests/integration/integration.bats
 RUN make DESTDIR=/ install
 
 ENTRYPOINT ["/usr/bin/pkgstats"]

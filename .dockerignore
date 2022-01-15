@@ -3,3 +3,5 @@
 /pkgstats
 /pkgstats-cli
 /*.out
+/tests/integration/Dockerfile
+/tests/build

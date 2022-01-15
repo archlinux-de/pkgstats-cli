@@ -2,7 +2,7 @@
 
 function setup() {
 	pushd $BATS_TEST_DIRNAME
-	PKGSTATS="run ../pkgstats --base-url http://localhost:8888"
+	PKGSTATS="run ../../pkgstats --base-url http://localhost:8888"
 }
 
 @test "show help" {
