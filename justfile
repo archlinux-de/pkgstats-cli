@@ -29,25 +29,25 @@ test-cross-platform:
 test-build:
 	@for arch in amd64 386 arm64 arm riscv64; do \
 		echo "Building for ${arch}"; \
-		CGO_ENABLED=0 GOARCH=${arch} go build -o tests/build/pkgstats-build-${arch}; \
+		CGO_ENABLED=0 GOARCH=${arch} go build -o tests/build/pkgstats-${arch}; \
 	done
 
 # test system architecture detection on different CPUs
-test-cpu-detection: test-build
+test-cpu-detection:
 	@# ARM 32-Bit
-	qemu-arm -cpu arm946 ./tests/build/pkgstats-build-arm submit --dump-json | jq -r '.system.architecture' | grep -q '^armv5$'
-	qemu-arm -cpu arm1176 ./tests/build/pkgstats-build-arm submit --dump-json | jq -r '.system.architecture' | grep -q '^armv6$'
-	qemu-arm -cpu cortex-a15 ./tests/build/pkgstats-build-arm submit --dump-json | jq -r '.system.architecture' | grep -q '^armv7$'
-	qemu-arm -cpu max ./tests/build/pkgstats-build-arm submit --dump-json | jq -r '.system.architecture' | grep -q '^aarch64$'
+	CGO_ENABLED=0 GOARCH=arm go run -exec 'qemu-arm -cpu arm946' tests/cpu.go | grep -q '^armv5$'
+	CGO_ENABLED=0 GOARCH=arm go run -exec 'qemu-arm -cpu arm1176' tests/cpu.go | grep -q '^armv6$'
+	CGO_ENABLED=0 GOARCH=arm go run -exec 'qemu-arm -cpu cortex-a15' tests/cpu.go | grep -q '^armv7$'
+	CGO_ENABLED=0 GOARCH=arm go run -exec 'qemu-arm -cpu max' tests/cpu.go | grep -q '^aarch64$'
 	@# ARM 64-Bit
-	qemu-aarch64 ./tests/build/pkgstats-build-arm64 submit --dump-json | jq -r '.system.architecture' | grep -q '^aarch64$'
+	CGO_ENABLED=0 GOARCH=arm64 go run -exec 'qemu-aarch64' tests/cpu.go | grep -q '^aarch64$'
 	@# RISC-V 64-Bit rv64gc
-	qemu-riscv64 -cpu sifive-u54 ./tests/build/pkgstats-build-riscv64 submit --dump-json | jq -r '.system.architecture' | grep -q '^riscv64$'
+	CGO_ENABLED=0 GOARCH=riscv64 go run -exec 'qemu-riscv64 -cpu sifive-u54' tests/cpu.go | grep -q '^riscv64$'
 	@# x86_64
-	qemu-x86_64 -cpu Conroe ./tests/build/pkgstats-build-amd64 submit --dump-json | jq -r '.system.architecture' | grep -q '^x86_64$'
-	qemu-x86_64 -cpu Nehalem ./tests/build/pkgstats-build-amd64 submit --dump-json | jq -r '.system.architecture' | grep -q '^x86_64_v2$'
+	CGO_ENABLED=0 GOARCH=amd64 go run -exec 'qemu-x86_64 -cpu Conroe' tests/cpu.go | grep -q '^x86_64$'
+	CGO_ENABLED=0 GOARCH=amd64 go run -exec 'qemu-x86_64 -cpu Nehalem' tests/cpu.go | grep -q '^x86_64_v2$'
 	@# 32-Bit on x86_64
-	linux32 ./tests/build/pkgstats-build-386 submit --dump-json | jq -r '.system.architecture' | grep -q '^x86_64'
+	CGO_ENABLED=0 GOARCH=386 go run -exec 'linux32' tests/cpu.go | grep -q '^x86_64'
 
 # run integration tests with a mocked API server
 test-integration:
