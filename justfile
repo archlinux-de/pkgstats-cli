@@ -3,30 +3,36 @@ export CGO_CFLAGS := env_var_or_default('CFLAGS', '')
 export CGO_CXXFLAGS := env_var_or_default('CXXFLAGS', '')
 export CGO_LDFLAGS := env_var_or_default('LDFLAGS', '')
 
+# list all recipes
 default:
 	@just --list
 
+# build pkgstats for production
 build:
 	go build -a -o pkgstats \
 		-trimpath -buildmode=pie -mod=readonly -modcacherw \
 		-ldflags '-linkmode=external -s -w -X pkgstats-cli/internal/build.Version={{`git describe --tags`}}'
 
+# run unit tests
 test:
 	go vet
 	go test -v ./...
 
+# run unit tests on different CPU architectures
 test-cross-platform:
 	CGO_ENABLED=0 GOARCH=arm go test -v -exec qemu-arm ./...
 	CGO_ENABLED=0 GOARCH=arm64 go test -v -exec qemu-aarch64 ./...
 	CGO_ENABLED=0 GOARCH=riscv64 go test -v -exec qemu-riscv64 ./...
 	CGO_ENABLED=0 GOARCH=386 go test -v -exec linux32 ./...
 
+# build for different CPU architectures
 test-build:
 	@for arch in amd64 386 arm64 arm riscv64; do \
 		echo "Building for ${arch}"; \
 		CGO_ENABLED=0 GOARCH=${arch} go build -o tests/build/pkgstats-build-${arch}; \
 	done
 
+# test system architecture detection on different CPUs
 test-cpu-detection: test-build
 	@# ARM 32-Bit
 	qemu-arm -cpu arm946 ./tests/build/pkgstats-build-arm submit --dump-json | jq -r '.system.architecture' | grep -q '^armv5$'
@@ -43,9 +49,11 @@ test-cpu-detection: test-build
 	@# 32-Bit on x86_64
 	linux32 ./tests/build/pkgstats-build-386 submit --dump-json | jq -r '.system.architecture' | grep -q '^x86_64'
 
+# run integration tests with a mocked API server
 test-integration:
 	docker build --pull . -f tests/integration/Dockerfile -t pkgstats-test-integration
 
+# install pkgstats and its configuration
 install *DESTDIR='':
 	@# cli
 	install -D pkgstats -m755 "{{DESTDIR}}/usr/bin/pkgstats"
@@ -69,8 +77,10 @@ install *DESTDIR='':
 	install -d "{{DESTDIR}}/usr/share/fish/vendor_completions.d"
 	./pkgstats completion fish > "{{DESTDIR}}/usr/share/fish/vendor_completions.d/pkgstats.fish"
 
+# run all available tests
 test-all: test test-build test-cpu-detection test-integration
 
+# remove any untracked and generated files
 clean:
 	git clean -fdqx -e .idea
 
