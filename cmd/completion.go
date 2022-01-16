@@ -24,7 +24,7 @@ var completionCmd = &cobra.Command{
 		case "fish":
 			err = cmd.Root().GenFishCompletion(os.Stdout, true)
 		default:
-			err = errors.New("Unknown argument")
+			err = errors.New("unknown argument")
 		}
 		return
 	},

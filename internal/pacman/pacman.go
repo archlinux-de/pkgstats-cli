@@ -53,7 +53,7 @@ func (pacman *Pacman) GetServer() (string, error) {
 	if len(servers) > 0 {
 		mirror = servers[0]
 	} else {
-		return mirror, errors.New("No server found")
+		return mirror, errors.New("no server found")
 	}
 
 	mirrorUrl, _ := url.Parse(mirror)

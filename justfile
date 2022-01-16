@@ -13,9 +13,23 @@ build:
 		-trimpath -buildmode=pie -mod=readonly -modcacherw \
 		-ldflags '-linkmode=external -s -w -X pkgstats-cli/internal/build.Version={{`git describe --tags`}}'
 
+# run go vet
+check-vet:
+	go vet ./...
+
+# run static code checks
+check-static:
+	staticcheck ./...
+
+# check go format
+check-fmt:
+	test -z $(gofmt -l .)
+
+# run all static checks
+check: check-fmt check-vet check-static
+
 # run unit tests
 test:
-	go vet
 	go test -v ./...
 
 # run unit tests on different CPU architectures
@@ -91,7 +105,7 @@ install *DESTDIR='':
 	./pkgstats completion fish > "{{DESTDIR}}/usr/share/fish/vendor_completions.d/pkgstats.fish"
 
 # run all available tests
-test-all: test test-build test-cpu-detection test-os-detection test-integration
+test-all: check test test-build test-cpu-detection test-os-detection test-integration
 
 # remove any untracked and generated files
 clean:

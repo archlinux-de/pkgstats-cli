@@ -21,7 +21,7 @@ var searchCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if limit < minLimit || limit > maxLimit {
-			return fmt.Errorf("Valid limit needs to be between %d and %d", minLimit, maxLimit)
+			return fmt.Errorf("valid limit needs to be between %d and %d", minLimit, maxLimit)
 		}
 
 		client := request.NewClient(baseURL)
