@@ -58,6 +58,8 @@ jobs:
         uses: actions/checkout@v2
       - name: Install Just
         uses: extractions/setup-just@v1
+      - name: Update APT
+        run: sudo apt-get update
       - name: Install Qemu
         run: sudo apt-get install qemu-user
       - run: just test-cross-platform
@@ -69,6 +71,8 @@ jobs:
         uses: actions/checkout@v2
       - name: Install Just
         uses: extractions/setup-just@v1
+      - name: Update APT
+        run: sudo apt-get update
       - name: Install Qemu
         run: sudo apt-get install qemu-user
       - run: just test-cpu-detection
