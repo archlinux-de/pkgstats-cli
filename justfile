@@ -13,6 +13,12 @@ build:
 		-trimpath -buildmode=pie -mod=readonly -modcacherw \
 		-ldflags '-linkmode=external -s -w -X pkgstats-cli/internal/build.Version={{`git describe --tags`}}'
 
+# update go modules
+update:
+	sed -E '/^go\s+[0-9\.]+$/d' -i go.mod
+	go get -u -t all
+	go mod tidy
+
 # run go vet
 check-vet:
 	go vet ./...
