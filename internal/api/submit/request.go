@@ -25,13 +25,8 @@ type Request struct {
 	Pacman  Pacman `json:"pacman"`
 }
 
-type result struct {
-	res string
-	err error
-}
-
-type arrayResult struct {
-	res []string
+type result[T any] struct {
+	res T
 	err error
 }
 
@@ -43,7 +38,7 @@ func NewRequest() *Request {
 
 func CreateRequest() (*Request, error) {
 	pacman := pacman.NewPacman()
-	packageChannel := asyncCallArray(pacman.GetInstalledPackages)
+	packageChannel := async(pacman.GetInstalledPackages)
 	mirrorChannel := async(pacman.GetServer)
 
 	system := system.NewSystem()
@@ -76,20 +71,11 @@ func CreateRequest() (*Request, error) {
 	return request, nil
 }
 
-func async(f func() (string, error)) chan result {
-	c := make(chan result)
+func async[T any](f func() (T, error)) chan result[T] {
+	c := make(chan result[T])
 	go func() {
 		v, e := f()
-		c <- result{v, e}
-	}()
-	return c
-}
-
-func asyncCallArray(f func() ([]string, error)) chan arrayResult {
-	c := make(chan arrayResult)
-	go func() {
-		v, e := f()
-		c <- arrayResult{v, e}
+		c <- result[T]{v, e}
 	}()
 	return c
 }
