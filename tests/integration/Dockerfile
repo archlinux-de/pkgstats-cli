@@ -1,8 +1,6 @@
-FROM alpine:edge
+FROM archlinux
 
-RUN apk add go just git bats php8 php8-json jq pacman
-RUN echo -e '[core]\nSigLevel=Never\nServer=https://mirror.rackspace.com/archlinux/$repo/os/$arch' >> /etc/pacman.conf
-RUN pacman -Sy --noconfirm --noscriptlet --quiet pacman-mirrorlist archlinux-keyring
+RUN pacman -Syu --noconfirm --cachedir /tmp/pacman-cache go just git bash-bats php jq gcc
 
 COPY . /app/
 WORKDIR /app
