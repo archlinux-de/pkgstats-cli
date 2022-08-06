@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"pkgstats-cli/internal/build"
@@ -55,7 +55,7 @@ func (client *Client) SendRequest(request Request) error {
 	}
 
 	if response.StatusCode != 204 && err == nil {
-		body, _ := ioutil.ReadAll(response.Body)
+		body, _ := io.ReadAll(response.Body)
 		err = errors.New("Server Error:" + string(body))
 	}
 

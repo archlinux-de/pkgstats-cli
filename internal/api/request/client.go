@@ -3,7 +3,7 @@ package request
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"pkgstats-cli/internal/build"
@@ -69,7 +69,7 @@ func (client *Client) query(path string, params url.Values) ([]byte, error) {
 
 	defer response.Body.Close()
 
-	body, _ := ioutil.ReadAll(response.Body)
+	body, _ := io.ReadAll(response.Body)
 	return body, err
 }
 

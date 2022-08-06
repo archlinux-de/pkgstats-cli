@@ -2,7 +2,7 @@ package submit
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"pkgstats-cli/internal/build"
@@ -47,7 +47,7 @@ func validateRequest(t *testing.T, req *http.Request) {
 	}
 
 	request := Request{}
-	body, err := ioutil.ReadAll(req.Body)
+	body, err := io.ReadAll(req.Body)
 	if err != nil {
 		t.Errorf("Could not read request body %s", err)
 	}
