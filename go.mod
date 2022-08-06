@@ -1,11 +1,11 @@
 module pkgstats-cli
 
-go 1.18
+go 1.19
 
 require (
-	github.com/intel-go/cpuid v0.0.0-20210602155658-5747e5cec0d9
+	github.com/intel-go/cpuid v0.0.0-20220614022739-219e067757cb
 	github.com/spf13/cobra v1.5.0
-	golang.org/x/sys v0.0.0-20220429233432-b5fbb4746d32
+	golang.org/x/sys v0.0.0-20220804214406-8e32c043e418
 )
 
 require (
