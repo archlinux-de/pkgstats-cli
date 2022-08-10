@@ -11,7 +11,6 @@ CapabilityBoundingSet=
 RestrictAddressFamilies=AF_INET AF_INET6
 RestrictNamespaces=true
 SystemCallFilter=@system-service
-SystemCallFilter=~@privileged @resources
 SystemCallArchitectures=native
 DevicePolicy=closed
 LockPersonality=true
