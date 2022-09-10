@@ -19,7 +19,7 @@ func init() {
 
 	Mocks["pacman-conf"] = func() {
 		fmt.Println("https://mirror.rackspace.com/archlinux/core/os/x86_64")
-		fmt.Println("https://mirror.pkgbuild.com/core/os/x86_64")
+		fmt.Println("https://geo.mirror.pkgbuild.com/core/os/x86_64")
 		os.Exit(0)
 	}
 }

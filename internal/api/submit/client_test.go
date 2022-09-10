@@ -27,7 +27,7 @@ func TestSendRequest(t *testing.T) {
 	request.Pacman.Packages = []string{"pacman", "linux"}
 	request.System.Architecture = "x86_64"
 	request.OS.Architecture = "i686"
-	request.Pacman.Mirror = "https://mirror.pkgbuild.com/"
+	request.Pacman.Mirror = "https://geo.mirror.pkgbuild.com/"
 	err := client.SendRequest(*request)
 
 	if err != nil {
@@ -68,7 +68,7 @@ func validateRequest(t *testing.T, req *http.Request) {
 	if request.OS.Architecture != "i686" {
 		t.Error("Invalid arch value")
 	}
-	if request.Pacman.Mirror != "https://mirror.pkgbuild.com/" {
+	if request.Pacman.Mirror != "https://geo.mirror.pkgbuild.com/" {
 		t.Error("Invalid mirror value")
 	}
 }
@@ -95,7 +95,7 @@ func TestSendRequestFollowsRedirect(t *testing.T) {
 	request.Pacman.Packages = []string{"pacman", "linux"}
 	request.System.Architecture = "x86_64"
 	request.OS.Architecture = "i686"
-	request.Pacman.Mirror = "https://mirror.pkgbuild.com/"
+	request.Pacman.Mirror = "https://geo.mirror.pkgbuild.com/"
 	err := client.SendRequest(*request)
 
 	if err != nil {
