@@ -23,6 +23,9 @@ var searchCmd = &cobra.Command{
 		if limit < minLimit || limit > maxLimit {
 			return fmt.Errorf("valid limit needs to be between %d and %d", minLimit, maxLimit)
 		}
+		if !request.ValidatePackageName(args[0]) {
+			return fmt.Errorf("invalid package name %s", args[0])
+		}
 
 		client := request.NewClient(baseURL)
 

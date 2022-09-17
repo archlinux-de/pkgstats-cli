@@ -18,6 +18,10 @@ var showCmd = &cobra.Command{
 	Short: "Show one or more packages and compare their popularity",
 	Args:  cobra.RangeArgs(minPackages, maxPackages),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		if !request.ValidatePackageNames(args) {
+			return fmt.Errorf("invalid package names %s", args)
+		}
+
 		client := request.NewClient(baseURL)
 
 		ppl, err := client.GetPackages(args...)
