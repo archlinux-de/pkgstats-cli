@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/intel-go/cpuid v0.0.0-20220614022739-219e067757cb
-	github.com/spf13/cobra v1.5.0
+	github.com/spf13/cobra v1.6.0
 	golang.org/x/sys v0.0.0-20220915200043-7b5979e65e41
 )
 
