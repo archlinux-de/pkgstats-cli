@@ -23,4 +23,5 @@ func Execute() {
 func init() {
 	rootCmd.PersistentFlags().StringVar(&baseURL, "base-url", baseURL, "base url of the pkgstats server")
 	rootCmd.PersistentFlags().MarkHidden("base-url")
+	rootCmd.CompletionOptions.HiddenDefaultCmd = true
 }
