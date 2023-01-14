@@ -66,6 +66,8 @@ test-cpu-detection:
 	@# x86_64
 	CGO_ENABLED=0 GOARCH=amd64 go run -exec 'qemu-x86_64 -cpu Conroe' main.go architecture system | grep -q '^x86_64$'
 	CGO_ENABLED=0 GOARCH=amd64 go run -exec 'qemu-x86_64 -cpu Nehalem' main.go architecture system | grep -q '^x86_64_v2$'
+	@# Test crashes on older Qemu versions
+	if qemu-x86_64 -version | grep -Eq 'version [7-9]\.[2-9][0-9]*\.[0-9]+$'; then CGO_ENABLED=0 GOARCH=amd64 go run -exec 'qemu-x86_64 -cpu Haswell' main.go architecture system 2>&1 | grep -q '^x86_64_v3$'; fi
 	@# 32-Bit on x86_64
 	CGO_ENABLED=0 GOARCH=386 go run -exec 'linux32' main.go architecture system | grep -q '^x86_64'
 
