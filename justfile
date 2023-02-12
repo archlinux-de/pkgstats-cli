@@ -86,7 +86,7 @@ test-os-detection:
 
 # run integration tests with a mocked API server
 test-integration:
-	docker build --pull . -f tests/integration/Dockerfile -t pkgstats-test-integration
+	docker buildx build --pull . -f tests/integration/Dockerfile -t pkgstats-test-integration
 
 # install pkgstats and its configuration
 install *DESTDIR='':
