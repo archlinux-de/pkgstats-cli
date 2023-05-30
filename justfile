@@ -44,10 +44,11 @@ test-cross-platform:
 	CGO_ENABLED=0 GOARCH=arm64 go test -v -exec qemu-aarch64 ./...
 	CGO_ENABLED=0 GOARCH=riscv64 go test -v -exec qemu-riscv64 ./...
 	CGO_ENABLED=0 GOARCH=386 go test -v -exec 'qemu-x86_64 /usr/bin/linux32' ./...
+	CGO_ENABLED=0 GOARCH=loong64 go test -v -exec qemu-loongarch64 ./...
 
 # build for different CPU architectures
 test-build:
-	@for arch in amd64 386 arm64 arm riscv64; do \
+	@for arch in amd64 386 arm64 arm riscv64 loong64; do \
 		echo "Building for ${arch}"; \
 		CGO_ENABLED=0 GOARCH=${arch} go build -o tests/build/pkgstats-${arch}; \
 	done
@@ -70,6 +71,8 @@ test-cpu-detection:
 	if qemu-x86_64 -version | grep -Eq 'version [7-9]\.[2-9][0-9]*\.[0-9]+$'; then CGO_ENABLED=0 GOARCH=amd64 go run -exec 'qemu-x86_64 -cpu Haswell' main.go architecture system 2>&1 | grep -q '^x86_64_v3$'; fi
 	@# 32-Bit on x86_64
 	CGO_ENABLED=0 GOARCH=386 go run -exec 'qemu-x86_64 /usr/bin/linux32' main.go architecture system | grep -q '^x86_64'
+	@# loong64
+	CGO_ENABLED=0 GOARCH=loong64 go run -exec 'qemu-loongarch64 -cpu la464-loongarch-cpu' main.go architecture system | grep -q '^loong64$'
 
 # test os architecture detection on different CPUs
 test-os-detection:
@@ -83,6 +86,8 @@ test-os-detection:
 	CGO_ENABLED=0 GOARCH=amd64 go run -exec 'qemu-x86_64' main.go architecture os | grep -q '^x86_64$'
 	@# 32-Bit on x86_64
 	CGO_ENABLED=0 GOARCH=386 go run -exec 'qemu-x86_64 /usr/bin/linux32' main.go architecture os | grep -q '^i686$'
+	@# loong64
+	CGO_ENABLED=0 GOARCH=loong64 go run -exec 'qemu-loongarch64' main.go architecture os| grep -q '^loongarch64$'
 
 # run integration tests with a mocked API server
 test-integration:

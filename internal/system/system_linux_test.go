@@ -23,6 +23,8 @@ func TestGetMachine(t *testing.T) {
 		expectedArch = "^aarch64$"
 	case "riscv64":
 		expectedArch = "^riscv64$"
+	case "loong64":
+		expectedArch = "^loongarch64$"
 	}
 
 	if err != nil {
