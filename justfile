@@ -43,7 +43,7 @@ test-cross-platform:
 	CGO_ENABLED=0 GOARCH=arm go test -v -exec qemu-arm ./...
 	CGO_ENABLED=0 GOARCH=arm64 go test -v -exec qemu-aarch64 ./...
 	CGO_ENABLED=0 GOARCH=riscv64 go test -v -exec qemu-riscv64 ./...
-	CGO_ENABLED=0 GOARCH=386 go test -v -exec linux32 ./...
+	CGO_ENABLED=0 GOARCH=386 go test -v -exec 'qemu-x86_64 /usr/bin/linux32' ./...
 
 # build for different CPU architectures
 test-build:
@@ -69,7 +69,7 @@ test-cpu-detection:
 	@# Test crashes on older Qemu versions
 	if qemu-x86_64 -version | grep -Eq 'version [7-9]\.[2-9][0-9]*\.[0-9]+$'; then CGO_ENABLED=0 GOARCH=amd64 go run -exec 'qemu-x86_64 -cpu Haswell' main.go architecture system 2>&1 | grep -q '^x86_64_v3$'; fi
 	@# 32-Bit on x86_64
-	CGO_ENABLED=0 GOARCH=386 go run -exec 'linux32' main.go architecture system | grep -q '^x86_64'
+	CGO_ENABLED=0 GOARCH=386 go run -exec 'qemu-x86_64 /usr/bin/linux32' main.go architecture system | grep -q '^x86_64'
 
 # test os architecture detection on different CPUs
 test-os-detection:
@@ -82,7 +82,7 @@ test-os-detection:
 	@# x86_64
 	CGO_ENABLED=0 GOARCH=amd64 go run -exec 'qemu-x86_64' main.go architecture os | grep -q '^x86_64$'
 	@# 32-Bit on x86_64
-	CGO_ENABLED=0 GOARCH=386 go run -exec 'linux32' main.go architecture os | grep -q '^i686$'
+	CGO_ENABLED=0 GOARCH=386 go run -exec 'qemu-x86_64 /usr/bin/linux32' main.go architecture os | grep -q '^i686$'
 
 # run integration tests with a mocked API server
 test-integration:
