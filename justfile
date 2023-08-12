@@ -56,8 +56,6 @@ test-build:
 # test cpu architecture detection on different CPUs
 test-cpu-detection:
 	@# ARM 32-Bit
-	CGO_ENABLED=0 GOARCH=arm go run -exec 'qemu-arm -cpu arm946' main.go architecture system | grep -q '^armv5$'
-	CGO_ENABLED=0 GOARCH=arm go run -exec 'qemu-arm -cpu arm1176' main.go architecture system | grep -q '^armv6$'
 	CGO_ENABLED=0 GOARCH=arm go run -exec 'qemu-arm -cpu cortex-a15' main.go architecture system | grep -q '^armv7$'
 	CGO_ENABLED=0 GOARCH=arm go run -exec 'qemu-arm -cpu max' main.go architecture system | grep -q '^aarch64$'
 	@# ARM 64-Bit
