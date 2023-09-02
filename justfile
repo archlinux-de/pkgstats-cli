@@ -1,96 +1,116 @@
-export CGO_CPPFLAGS := env_var_or_default('CPPFLAGS', '')
-export CGO_CFLAGS := env_var_or_default('CFLAGS', '')
-export CGO_CXXFLAGS := env_var_or_default('CXXFLAGS', '')
-export CGO_LDFLAGS := env_var_or_default('LDFLAGS', '')
-
 # list all recipes
 default:
 	@just --list
 
 # Prepare sources in order to build offline
 prepare:
-	go mod download
+	cargo fetch --locked
 
 # build pkgstats for production
 build:
-	go build -a -o pkgstats \
-		-buildmode=pie -mod=readonly -modcacherw -buildvcs=false \
-		-ldflags '-compressdwarf=false -linkmode=external -s -w -X pkgstats-cli/internal/build.Version={{`git describe --tags`}}'
+	cargo build --frozen --release
 
-# update go modules
+# update dependencies
 update:
-	sed -E '/^go\s+[0-9\.]+$/d' -i go.mod
-	go get -u -t all
-	go mod tidy
+	cargo update
 
-# run go vet
-check-vet:
-	go vet ./...
+# run cargo clippy
+check-clippy:
+	cargo clippy
 
-# run static code checks
-check-static:
-	staticcheck ./...
-
-# check go format
+# check cargo fmt
 check-fmt:
-	test -z $(gofmt -l .)
+	cargo fmt --check
 
 # run all static checks
-check: check-fmt check-vet check-static
+check: check-fmt check-clippy
 
 # run unit tests
 test:
-	go test -v ./...
+	cargo --frozen test
+
+# See https://github.com/cross-rs/cross
+# and https://github.com/cargo-bins/cargo-binstall
+#     https://github.com/marketplace/actions/install-development-tools
+#
+# TODO: use cargo install?
+#
+# separate justfile for cross testing
+# use test martix on ci
+
+cargo-aarch64 command *options:
+	cross {{command}} --target aarch64-unknown-linux-musl -F bundled-tls {{options}}
+
+cargo-arm command *options:
+	cross {{command}} --target arm-unknown-linux-musleabihf -F bundled-tls {{options}}
+
+cargo-armv7 command *options:
+	cross {{command}} --target armv7-unknown-linux-musleabihf -F bundled-tls {{options}}
+
+cargo-i586 command *options:
+	cross {{command}} --target i586-unknown-linux-musl -F bundled-tls {{options}}
+
+cargo-i686 command *options:
+	cross {{command}} --target i686-unknown-linux-musl -F bundled-tls {{options}}
+
+cargo-riscv64 command *options:
+	# musl libc is currently unavailable on riscv64
+	cross {{command}} --target riscv64gc-unknown-linux-gnu -F bundled-tls {{options}}
+
+cargo-x86_64 command *options:
+	cross {{command}} --target x86_64-unknown-linux-musl -F bundled-tls {{options}}
 
 # run unit tests on different CPU architectures
-test-cross-platform:
-	CGO_ENABLED=0 GOARCH=arm go test -v -exec qemu-arm ./...
-	CGO_ENABLED=0 GOARCH=arm64 go test -v -exec qemu-aarch64 ./...
-	CGO_ENABLED=0 GOARCH=riscv64 go test -v -exec qemu-riscv64 ./...
-	CGO_ENABLED=0 GOARCH=386 go test -v -exec 'qemu-x86_64 /usr/bin/linux32' ./...
-	if [ -x "$(command -v qemu-loongarch64)" ]; then CGO_ENABLED=0 GOARCH=loong64 go test -v -exec qemu-loongarch64 ./...; fi
+test-cross-platform: (cargo-aarch64 'test') (cargo-arm 'test') (cargo-armv7 'test') (cargo-i586 'test') (cargo-i686 'test') (cargo-riscv64 'test') (cargo-x86_64 'test')
 
 # build for different CPU architectures
-test-build:
-	@for arch in amd64 386 arm64 arm riscv64 loong64; do \
-		echo "Building for ${arch}"; \
-		CGO_ENABLED=0 GOARCH=${arch} go build -buildvcs=false -o tests/build/pkgstats-${arch}; \
-	done
+test-build: (cargo-aarch64 'build') (cargo-arm 'build') (cargo-armv7 'build') (cargo-i586 'build') (cargo-i686 'build') (cargo-riscv64 'build') (cargo-x86_64 'build')
 
 # test cpu architecture detection on different CPUs
-test-cpu-detection:
+test-cpu-detection: test-build
 	@# ARM 32-Bit
-	CGO_ENABLED=0 GOARCH=arm go run -exec 'qemu-arm -cpu cortex-a15' main.go architecture system | grep -q '^armv7$'
-	CGO_ENABLED=0 GOARCH=arm go run -exec 'qemu-arm -cpu max' main.go architecture system | grep -q '^aarch64$'
+	#qemu-arm -cpu cortex-a15 target/arm-unknown-linux-musleabihf/debug/pkgstats architecture system | grep -q '^armv7$'
+	#qemu-arm -cpu max target/armv7-unknown-linux-musleabihf/debug/pkgstats architecture system | grep -q '^aarch64$'
+
 	@# ARM 64-Bit
-	CGO_ENABLED=0 GOARCH=arm64 go run -exec 'qemu-aarch64' main.go architecture system | grep -q '^aarch64$'
+	qemu-aarch64 target/aarch64-unknown-linux-musl/debug/pkgstats architecture system | grep -q '^aarch64$'
+
 	@# RISC-V 64-Bit rv64gc
-	CGO_ENABLED=0 GOARCH=riscv64 go run -exec 'qemu-riscv64 -cpu sifive-u54' main.go architecture system | grep -q '^riscv64$'
+	just cargo-riscv64 run -- architecture system | grep -q '^riscv64$'
+
 	@# x86_64
-	CGO_ENABLED=0 GOARCH=amd64 go run -exec 'qemu-x86_64 -cpu Conroe' main.go architecture system | grep -q '^x86_64$'
-	CGO_ENABLED=0 GOARCH=amd64 go run -exec 'qemu-x86_64 -cpu Nehalem' main.go architecture system | grep -q '^x86_64_v2$'
+	qemu-x86_64 -cpu Conroe target/x86_64-unknown-linux-musl/debug/pkgstats architecture system | grep -q '^x86_64$'
+	qemu-x86_64 -cpu Nehalem target/x86_64-unknown-linux-musl/debug/pkgstats architecture system | grep -q '^x86_64_v2$'
 	@# Test crashes on older Qemu versions
-	if qemu-x86_64 -version | grep -Eq 'version (7\.[2-9]|[8-9]\.)[0-9]*\.[0-9]+$'; then CGO_ENABLED=0 GOARCH=amd64 go run -exec 'qemu-x86_64 -cpu Haswell' main.go architecture system 2>&1 | grep -q '^x86_64_v3$'; fi
+	if qemu-x86_64 -version | grep -Eq 'version (7\.[2-9]|[8-9]\.)[0-9]*\.[0-9]+$'; then qemu-x86_64 -cpu Haswell target/x86_64-unknown-linux-musl/debug/pkgstats architecture system 2>&1 | grep -q '^x86_64_v3$'; fi
+
 	@# 32-Bit on x86_64
-	CGO_ENABLED=0 GOARCH=386 go run -exec 'qemu-x86_64 /usr/bin/linux32' main.go architecture system | grep -q '^x86_64'
-	@# loong64
-	@# loongarch64 is not supported by older Qemu versions
-	if [ -x "$(command -v qemu-loongarch64)" ]; then CGO_ENABLED=0 GOARCH=loong64 go run -exec 'qemu-loongarch64 -cpu la464-loongarch-cpu' main.go architecture system | grep -q '^loong64$'; fi
+	#qemu-x86_64 /usr/bin/linux32 target/i586-unknown-linux-musl/debug/pkgstats architecture system | grep -q '^x86_64'
+	qemu-x86_64 /usr/bin/linux32 target/i686-unknown-linux-musl/debug/pkgstats architecture system | grep -q '^x86_64'
 
 # test os architecture detection on different CPUs
-test-os-detection:
-	@# ARM 32-Bit
-	CGO_ENABLED=0 GOARCH=arm go run -exec 'qemu-arm' main.go architecture os | grep -q '^armv7l$'
+test-os-detection: test-build
 	@# ARM 64-Bit
-	CGO_ENABLED=0 GOARCH=arm64 go run -exec 'qemu-aarch64' main.go architecture os | grep -q '^aarch64$'
-	@# RISC-V 64-Bit rv64gc
-	CGO_ENABLED=0 GOARCH=riscv64 go run -exec 'qemu-riscv64' main.go architecture os | grep -q '^riscv64$'
+	qemu-aarch64 target/aarch64-unknown-linux-musl/debug/pkgstats architecture os | grep -q '^aarch64$'
+
+	@# ARM 32-Bit
+	qemu-arm -cpu max target/arm-unknown-linux-musleabihf/debug/pkgstats architecture os | grep -q '^armv7l$'
+	qemu-arm -cpu max target/armv7-unknown-linux-musleabihf/debug/pkgstats architecture os | grep -q '^armv7l$'
+
+	@# i586
+	qemu-i386 -cpu pentium target/i586-unknown-linux-musl/debug/pkgstats architecture os | grep -q '^i586$'
+
+	@# i686
+	qemu-i386 -cpu pentium2 target/i586-unknown-linux-musl/debug/pkgstats architecture os | grep -q '^i686$'
+
+	@# riscv64
+	just cargo-riscv64 run -- architecture os | grep -q '^riscv64$'
+
 	@# x86_64
-	CGO_ENABLED=0 GOARCH=amd64 go run -exec 'qemu-x86_64' main.go architecture os | grep -q '^x86_64$'
-	@# 32-Bit on x86_64
-	CGO_ENABLED=0 GOARCH=386 go run -exec 'qemu-x86_64 /usr/bin/linux32' main.go architecture os | grep -q '^i686$'
-	@# loong64
-	if [ -x "$(command -v qemu-loongarch64)" ]; then CGO_ENABLED=0 GOARCH=loong64 go run -exec 'qemu-loongarch64' main.go architecture os| grep -q '^loongarch64$'; fi
+	qemu-x86_64 target/x86_64-unknown-linux-musl/debug/pkgstats architecture os | grep -q '^x86_64$'
+
+	@# i686 on x86_64
+	qemu-x86_64 /usr/bin/linux32 target/i686-unknown-linux-musl/debug/pkgstats architecture os | grep -q '^i686$'
 
 # run integration tests with a mocked API server
 test-integration:
@@ -99,7 +119,9 @@ test-integration:
 # install pkgstats and its configuration
 install *DESTDIR='':
 	@# cli
-	install -D pkgstats -m755 "{{DESTDIR}}/usr/bin/pkgstats"
+	install -D target/release/pkgstats -m755 "{{DESTDIR}}/usr/bin/pkgstats"
+
+	#@TODO: install only on supported targets
 
 	@# systemd timer
 	for service in pkgstats.service pkgstats.timer; do \
@@ -109,22 +131,19 @@ install *DESTDIR='':
 	cd "{{DESTDIR}}/usr/lib/systemd/system/timers.target.wants" && ln -s ../pkgstats.timer
 
 	@# bash completions
-	install -d "{{DESTDIR}}/usr/share/bash-completion/completions"
-	./pkgstats completion bash > "{{DESTDIR}}/usr/share/bash-completion/completions/pkgstats"
+	install -D target/release/completions/pkgstats.bash "{{DESTDIR}}/usr/share/bash-completion/completions/pkgstats"
 
 	@# zsh completions
-	install -d "{{DESTDIR}}/usr/share/zsh/site-functions/"
-	./pkgstats completion zsh > "{{DESTDIR}}/usr/share/zsh/site-functions/_pkgstats"
+	install -Dt "{{DESTDIR}}/usr/share/zsh/site-functions/" target/release/completions/_pkgstats
 
 	@# fish completions
-	install -d "{{DESTDIR}}/usr/share/fish/vendor_completions.d"
-	./pkgstats completion fish > "{{DESTDIR}}/usr/share/fish/vendor_completions.d/pkgstats.fish"
+	install -Dt "{{DESTDIR}}/usr/share/fish/vendor_completions.d" target/release/completions/pkgstats.fish
 
 # run all available tests
 test-all: check test test-build test-cpu-detection test-os-detection test-integration
 
 # remove any untracked and generated files
 clean:
-	git clean -fdqx -e .idea
+	git clean -fdqx -e .idea -e .vscode
 
 # vim: set ft=make :

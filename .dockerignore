@@ -1,7 +1,9 @@
 /.idea
+/.vscode
 /.github
 /pkgstats
 /pkgstats-cli
+/pkgstats-cli.exe
 /*.out
 /tests/integration/Dockerfile
-/tests/build
+/target
