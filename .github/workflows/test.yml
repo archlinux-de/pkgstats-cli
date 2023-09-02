@@ -15,14 +15,10 @@ jobs:
         uses: extractions/setup-just@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Setup Go
-        uses: actions/setup-go@v5
+      - name: Setup Cross
+        uses: taiki-e/install-action@v2
         with:
-          go-version: '1.22'
-      - name: Staticcheck
-        uses: dominikh/staticcheck-action@v1.3.1
-        with:
-          install-go: false
+          tool: cross
       - run: just check
 
   test:
@@ -36,10 +32,10 @@ jobs:
         uses: extractions/setup-just@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Setup Go
-        uses: actions/setup-go@v5
+      - name: Setup Cross
+        uses: taiki-e/install-action@v2
         with:
-          go-version: '1.22'
+          tool: cross
       - run: just test
 
   test-build:
@@ -53,10 +49,10 @@ jobs:
         uses: extractions/setup-just@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Setup Go
-        uses: actions/setup-go@v5
+      - name: Setup Cross
+        uses: taiki-e/install-action@v2
         with:
-          go-version: '1.22'
+          tool: cross
       - run: just test-build
       - run: just build
 
@@ -82,10 +78,10 @@ jobs:
         uses: extractions/setup-just@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Setup Go
-        uses: actions/setup-go@v5
+      - name: Setup Cross
+        uses: taiki-e/install-action@v2
         with:
-          go-version: '1.22'
+          tool: cross
       - name: Update APT
         run: sudo apt-get update
       - name: Install Qemu
@@ -101,10 +97,10 @@ jobs:
         uses: extractions/setup-just@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Setup Go
-        uses: actions/setup-go@v5
+      - name: Setup Cross
+        uses: taiki-e/install-action@v2
         with:
-          go-version: '1.22'
+          tool: cross
       - name: Update APT
         run: sudo apt-get update
       - name: Install Qemu

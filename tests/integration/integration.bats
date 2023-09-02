@@ -2,7 +2,7 @@
 
 function setup() {
 	pushd $BATS_TEST_DIRNAME
-	PKGSTATS="run ../../pkgstats --base-url http://localhost:8888"
+	PKGSTATS="run ../../target/release/pkgstats --base-url http://localhost:8888"
 }
 
 @test "show help" {
@@ -17,7 +17,7 @@ function setup() {
 
 @test "show information to be sent" {
 	$PKGSTATS submit --dump-json
-	[ $(echo "${output}" | jq -r '.version') -eq 3 ]
+	[ $(echo "${output}" | jq -r '.version') -eq 4 ]
 	echo "${output}" | jq -r '.system.architecture' | grep -q '^x86_64'
 	[ $(echo "${output}" | jq -r '.os.architecture') = 'x86_64' ]
 	echo "${output}" | jq -r '.pacman.mirror' | grep -q '^https://'

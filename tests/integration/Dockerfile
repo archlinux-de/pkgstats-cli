@@ -1,6 +1,6 @@
 FROM archlinux
 
-RUN pacman -Syu --noconfirm --cachedir /tmp/pacman-cache go just git bats php jq gcc
+RUN pacman -Syu --noconfirm --cachedir /tmp/pacman-cache rust just git bats php jq pkgconf
 
 COPY . /app/
 WORKDIR /app

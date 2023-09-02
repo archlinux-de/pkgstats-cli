@@ -1,7 +1,7 @@
 /.idea
+/.vscode
 /pkgstats
 /pkgstats-cli
 /pkgstats-cli.exe
-/tests/build/*
-!/tests/build/.gitkeep
 /*.out
+/target
