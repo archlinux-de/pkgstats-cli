@@ -82,12 +82,12 @@ test-cpu-detection-riscv64:
 
 test-cpu-detection-i586: (cargo-i586 'build')
 	qemu-i386 -cpu pentium target/i586-unknown-linux-musl/debug/pkgstats architecture os | grep -q '^i586$'
-	@# 32-Bit on x86_64
+	@# i586 on x86_64
 	@#qemu-x86_64 /usr/bin/linux32 target/i586-unknown-linux-musl/debug/pkgstats architecture system | grep -q '^x86_64'
 
 test-cpu-detection-i686: (cargo-i686 'build')
-	#qemu-i386 -cpu pentium2 target/i586-unknown-linux-musl/debug/pkgstats architecture os | grep -q '^i686$'
-	@# 32-Bit on x86_64
+	qemu-i386 -cpu pentium2 target/i686-unknown-linux-musl/debug/pkgstats architecture os | grep -q '^i686$'
+	@# i686 on x86_64
 	qemu-x86_64 /usr/bin/linux32 target/i686-unknown-linux-musl/debug/pkgstats architecture system | grep -q '^x86_64'
 
 test-cpu-detection-x86_64: (cargo-x86_64 'build')
@@ -113,7 +113,7 @@ test-os-detection-i586: (cargo-i586 'build')
 	qemu-i386 -cpu pentium target/i586-unknown-linux-musl/debug/pkgstats architecture os | grep -q '^i586$'
 
 test-os-detection-i686: (cargo-i686 'build')
-	#qemu-i386 -cpu pentium2 target/i586-unknown-linux-musl/debug/pkgstats architecture os | grep -q '^i686$'
+	qemu-i386 -cpu pentium2 target/i686-unknown-linux-musl/debug/pkgstats architecture os | grep -q '^i686$'
 	@# i686 on x86_64
 	qemu-x86_64 /usr/bin/linux32 target/i686-unknown-linux-musl/debug/pkgstats architecture os | grep -q '^i686$'
 
