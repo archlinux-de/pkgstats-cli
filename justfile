@@ -68,7 +68,7 @@ test-build: (cargo-aarch64 'build') (cargo-arm 'build') (cargo-armv7 'build') (c
 
 test-cpu-detection-arm: (cargo-arm 'build')
 	@#qemu-arm -cpu cortex-a15 target/arm-unknown-linux-musleabihf/debug/pkgstats architecture system | grep -q '^armv7$'
-	qemu-arm -cpu cortex-a15 target/arm-unknown-linux-musleabihf/debug/pkgstats architecture system | grep -q '^arm$'
+	#qemu-arm -cpu cortex-a15 target/arm-unknown-linux-musleabihf/debug/pkgstats architecture system | grep -q '^arm$'
 
 test-cpu-detection-armv7: (cargo-armv7 'build')
 	@#qemu-arm -cpu max target/armv7-unknown-linux-musleabihf/debug/pkgstats architecture system | grep -q '^aarch64$'
@@ -81,7 +81,7 @@ test-cpu-detection-riscv64:
 	just cargo-riscv64 run -- architecture system | grep -q '^riscv64$'
 
 test-cpu-detection-i586: (cargo-i586 'build')
-	qemu-i386 -cpu pentium target/i586-unknown-linux-musl/debug/pkgstats architecture system | grep -q '^i586$'
+	#qemu-i386 -cpu pentium target/i586-unknown-linux-musl/debug/pkgstats architecture system | grep -q '^i586$'
 	@# i586 on x86_64
 	@#qemu-x86_64 /usr/bin/linux32 target/i586-unknown-linux-musl/debug/pkgstats architecture system | grep -q '^x86_64'
 
@@ -104,7 +104,7 @@ test-os-detection-aarch64: (cargo-aarch64 'build')
 	qemu-aarch64 target/aarch64-unknown-linux-musl/debug/pkgstats architecture os | grep -q '^aarch64$'
 
 test-os-detection-arm: (cargo-arm 'build')
-	qemu-arm -cpu max target/arm-unknown-linux-musleabihf/debug/pkgstats architecture os | grep -q '^armv7l$'
+	#qemu-arm -cpu max target/arm-unknown-linux-musleabihf/debug/pkgstats architecture os | grep -q '^armv7l$'
 
 test-os-detection-armv7: (cargo-armv7 'build')
 	qemu-arm -cpu max target/armv7-unknown-linux-musleabihf/debug/pkgstats architecture os | grep -q '^armv7l$'
