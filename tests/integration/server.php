@@ -33,10 +33,10 @@ switch ($requestPath) {
 			&& count($request['pacman']['packages']) > 1
 			&& in_array('pacman-mirrorlist', $request['pacman']['packages'])
 		) {
-			error_log('Request was vaild');
+			error_log('Request was valid');
 			header('HTTP/1.0 204');
 		} else {
-			error_log('Request was invaild');
+			error_log('Request was invalid');
 			error_log(print_r($request, true));
 			header('HTTP/1.0 400');
 			echo 'TEST FAILED';
