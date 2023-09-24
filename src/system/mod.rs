@@ -41,17 +41,19 @@ pub fn get_cpu_architecture() -> Option<String> {
 
 #[cfg(test)]
 mod tests {
-    #[cfg(all(target_arch = "x86_64"))]
     #[test]
     fn it_gets_cpu_architecture() {
         use crate::system::get_cpu_architecture;
-        assert!(get_cpu_architecture().unwrap().starts_with("x86_64"));
+        assert!(get_cpu_architecture()
+            .unwrap()
+            .starts_with(std::env::consts::ARCH));
     }
 
-    #[cfg(all(target_arch = "x86_64"))]
     #[test]
     fn it_gets_architecture() {
         use crate::system::get_architecture;
-        assert_eq!("x86_64", get_architecture().unwrap());
+        assert!(get_architecture()
+            .unwrap()
+            .starts_with(std::env::consts::ARCH));
     }
 }
