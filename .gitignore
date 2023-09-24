@@ -5,3 +5,4 @@
 /pkgstats-cli.exe
 /*.out
 /target
+/qemu_*
