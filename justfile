@@ -39,16 +39,15 @@ test:
 # use test martix on ci
 
 cargo-aarch64 command *options:
-	cross {{command}} --target aarch64-unknown-linux-musl -F bundled-tls {{options}}
+	cross {{command}} --target aarch64-unknown-linux-gnu -F bundled-tls {{options}}
 
 cargo-armv7 command *options:
-	cross {{command}} --target armv7-unknown-linux-musleabihf -F bundled-tls {{options}}
+	cross {{command}} --target armv7-unknown-linux-gnueabihf -F bundled-tls {{options}}
 
 cargo-i686 command *options:
 	cross {{command}} --target i686-unknown-linux-musl -F bundled-tls {{options}}
 
 cargo-riscv64 command *options:
-	# musl libc is currently unavailable on riscv64
 	cross {{command}} --target riscv64gc-unknown-linux-gnu -F bundled-tls {{options}}
 
 cargo-x86_64 command *options:
