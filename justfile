@@ -61,8 +61,7 @@ test-cross-platform: (cargo-aarch64 'test') (cargo-armv7 'test') (cargo-i686 'te
 test-build: (cargo-aarch64 'build') (cargo-armv7 'build') (cargo-i686 'build') (cargo-riscv64 'build') (cargo-x86_64 'build')
 
 test-cpu-detection-armv7: (cargo-armv7 'build')
-	@#qemu-arm -cpu max target/armv7-unknown-linux-musleabihf/debug/pkgstats architecture system | grep -q '^aarch64$'
-	qemu-arm -cpu max target/armv7-unknown-linux-musleabihf/debug/pkgstats architecture system | grep -q '^arm$'
+	qemu-arm -cpu cortex-a8 target/armv7-unknown-linux-musleabihf/debug/pkgstats architecture system | grep -q '^arm$'
 
 test-cpu-detection-aarch64: (cargo-aarch64 'build')
 	qemu-aarch64 target/aarch64-unknown-linux-musl/debug/pkgstats architecture system | grep -q '^aarch64$'
