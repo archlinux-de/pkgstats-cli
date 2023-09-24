@@ -60,11 +60,11 @@ test-cross-platform: (cargo-aarch64 'test') (cargo-armv7 'test') (cargo-i686 'te
 # build for different CPU architectures
 test-build: (cargo-aarch64 'build') (cargo-armv7 'build') (cargo-i686 'build') (cargo-riscv64 'build') (cargo-x86_64 'build')
 
-test-cpu-detection-armv7: (cargo-armv7 'build')
-	qemu-arm -cpu cortex-a8 target/armv7-unknown-linux-musleabihf/debug/pkgstats architecture system | grep -q '^arm$'
+test-cpu-detection-armv7:
+	just cargo-armv7 run -- architecture system | grep -q '^arm$'
 
-test-cpu-detection-aarch64: (cargo-aarch64 'build')
-	qemu-aarch64 target/aarch64-unknown-linux-musl/debug/pkgstats architecture system | grep -q '^aarch64$'
+test-cpu-detection-aarch64:
+	just cargo-aarch64 run -- architecture system | grep -q '^aarch64$'
 
 test-cpu-detection-riscv64:
 	just cargo-riscv64 run -- architecture system | grep -q '^riscv64$'
@@ -84,11 +84,11 @@ test-cpu-detection-x86_64: (cargo-x86_64 'build')
 # test cpu architecture detection on different CPUs
 test-cpu-detection: test-cpu-detection-armv7 test-cpu-detection-aarch64 test-cpu-detection-riscv64 test-cpu-detection-x86_64 test-cpu-detection-i686
 
-test-os-detection-aarch64: (cargo-aarch64 'build')
-	qemu-aarch64 target/aarch64-unknown-linux-musl/debug/pkgstats architecture os | grep -q '^aarch64$'
+test-os-detection-aarch64:
+	just cargo-aarch64 run -- architecture os | grep -q '^aarch64$'
 
-test-os-detection-armv7: (cargo-armv7 'build')
-	qemu-arm -cpu max target/armv7-unknown-linux-musleabihf/debug/pkgstats architecture os | grep -q '^armv7l$'
+test-os-detection-armv7:
+	just cargo-armv7 run -- architecture os | grep -q '^armv7l$'
 
 test-os-detection-i686: (cargo-i686 'build')
 	qemu-i386 -cpu coreduo target/i686-unknown-linux-musl/debug/pkgstats architecture os | grep -q '^i686$'
@@ -98,8 +98,8 @@ test-os-detection-i686: (cargo-i686 'build')
 test-os-detection-riscv64:
 	just cargo-riscv64 run -- architecture os | grep -q '^riscv64$'
 
-test-os-detection-x86_64: (cargo-x86_64 'build')
-	qemu-x86_64 target/x86_64-unknown-linux-musl/debug/pkgstats architecture os | grep -q '^x86_64$'
+test-os-detection-x86_64:
+	just cargo-x86_64 run -- architecture os | grep -q '^x86_64$'
 
 # test os architecture detection on different CPUs
 test-os-detection: test-os-detection-aarch64 test-os-detection-armv7 test-os-detection-i686 test-os-detection-riscv64 test-os-detection-x86_64
