@@ -44,9 +44,6 @@ cargo-aarch64 command *options:
 cargo-armv7 command *options:
 	cross {{command}} --target armv7-unknown-linux-musleabihf -F bundled-tls {{options}}
 
-cargo-i586 command *options:
-	cross {{command}} --target i586-unknown-linux-musl -F bundled-tls {{options}}
-
 cargo-i686 command *options:
 	cross {{command}} --target i686-unknown-linux-musl -F bundled-tls {{options}}
 
@@ -58,10 +55,10 @@ cargo-x86_64 command *options:
 	cross {{command}} --target x86_64-unknown-linux-musl -F bundled-tls {{options}}
 
 # run unit tests on different CPU architectures
-test-cross-platform: (cargo-aarch64 'test') (cargo-armv7 'test') (cargo-i586 'test') (cargo-i686 'test') (cargo-riscv64 'test') (cargo-x86_64 'test')
+test-cross-platform: (cargo-aarch64 'test') (cargo-armv7 'test') (cargo-i686 'test') (cargo-riscv64 'test') (cargo-x86_64 'test')
 
 # build for different CPU architectures
-test-build: (cargo-aarch64 'build') (cargo-armv7 'build') (cargo-i586 'build') (cargo-i686 'build') (cargo-riscv64 'build') (cargo-x86_64 'build')
+test-build: (cargo-aarch64 'build') (cargo-armv7 'build') (cargo-i686 'build') (cargo-riscv64 'build') (cargo-x86_64 'build')
 
 test-cpu-detection-armv7: (cargo-armv7 'build')
 	@#qemu-arm -cpu max target/armv7-unknown-linux-musleabihf/debug/pkgstats architecture system | grep -q '^aarch64$'
@@ -72,11 +69,6 @@ test-cpu-detection-aarch64: (cargo-aarch64 'build')
 
 test-cpu-detection-riscv64:
 	just cargo-riscv64 run -- architecture system | grep -q '^riscv64$'
-
-test-cpu-detection-i586: (cargo-i586 'build')
-	#qemu-i386 -cpu pentium target/i586-unknown-linux-musl/debug/pkgstats architecture system | grep -q '^i586$'
-	@# i586 on x86_64
-	@#qemu-x86_64 /usr/bin/linux32 target/i586-unknown-linux-musl/debug/pkgstats architecture system | grep -q '^x86_64'
 
 test-cpu-detection-i686: (cargo-i686 'build')
 	qemu-i386 -cpu coreduo target/i686-unknown-linux-musl/debug/pkgstats architecture system | grep -q '^i686$'
@@ -91,16 +83,13 @@ test-cpu-detection-x86_64: (cargo-x86_64 'build')
 	if qemu-x86_64 -version | grep -Eq 'version (7\.[2-9]|[8-9]\.)[0-9]*\.[0-9]+$'; then qemu-x86_64 -cpu Haswell target/x86_64-unknown-linux-musl/debug/pkgstats architecture system 2>&1 | grep -q '^x86_64_v3$'; fi
 
 # test cpu architecture detection on different CPUs
-test-cpu-detection: test-cpu-detection-armv7 test-cpu-detection-aarch64 test-cpu-detection-riscv64 test-cpu-detection-x86_64 test-cpu-detection-i686 test-cpu-detection-i586 
+test-cpu-detection: test-cpu-detection-armv7 test-cpu-detection-aarch64 test-cpu-detection-riscv64 test-cpu-detection-x86_64 test-cpu-detection-i686
 
 test-os-detection-aarch64: (cargo-aarch64 'build')
 	qemu-aarch64 target/aarch64-unknown-linux-musl/debug/pkgstats architecture os | grep -q '^aarch64$'
 
 test-os-detection-armv7: (cargo-armv7 'build')
 	qemu-arm -cpu max target/armv7-unknown-linux-musleabihf/debug/pkgstats architecture os | grep -q '^armv7l$'
-
-test-os-detection-i586: (cargo-i586 'build')
-	qemu-i386 -cpu pentium target/i586-unknown-linux-musl/debug/pkgstats architecture os | grep -q '^i586$'
 
 test-os-detection-i686: (cargo-i686 'build')
 	qemu-i386 -cpu coreduo target/i686-unknown-linux-musl/debug/pkgstats architecture os | grep -q '^i686$'
@@ -114,7 +103,7 @@ test-os-detection-x86_64: (cargo-x86_64 'build')
 	qemu-x86_64 target/x86_64-unknown-linux-musl/debug/pkgstats architecture os | grep -q '^x86_64$'
 
 # test os architecture detection on different CPUs
-test-os-detection: test-os-detection-aarch64 test-os-detection-armv7 test-os-detection-i586 test-os-detection-i686 test-os-detection-riscv64 test-os-detection-x86_64
+test-os-detection: test-os-detection-aarch64 test-os-detection-armv7 test-os-detection-i686 test-os-detection-riscv64 test-os-detection-x86_64
 
 # run integration tests with a mocked API server
 test-integration:
