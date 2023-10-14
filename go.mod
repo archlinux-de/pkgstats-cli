@@ -1,6 +1,6 @@
 module pkgstats-cli
 
-go 1.21.1
+go 1.21.3
 
 require (
 	github.com/intel-go/cpuid v0.0.0-20220614022739-219e067757cb
