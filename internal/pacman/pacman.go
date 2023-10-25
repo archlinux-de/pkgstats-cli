@@ -3,10 +3,8 @@ package pacman
 import (
 	"context"
 	"errors"
-	"fmt"
 	"net/url"
 	"os/exec"
-	"regexp"
 	"strings"
 	"time"
 )
@@ -57,12 +55,28 @@ func (pacman *Pacman) GetServer() (string, error) {
 	}
 
 	mirrorUrl, _ := url.Parse(mirror)
-	path := regexp.MustCompile(fmt.Sprintf(`^(.*/)%s/os/.*`, pacman.repository)).ReplaceAllString(mirrorUrl.Path, "$1")
-
-	port := ""
-	if mirrorUrl.Port() != "" {
-		port = ":" + mirrorUrl.Port()
-	}
+	path := extractMirrorPath(mirrorUrl.Path)
+	port := extractMirrorPort(mirrorUrl.Port())
 
 	return mirrorUrl.Scheme + "://" + mirrorUrl.Hostname() + port + path, err
+}
+
+func extractMirrorPort(input string) string {
+	port := ""
+	if input != "" {
+		port = ":" + input
+	}
+
+	return port
+}
+
+func extractMirrorPath(input string) string {
+	directories := strings.Split(input, "/")
+	path := ""
+	if len(directories) > 3 {
+		path = strings.Join(directories[:len(directories)-3], "/")
+	}
+	path = path + "/"
+
+	return path
 }

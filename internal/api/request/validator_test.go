@@ -4,34 +4,45 @@ import (
 	"testing"
 )
 
-func TestValidPackageName(t *testing.T) {
-	result := ValidatePackageName("foo")
+var validPackageNames = []string{"pacman", "@pacman", "_pacman", "+pacman", "pacman-contrib", "pacman_foo", "pacman@7", "pacman+bar", "pacman.bar"}
+var invalidPackageNames = []string{"-pacman", ".pacman", "ö", "", "pacman-ö"}
 
-	if !result {
-		t.Error("name should be valid")
+func TestValidPackageName(t *testing.T) {
+	for _, name := range validPackageNames {
+		result := ValidatePackageName(name)
+
+		if !result {
+			t.Error("name should be valid:", name)
+		}
 	}
 }
 
 func TestInvalidPackageName(t *testing.T) {
-	result := ValidatePackageName("üß")
+	for _, name := range invalidPackageNames {
+		result := ValidatePackageName(name)
 
-	if result {
-		t.Error("name should be invalid")
+		if result {
+			t.Error("name should be invalid")
+		}
 	}
 }
 
 func TestValidPackageNames(t *testing.T) {
-	result := ValidatePackageNames([]string{"foo", "bar"})
+	for _, name := range validPackageNames {
+		result := ValidatePackageNames(append([]string{"foo"}, name))
 
-	if !result {
-		t.Error("names should be valid")
+		if !result {
+			t.Error("names should be valid")
+		}
 	}
 }
 
 func TestInvalidPackageNames(t *testing.T) {
-	result := ValidatePackageNames([]string{"foo", "bar", "_baz"})
+	for _, name := range invalidPackageNames {
+		result := ValidatePackageNames(append([]string{"foo"}, name))
 
-	if result {
-		t.Error("names should be invalid")
+		if result {
+			t.Error("names should be invalid")
+		}
 	}
 }
