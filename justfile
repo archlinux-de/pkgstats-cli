@@ -7,6 +7,10 @@ export CGO_LDFLAGS := env_var_or_default('LDFLAGS', '')
 default:
 	@just --list
 
+# Prepare sources in order to build offline
+prepare:
+	go mod download
+
 # build pkgstats for production
 build:
 	go build -a -o pkgstats \
