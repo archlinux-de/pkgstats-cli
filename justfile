@@ -10,8 +10,8 @@ default:
 # build pkgstats for production
 build:
 	go build -a -o pkgstats \
-		-trimpath -buildmode=pie -mod=readonly -modcacherw \
-		-ldflags '-linkmode=external -s -w -X pkgstats-cli/internal/build.Version={{`git describe --tags`}}'
+		-buildmode=pie -mod=readonly -modcacherw \
+		-ldflags 'ompressdwarf=false -linkmode=external -s -w -X pkgstats-cli/internal/build.Version={{`git describe --tags`}}'
 
 # update go modules
 update:
