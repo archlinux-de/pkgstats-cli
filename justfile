@@ -14,7 +14,7 @@ prepare:
 # build pkgstats for production
 build:
 	go build -a -o pkgstats \
-		-buildmode=pie -mod=readonly -modcacherw \
+		-buildmode=pie -mod=readonly -modcacherw -buildvcs=false \
 		-ldflags 'ompressdwarf=false -linkmode=external -s -w -X pkgstats-cli/internal/build.Version={{`git describe --tags`}}'
 
 # update go modules
@@ -54,7 +54,7 @@ test-cross-platform:
 test-build:
 	@for arch in amd64 386 arm64 arm riscv64 loong64; do \
 		echo "Building for ${arch}"; \
-		CGO_ENABLED=0 GOARCH=${arch} go build -o tests/build/pkgstats-${arch}; \
+		CGO_ENABLED=0 GOARCH=${arch} go build -buildvcs=false -o tests/build/pkgstats-${arch}; \
 	done
 
 # test cpu architecture detection on different CPUs
