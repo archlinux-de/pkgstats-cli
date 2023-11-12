@@ -15,7 +15,7 @@ prepare:
 build:
 	go build -a -o pkgstats \
 		-buildmode=pie -mod=readonly -modcacherw -buildvcs=false \
-		-ldflags 'ompressdwarf=false -linkmode=external -s -w -X pkgstats-cli/internal/build.Version={{`git describe --tags`}}'
+		-ldflags '-compressdwarf=false -linkmode=external -s -w -X pkgstats-cli/internal/build.Version={{`git describe --tags`}}'
 
 # update go modules
 update:
