@@ -8,7 +8,9 @@ prepare:
 
 # build pkgstats for production
 build:
-	VERSION={{`git describe --tags`}} cargo build --frozen --release
+	VERSION="{{`git describe --tags`}}" \
+	RUSTFLAGS="--remap-path-prefix {{justfile_directory()}}=/ --remap-path-prefix ${HOME}=/" \
+	cargo build --frozen --release
 
 # update dependencies
 update:
