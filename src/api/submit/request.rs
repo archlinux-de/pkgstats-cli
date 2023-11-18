@@ -31,7 +31,7 @@ pub struct Request {
 impl Request {
     pub fn create() -> Self {
         Self {
-            version: "4".to_owned(),
+            version: "3".to_owned(),
             system: System {
                 architecture: get_cpu_architecture().unwrap(),
             },

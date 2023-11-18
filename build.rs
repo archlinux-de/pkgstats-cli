@@ -6,6 +6,11 @@ use std::{env, fs, path};
 include!("src/cli.rs");
 
 fn main() {
+    set_version();
+    generate_shell_completion();
+}
+
+fn generate_shell_completion() {
     let outdir = match env::var_os("OUT_DIR") {
         None => return,
         Some(outdir) => outdir,
@@ -30,4 +35,11 @@ fn main() {
     for &shell in &[Shell::Bash, Shell::Fish, Shell::Zsh] {
         generate_to(shell, &mut cmd, crate_name!(), &completions_dir).unwrap();
     }
+}
+
+fn set_version() {
+    if let Ok(val) = std::env::var("VERSION") {
+        println!("cargo:rustc-env=CARGO_PKG_VERSION={}", val);
+    }
+    println!("cargo:rerun-if-env-changed=VERSION");
 }
