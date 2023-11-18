@@ -26,7 +26,7 @@ switch ($requestPath) {
 		$request = json_decode(file_get_contents('php://input'), true);
 
 		if (
-			$request['version'] === '4'
+			$request['version'] === '3'
 			&& $request['os']['architecture'] === php_uname('m')
 			&& in_array($request['system']['architecture'], ['x86_64', 'x86_64_v2', 'x86_64_v3', 'x86_64_v4'])
 			&& preg_match('#^https?://.+$#', $request['pacman']['mirror'])

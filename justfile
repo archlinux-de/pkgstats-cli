@@ -8,7 +8,7 @@ prepare:
 
 # build pkgstats for production
 build:
-	cargo build --frozen --release
+	VERSION={{`git describe --tags`}} cargo build --frozen --release
 
 # update dependencies
 update:

@@ -17,7 +17,7 @@ function setup() {
 
 @test "show information to be sent" {
 	$PKGSTATS submit --dump-json
-	[ $(echo "${output}" | jq -r '.version') -eq 4 ]
+	[ $(echo "${output}" | jq -r '.version') -eq 3 ]
 	echo "${output}" | jq -r '.system.architecture' | grep -q '^x86_64'
 	[ $(echo "${output}" | jq -r '.os.architecture') = 'x86_64' ]
 	echo "${output}" | jq -r '.pacman.mirror' | grep -q '^https://'
