@@ -18,7 +18,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.21'
+          go-version: '1.22'
       - name: Staticcheck
         uses: dominikh/staticcheck-action@v1.3.0
         with:
@@ -39,7 +39,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.21'
+          go-version: '1.22'
       - run: just test
 
   test-build:
@@ -56,7 +56,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.21'
+          go-version: '1.22'
       - run: just test-build
       - run: just build
 
@@ -85,7 +85,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.21'
+          go-version: '1.22'
       - name: Update APT
         run: sudo apt-get update
       - name: Install Qemu
@@ -104,7 +104,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.21'
+          go-version: '1.22'
       - name: Update APT
         run: sudo apt-get update
       - name: Install Qemu
