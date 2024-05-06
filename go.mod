@@ -5,7 +5,7 @@ go 1.22.2
 require (
 	github.com/intel-go/cpuid v0.0.0-20220614022739-219e067757cb
 	github.com/spf13/cobra v1.8.0
-	golang.org/x/sys v0.19.0
+	golang.org/x/sys v0.20.0
 )
 
 require (
