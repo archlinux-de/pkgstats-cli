@@ -77,5 +77,6 @@ func async[T any](f func() (T, error)) chan result[T] {
 		v, e := f()
 		c <- result[T]{v, e}
 	}()
+
 	return c
 }

@@ -12,20 +12,22 @@ import (
 	"time"
 )
 
+const timeout = 5 * time.Second
+
 type Client struct {
 	Client  *http.Client
 	baseURL string
 }
 
 type PackagePopularity struct {
-	Name       string
-	Popularity float64
+	Name       string  `json:"name"`
+	Popularity float64 `json:"popularity"`
 }
 
 type PackagePopularityList struct {
-	Total               int
-	Count               int
-	PackagePopularities []PackagePopularity
+	Total               int                 `json:"total"`
+	Count               int                 `json:"count"`
+	PackagePopularities []PackagePopularity `json:"packagePopularities"`
 }
 
 type packagePopularityResult struct {
@@ -35,7 +37,7 @@ type packagePopularityResult struct {
 
 func NewClient(baseURL string) *Client {
 	httpClient := &http.Client{
-		Timeout: 5 * time.Second,
+		Timeout: timeout,
 	}
 
 	client := Client{}
@@ -54,7 +56,7 @@ func (client *Client) query(path string, params url.Values) ([]byte, error) {
 
 	u.RawQuery = params.Encode()
 
-	req, err := http.NewRequest("GET", u.String(), nil)
+	req, err := http.NewRequest(http.MethodGet, u.String(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -70,6 +72,7 @@ func (client *Client) query(path string, params url.Values) ([]byte, error) {
 	defer response.Body.Close()
 
 	body, _ := io.ReadAll(response.Body)
+
 	return body, err
 }
 

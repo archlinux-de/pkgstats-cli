@@ -9,6 +9,8 @@ import (
 	"time"
 )
 
+const timeout = 10 * time.Second
+
 type Pacman struct {
 	timeout    time.Duration
 	pacman     string
@@ -18,12 +20,12 @@ type Pacman struct {
 }
 
 func NewPacman() Pacman {
-	pacman := Pacman{}
-	pacman.timeout = 10 * time.Second
-	pacman.pacman = "pacman"
-	pacman.pacmanConf = "pacman-conf"
-	pacman.repository = "core"
-	return pacman
+	return Pacman{
+		timeout:    timeout,
+		pacman:     "pacman",
+		pacmanConf: "pacman-conf",
+		repository: "core",
+	}
 }
 
 func (pacman *Pacman) GetInstalledPackages() ([]string, error) {
@@ -71,12 +73,13 @@ func extractMirrorPort(input string) string {
 }
 
 func extractMirrorPath(input string) string {
+	const directoryPattern = 3
 	directories := strings.Split(input, "/")
 	path := ""
-	if len(directories) > 3 {
-		path = strings.Join(directories[:len(directories)-3], "/")
+	if len(directories) > directoryPattern {
+		path = strings.Join(directories[:len(directories)-directoryPattern], "/")
 	}
-	path = path + "/"
+	path += "/"
 
 	return path
 }

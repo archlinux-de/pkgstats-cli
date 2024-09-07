@@ -9,8 +9,13 @@ import (
 	"text/tabwriter"
 )
 
+const (
+	minWidth = 15
+	padding  = 2
+)
+
 func PrintPackagePopularities(writer io.Writer, ppl PackagePopularityList) {
-	w := tabwriter.NewWriter(writer, 15, 0, 2, ' ', 0)
+	w := tabwriter.NewWriter(writer, minWidth, 0, padding, ' ', 0)
 	for _, pkg := range ppl.PackagePopularities {
 		fmt.Fprintf(w, "%s\t%.2f\n", pkg.Name, pkg.Popularity)
 	}

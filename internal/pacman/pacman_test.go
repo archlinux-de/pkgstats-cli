@@ -39,10 +39,11 @@ func TestMain(m *testing.M) {
 }
 
 func TestGetInstalledPackages(t *testing.T) {
-	pacman := Pacman{}
-	pacman.pacman = os.Args[0]
-	pacman.timeout = 1 * time.Second
-	pacman.env = []string{"TEST_MOCK=pacman"}
+	pacman := Pacman{
+		pacman:  os.Args[0],
+		timeout: 1 * time.Second,
+		env:     []string{"TEST_MOCK=pacman"},
+	}
 
 	out, err := pacman.GetInstalledPackages()
 
@@ -55,11 +56,12 @@ func TestGetInstalledPackages(t *testing.T) {
 }
 
 func TestGetServer(t *testing.T) {
-	pacman := Pacman{}
-	pacman.pacmanConf = os.Args[0]
-	pacman.timeout = 1 * time.Second
-	pacman.repository = "core"
-	pacman.env = []string{"TEST_MOCK=pacman-conf"}
+	pacman := Pacman{
+		pacmanConf: os.Args[0],
+		timeout:    1 * time.Second,
+		repository: "core",
+		env:        []string{"TEST_MOCK=pacman-conf"},
+	}
 
 	out, err := pacman.GetServer()
 

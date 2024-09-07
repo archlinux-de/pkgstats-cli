@@ -3,7 +3,6 @@ package submit
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -12,6 +11,8 @@ import (
 	"time"
 )
 
+const timeout = 15 * time.Second
+
 type Client struct {
 	Client  *http.Client
 	baseURL string
@@ -19,7 +20,7 @@ type Client struct {
 
 func NewClient(baseURL string) *Client {
 	httpClient := &http.Client{
-		Timeout: 15 * time.Second,
+		Timeout: timeout,
 	}
 
 	client := Client{}
@@ -41,7 +42,7 @@ func (client *Client) SendRequest(request Request) error {
 	}
 	u.Path = "/api/submit"
 
-	req, err := http.NewRequest("POST", u.String(), bytes.NewReader(payload))
+	req, err := http.NewRequest(http.MethodPost, u.String(), bytes.NewReader(payload))
 	if err != nil {
 		return err
 	}
@@ -54,12 +55,12 @@ func (client *Client) SendRequest(request Request) error {
 		return err
 	}
 
-	if response.StatusCode != 204 && err == nil {
-		body, _ := io.ReadAll(response.Body)
-		err = errors.New("Server Error:" + string(body))
-	}
-
 	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusNoContent {
+		body, _ := io.ReadAll(response.Body)
+		err = fmt.Errorf("server error: %s", string(body))
+	}
 
 	return err
 }

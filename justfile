@@ -31,6 +31,10 @@ check-vet:
 check-static:
 	staticcheck ./...
 
+# run golangci-lint
+golangci-lint args='run':
+    golangci-lint {{ args }}
+
 # check go format
 check-fmt:
 	test -z $(gofmt -l .)

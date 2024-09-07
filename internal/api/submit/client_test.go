@@ -18,7 +18,7 @@ func TestSendRequest(t *testing.T) {
 
 		validateRequest(t, req)
 
-		rw.WriteHeader(204)
+		rw.WriteHeader(http.StatusNoContent)
 	}))
 	defer server.Close()
 
@@ -36,7 +36,7 @@ func TestSendRequest(t *testing.T) {
 }
 
 func validateRequest(t *testing.T, req *http.Request) {
-	if req.Method != "POST" {
+	if req.Method != http.MethodPost {
 		t.Error("Invalid Method", req.Method)
 	}
 	if req.Header.Get("Accept") != "application/json" {
@@ -77,7 +77,8 @@ func TestSendRequestFollowsRedirect(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		if req.URL.Query().Get("redirect") == "" {
 			rw.Header().Add("Location", "/api/submit?redirect=1")
-			rw.WriteHeader(308)
+			rw.WriteHeader(http.StatusPermanentRedirect)
+
 			return
 		}
 		if req.URL.String() != "/api/submit?redirect=1" {
@@ -86,7 +87,7 @@ func TestSendRequestFollowsRedirect(t *testing.T) {
 
 		validateRequest(t, req)
 
-		rw.WriteHeader(204)
+		rw.WriteHeader(http.StatusNoContent)
 	}))
 	defer server.Close()
 
