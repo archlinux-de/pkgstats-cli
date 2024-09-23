@@ -17,7 +17,7 @@ var architectureCmd = &cobra.Command{
 		system := system.NewSystem()
 		osArchitecture, _ := system.GetArchitecture()
 		systemArchitecture, _ := system.GetCpuArchitecture()
-		fmt.Printf("You are using a %s CPU on a %s OS\n", systemArchitecture, osArchitecture)
+		fmt.Fprintf(cmd.OutOrStdout(), "You are using a %s CPU on a %s OS\n", systemArchitecture, osArchitecture)
 	},
 }
 
@@ -28,7 +28,7 @@ var osArchitectureCommand = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		system := system.NewSystem()
 		osArchitecture, _ := system.GetArchitecture()
-		fmt.Println(osArchitecture)
+		fmt.Fprintln(cmd.OutOrStdout(), osArchitecture)
 	},
 }
 
@@ -40,7 +40,7 @@ var systemArchitectureCommand = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		system := system.NewSystem()
 		systemArchitecture, _ := system.GetCpuArchitecture()
-		fmt.Println(systemArchitecture)
+		fmt.Fprintln(cmd.OutOrStdout(), systemArchitecture)
 	},
 }
 

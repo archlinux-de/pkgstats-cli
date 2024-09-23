@@ -125,7 +125,7 @@ install *DESTDIR='':
 	./pkgstats completion fish > "{{DESTDIR}}/usr/share/fish/vendor_completions.d/pkgstats.fish"
 
 # run all available tests
-test-all: check test test-build test-cpu-detection test-os-detection test-integration
+test-all: check test test-cross-platform test-build test-cpu-detection test-os-detection test-integration
 
 # remove any untracked and generated files
 clean:

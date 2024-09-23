@@ -12,7 +12,7 @@ var versionCmd = &cobra.Command{
 	Short: "Show the pkgstats client version",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("pkgstats, version", build.Version)
+		fmt.Fprintln(cmd.OutOrStdout(), "pkgstats, version", build.Version)
 	},
 }
 

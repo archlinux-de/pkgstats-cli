@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 	"pkgstats-cli/internal/api/request"
 
 	"github.com/spf13/cobra"
@@ -29,9 +28,9 @@ var showCmd = &cobra.Command{
 			return err
 		}
 
-		request.PrintPackagePopularities(os.Stdout, ppl)
-		fmt.Println()
-		request.PrintShowURL(os.Stdout, baseURL, args)
+		request.PrintPackagePopularities(cmd.OutOrStdout(), ppl)
+		fmt.Fprintln(cmd.OutOrStdout())
+		request.PrintShowURL(cmd.OutOrStdout(), baseURL, args)
 
 		return nil
 	},

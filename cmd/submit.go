@@ -25,7 +25,7 @@ var submitCmd = &cobra.Command{
 		}
 
 		if !dumpJSON && !quiet {
-			fmt.Println("Collecting data...")
+			fmt.Fprintln(cmd.OutOrStdout(), "Collecting data...")
 		}
 
 		request, err := submit.CreateRequest()
@@ -35,7 +35,7 @@ var submitCmd = &cobra.Command{
 
 		if !dumpJSON {
 			if !quiet {
-				fmt.Println("Submitting data...")
+				fmt.Fprintln(cmd.OutOrStdout(), "Submitting data...")
 			}
 			client := submit.NewClient(baseURL)
 
@@ -45,14 +45,14 @@ var submitCmd = &cobra.Command{
 			}
 
 			if !quiet {
-				fmt.Println("Data were successfully sent")
+				fmt.Fprintln(cmd.OutOrStdout(), "Data were successfully sent")
 			}
 		} else {
 			formatedRequest, err := json.MarshalIndent(request, "", "  ")
 			if err != nil {
 				return err
 			}
-			fmt.Println(string(formatedRequest))
+			fmt.Fprintln(cmd.OutOrStdout(), string(formatedRequest))
 		}
 
 		return nil

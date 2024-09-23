@@ -25,9 +25,13 @@ func Execute() {
 func init() {
 	rootCmd.PersistentFlags().StringVar(&baseURL, baseUrlParam, baseURL, "base url of the pkgstats server")
 	if err := rootCmd.PersistentFlags().MarkHidden(baseUrlParam); err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		fmt.Fprintln(rootCmd.ErrOrStderr(), err)
 		os.Exit(1)
 	}
 
 	rootCmd.CompletionOptions.HiddenDefaultCmd = true
+}
+
+func GetRootCmd() *cobra.Command {
+	return rootCmd
 }
