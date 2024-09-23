@@ -2,11 +2,22 @@ package integration_test
 
 import (
 	"encoding/json"
+	"os/exec"
 	"pkgstats-cli/internal/system"
 	"slices"
 	"strings"
 	"testing"
 )
+
+func requiresPacman(t *testing.T) {
+	t.Helper()
+	if _, err := exec.LookPath("pacman"); err != nil {
+		t.Skip("tests require pacman to be installed")
+	}
+	if _, err := exec.LookPath("pacman-conf"); err != nil {
+		t.Skip("tests require pacman-conf to be installed")
+	}
+}
 
 func TestShowHelp(t *testing.T) {
 	output, err := pkgstats("help")
@@ -29,6 +40,8 @@ func TestShowVersion(t *testing.T) {
 }
 
 func TestShowInformationToBeSent(t *testing.T) {
+	requiresPacman(t)
+
 	system := system.NewSystem()
 	osArchitecture, _ := system.GetArchitecture()
 	cpuArchitecture, _ := system.GetCpuArchitecture()
@@ -59,6 +72,8 @@ func TestShowInformationToBeSent(t *testing.T) {
 }
 
 func TestSetQuietMode(t *testing.T) {
+	requiresPacman(t)
+
 	output, err := pkgstats("submit", "--quiet")
 	if err != nil {
 		t.Fatalf("Failed to run command: %v", err)
@@ -69,6 +84,8 @@ func TestSetQuietMode(t *testing.T) {
 }
 
 func TestSendInformation(t *testing.T) {
+	requiresPacman(t)
+
 	output, err := pkgstats("submit")
 	if err != nil {
 		t.Fatalf("Failed to run command: %v", err)
