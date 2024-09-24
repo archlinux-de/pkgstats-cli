@@ -60,7 +60,7 @@ func handlePackages(w http.ResponseWriter, r *http.Request) {
 			{"name": "php-fpm", "popularity": 12.34},
 		},
 	}
-	json.NewEncoder(w).Encode(response)
+	_ = json.NewEncoder(w).Encode(response)
 }
 
 func handlePackagesPacman(w http.ResponseWriter, r *http.Request) {
@@ -68,7 +68,7 @@ func handlePackagesPacman(w http.ResponseWriter, r *http.Request) {
 		"name":       "pacman",
 		"popularity": 12.34,
 	}
-	json.NewEncoder(w).Encode(response)
+	_ = json.NewEncoder(w).Encode(response)
 }
 
 func handlePackagesPhp(w http.ResponseWriter, r *http.Request) {
@@ -76,7 +76,7 @@ func handlePackagesPhp(w http.ResponseWriter, r *http.Request) {
 		"name":       "php",
 		"popularity": 56.78,
 	}
-	json.NewEncoder(w).Encode(response)
+	_ = json.NewEncoder(w).Encode(response)
 }
 
 func handleDefault(w http.ResponseWriter, r *http.Request) {

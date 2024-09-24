@@ -29,7 +29,7 @@ func pkgstats(args ...string) (output string, err error) {
 
 func resetFlags(cmd *cobra.Command) {
 	cmd.Flags().VisitAll(func(flag *pflag.Flag) {
-		flag.Value.Set(flag.DefValue)
+		_ = flag.Value.Set(flag.DefValue)
 	})
 	for _, subCmd := range cmd.Commands() {
 		resetFlags(subCmd)
