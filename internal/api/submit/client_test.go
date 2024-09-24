@@ -10,6 +10,12 @@ import (
 	"testing"
 )
 
+const (
+	ARCH_X86_64 = "x86_64"
+	ARCH_I686   = "i686"
+	MIRROR      = "https://geo.mirror.pkgbuild.com/"
+)
+
 func TestSendRequest(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		if req.URL.String() != "/api/submit" {
@@ -25,9 +31,9 @@ func TestSendRequest(t *testing.T) {
 	client := Client{server.Client(), server.URL}
 	request := NewRequest()
 	request.Pacman.Packages = []string{"pacman", "linux"}
-	request.System.Architecture = "x86_64"
-	request.OS.Architecture = "i686"
-	request.Pacman.Mirror = "https://geo.mirror.pkgbuild.com/"
+	request.System.Architecture = ARCH_X86_64
+	request.OS.Architecture = ARCH_I686
+	request.Pacman.Mirror = MIRROR
 	err := client.SendRequest(*request)
 
 	if err != nil {
@@ -62,13 +68,13 @@ func validateRequest(t *testing.T, req *http.Request) {
 	if strings.Join(request.Pacman.Packages, ",") != "pacman,linux" {
 		t.Error("Invalid packages value")
 	}
-	if request.System.Architecture != "x86_64" {
+	if request.System.Architecture != ARCH_X86_64 {
 		t.Error("Invalid cpuarch value")
 	}
-	if request.OS.Architecture != "i686" {
+	if request.OS.Architecture != ARCH_I686 {
 		t.Error("Invalid arch value")
 	}
-	if request.Pacman.Mirror != "https://geo.mirror.pkgbuild.com/" {
+	if request.Pacman.Mirror != MIRROR {
 		t.Error("Invalid mirror value")
 	}
 }
@@ -94,9 +100,9 @@ func TestSendRequestFollowsRedirect(t *testing.T) {
 	client := Client{server.Client(), server.URL}
 	request := NewRequest()
 	request.Pacman.Packages = []string{"pacman", "linux"}
-	request.System.Architecture = "x86_64"
-	request.OS.Architecture = "i686"
-	request.Pacman.Mirror = "https://geo.mirror.pkgbuild.com/"
+	request.System.Architecture = ARCH_X86_64
+	request.OS.Architecture = ARCH_I686
+	request.Pacman.Mirror = MIRROR
 	err := client.SendRequest(*request)
 
 	if err != nil {
