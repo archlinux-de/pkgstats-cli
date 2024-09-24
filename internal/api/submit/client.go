@@ -7,8 +7,9 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"pkgstats-cli/internal/build"
 	"time"
+
+	"pkgstats-cli/internal/build"
 )
 
 const timeout = 15 * time.Second
@@ -50,7 +51,6 @@ func (client *Client) SendRequest(request Request) error {
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", fmt.Sprintf("pkgstats/%s", build.Version))
 	response, err := client.Client.Do(req)
-
 	if err != nil {
 		return err
 	}

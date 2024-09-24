@@ -3,6 +3,7 @@ package integration_test
 import (
 	"bytes"
 	"net/http/httptest"
+
 	"pkgstats-cli/cmd"
 
 	"github.com/spf13/cobra"

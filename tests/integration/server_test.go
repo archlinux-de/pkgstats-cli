@@ -4,9 +4,10 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
-	"pkgstats-cli/internal/system"
 	"regexp"
 	"slices"
+
+	"pkgstats-cli/internal/system"
 )
 
 func NewServer() *http.ServeMux {

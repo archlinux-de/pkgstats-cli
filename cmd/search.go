@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+
 	"pkgstats-cli/internal/api/request"
 
 	"github.com/spf13/cobra"

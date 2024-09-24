@@ -6,10 +6,11 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"pkgstats-cli/internal/build"
 	"sort"
 	"strconv"
 	"time"
+
+	"pkgstats-cli/internal/build"
 )
 
 const timeout = 5 * time.Second
@@ -64,7 +65,6 @@ func (client *Client) query(path string, params url.Values) ([]byte, error) {
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", fmt.Sprintf("pkgstats/%s", build.Version))
 	response, err := client.Client.Do(req)
-
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +108,6 @@ func (client *Client) GetPackage(p string) (PackagePopularity, error) {
 	var pp PackagePopularity
 
 	response, err := client.query(fmt.Sprintf("/api/packages/%s", url.QueryEscape(p)), url.Values{})
-
 	if err != nil {
 		return pp, err
 	}
@@ -129,7 +128,6 @@ func (client *Client) SearchPackages(query string, limit int) (PackagePopularity
 	params.Add("query", query)
 
 	response, err := client.query("/api/packages", params)
-
 	if err != nil {
 		return ppl, err
 	}

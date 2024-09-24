@@ -3,10 +3,11 @@ package integration_test
 import (
 	"encoding/json"
 	"os/exec"
-	"pkgstats-cli/internal/system"
 	"slices"
 	"strings"
 	"testing"
+
+	"pkgstats-cli/internal/system"
 )
 
 func requiresPacman(t *testing.T) {

@@ -11,7 +11,6 @@ func TestGetArchitecture(t *testing.T) {
 	system := System{}
 
 	cpuArch, err := system.GetArchitecture()
-
 	if err != nil {
 		t.Error(err)
 	}

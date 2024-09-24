@@ -1,7 +1,6 @@
 package system
 
-type System struct {
-}
+type System struct{}
 
 func NewSystem() System {
 	system := System{}

@@ -32,8 +32,12 @@ check-static:
 	staticcheck ./...
 
 # run golangci-lint
-golangci-lint args='run':
+golangci-lint *args='run':
     golangci-lint {{ args }}
+
+# run gofumpt
+gofumpt *args='-w':
+    gofumpt {{ args }}
 
 # check go format
 check-fmt:

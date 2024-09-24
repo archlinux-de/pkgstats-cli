@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+
 	"pkgstats-cli/internal/api/submit"
 
 	"github.com/spf13/cobra"

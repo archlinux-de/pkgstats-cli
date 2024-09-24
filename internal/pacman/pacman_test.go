@@ -46,7 +46,6 @@ func TestGetInstalledPackages(t *testing.T) {
 	}
 
 	out, err := pacman.GetInstalledPackages()
-
 	if err != nil {
 		t.Error(err, out)
 	}
@@ -64,7 +63,6 @@ func TestGetServer(t *testing.T) {
 	}
 
 	out, err := pacman.GetServer()
-
 	if err != nil {
 		t.Error(err, out)
 	}

@@ -4,8 +4,10 @@ import (
 	"testing"
 )
 
-var validPackageNames = []string{"pacman", "@pacman", "_pacman", "+pacman", "pacman-contrib", "pacman_foo", "pacman@7", "pacman+bar", "pacman.bar"}
-var invalidPackageNames = []string{"-pacman", ".pacman", "ö", "", "pacman-ö"}
+var (
+	validPackageNames   = []string{"pacman", "@pacman", "_pacman", "+pacman", "pacman-contrib", "pacman_foo", "pacman@7", "pacman+bar", "pacman.bar"}
+	invalidPackageNames = []string{"-pacman", ".pacman", "ö", "", "pacman-ö"}
+)
 
 func TestValidPackageName(t *testing.T) {
 	for _, name := range validPackageNames {

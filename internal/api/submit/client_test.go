@@ -5,9 +5,10 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
-	"pkgstats-cli/internal/build"
 	"strings"
 	"testing"
+
+	"pkgstats-cli/internal/build"
 )
 
 const (
@@ -35,7 +36,6 @@ func TestSendRequest(t *testing.T) {
 	request.OS.Architecture = ARCH_I686
 	request.Pacman.Mirror = MIRROR
 	err := client.SendRequest(*request)
-
 	if err != nil {
 		t.Error(err)
 	}
@@ -104,7 +104,6 @@ func TestSendRequestFollowsRedirect(t *testing.T) {
 	request.OS.Architecture = ARCH_I686
 	request.Pacman.Mirror = MIRROR
 	err := client.SendRequest(*request)
-
 	if err != nil {
 		t.Error(err)
 	}

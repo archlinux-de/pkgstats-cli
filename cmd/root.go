@@ -9,11 +9,13 @@ import (
 
 const baseUrlParam = "base-url"
 
-var baseURL = "https://pkgstats.archlinux.de"
-var rootCmd = &cobra.Command{
-	Use:   "pkgstats",
-	Short: "pkgstats client",
-}
+var (
+	baseURL = "https://pkgstats.archlinux.de"
+	rootCmd = &cobra.Command{
+		Use:   "pkgstats",
+		Short: "pkgstats client",
+	}
+)
 
 // Execute executes the root command.
 func Execute() {
