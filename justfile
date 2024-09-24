@@ -130,5 +130,3 @@ test-all: check test test-cross-platform test-build test-cpu-detection test-os-d
 # remove any untracked and generated files
 clean:
 	git clean -fdqx -e .idea
-
-# vim: set ft=make :
