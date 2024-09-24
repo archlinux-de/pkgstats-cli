@@ -3,7 +3,6 @@ package integration_test
 import (
 	"encoding/json"
 	"io"
-	"log"
 	"net/http"
 	"pkgstats-cli/internal/system"
 	"regexp"
@@ -21,18 +20,12 @@ func NewServer() *http.ServeMux {
 }
 
 func handleSubmit(w http.ResponseWriter, r *http.Request) {
-	userAgent := r.Header.Get("User-Agent")
-	requestUri := r.RequestURI
-	log.Printf("Got request from %s on %s", userAgent, requestUri)
-
-	if !regexp.MustCompile(`^pkgstats/[\w.-]+$`).MatchString(userAgent) {
+	if !regexp.MustCompile(`^pkgstats/[\w.-]+$`).MatchString(r.Header.Get("User-Agent")) {
 		http.Error(w, "Invalid user agent", http.StatusBadRequest)
-		log.Println("Invalid user agent")
 		return
 	}
 
 	if r.URL.Query().Get("redirect") == "" {
-		log.Println("Testing redirect")
 		w.Header().Set("Location", "/api/submit?redirect=1")
 		w.WriteHeader(http.StatusPermanentRedirect)
 		return
@@ -52,11 +45,8 @@ func handleSubmit(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if isValidRequest(request) {
-		log.Println("Request was valid")
 		w.WriteHeader(http.StatusNoContent)
 	} else {
-		log.Println("Request was invalid")
-		log.Println(request)
 		http.Error(w, "TEST FAILED", http.StatusBadRequest)
 	}
 }
@@ -90,7 +80,6 @@ func handlePackagesPhp(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleDefault(w http.ResponseWriter, r *http.Request) {
-	log.Println("Unknown request")
 	http.Error(w, "Unknown request", http.StatusBadRequest)
 }
 
