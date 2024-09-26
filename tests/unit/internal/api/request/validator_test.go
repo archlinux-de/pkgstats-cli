@@ -1,7 +1,9 @@
-package request
+package request_test
 
 import (
 	"testing"
+
+	"pkgstats-cli/internal/api/request"
 )
 
 var (
@@ -11,7 +13,7 @@ var (
 
 func TestValidPackageName(t *testing.T) {
 	for _, name := range validPackageNames {
-		result := ValidatePackageName(name)
+		result := request.ValidatePackageName(name)
 
 		if !result {
 			t.Error("name should be valid:", name)
@@ -21,7 +23,7 @@ func TestValidPackageName(t *testing.T) {
 
 func TestInvalidPackageName(t *testing.T) {
 	for _, name := range invalidPackageNames {
-		result := ValidatePackageName(name)
+		result := request.ValidatePackageName(name)
 
 		if result {
 			t.Error("name should be invalid")
@@ -31,7 +33,7 @@ func TestInvalidPackageName(t *testing.T) {
 
 func TestValidPackageNames(t *testing.T) {
 	for _, name := range validPackageNames {
-		result := ValidatePackageNames(append([]string{"foo"}, name))
+		result := request.ValidatePackageNames(append([]string{"foo"}, name))
 
 		if !result {
 			t.Error("names should be valid")
@@ -41,7 +43,7 @@ func TestValidPackageNames(t *testing.T) {
 
 func TestInvalidPackageNames(t *testing.T) {
 	for _, name := range invalidPackageNames {
-		result := ValidatePackageNames(append([]string{"foo"}, name))
+		result := request.ValidatePackageNames(append([]string{"foo"}, name))
 
 		if result {
 			t.Error("names should be invalid")

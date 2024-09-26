@@ -1,14 +1,16 @@
 //go:build !linux
 
-package system
+package system_test
 
 import (
 	"runtime"
 	"testing"
+
+	"pkgstats-cli/internal/system"
 )
 
 func TestGetArchitecture(t *testing.T) {
-	system := System{}
+	system := system.System{}
 
 	cpuArch, err := system.GetArchitecture()
 	if err != nil {

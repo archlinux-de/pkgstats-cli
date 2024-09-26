@@ -1,6 +1,6 @@
 //go:build amd64 || 386
 
-package pacman
+package pacman_test
 
 import (
 	"fmt"
@@ -8,6 +8,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"pkgstats-cli/internal/pacman"
 )
 
 func init() {
@@ -39,10 +41,10 @@ func TestMain(m *testing.M) {
 }
 
 func TestGetInstalledPackages(t *testing.T) {
-	pacman := Pacman{
-		pacman:  os.Args[0],
-		timeout: 1 * time.Second,
-		env:     []string{"TEST_MOCK=pacman"},
+	pacman := pacman.Pacman{
+		Pacman:  os.Args[0],
+		Timeout: 1 * time.Second,
+		Env:     []string{"TEST_MOCK=pacman"},
 	}
 
 	out, err := pacman.GetInstalledPackages()
@@ -55,11 +57,11 @@ func TestGetInstalledPackages(t *testing.T) {
 }
 
 func TestGetServer(t *testing.T) {
-	pacman := Pacman{
-		pacmanConf: os.Args[0],
-		timeout:    1 * time.Second,
-		repository: "core",
-		env:        []string{"TEST_MOCK=pacman-conf"},
+	pacman := pacman.Pacman{
+		PacmanConf: os.Args[0],
+		Timeout:    1 * time.Second,
+		Repository: "core",
+		Env:        []string{"TEST_MOCK=pacman-conf"},
 	}
 
 	out, err := pacman.GetServer()

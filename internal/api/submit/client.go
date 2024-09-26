@@ -16,7 +16,7 @@ const timeout = 15 * time.Second
 
 type Client struct {
 	Client  *http.Client
-	baseURL string
+	BaseURL string
 }
 
 func NewClient(baseURL string) *Client {
@@ -24,11 +24,10 @@ func NewClient(baseURL string) *Client {
 		Timeout: timeout,
 	}
 
-	client := Client{}
-	client.Client = httpClient
-	client.baseURL = baseURL
-
-	return &client
+	return &Client{
+		Client:  httpClient,
+		BaseURL: baseURL,
+	}
 }
 
 func (client *Client) SendRequest(request Request) error {
@@ -37,7 +36,7 @@ func (client *Client) SendRequest(request Request) error {
 		return err
 	}
 
-	u, err := url.Parse(client.baseURL)
+	u, err := url.Parse(client.BaseURL)
 	if err != nil {
 		return err
 	}

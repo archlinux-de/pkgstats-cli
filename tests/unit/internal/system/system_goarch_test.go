@@ -1,14 +1,16 @@
 //go:build !386 && !amd64 && !arm && !arm64
 
-package system
+package system_test
 
 import (
 	"runtime"
 	"testing"
+
+	"pkgstats-cli/internal/system"
 )
 
 func TestGetCpuArchitecture(t *testing.T) {
-	system := System{}
+	system := system.System{}
 
 	cpuArch, err := system.GetCpuArchitecture()
 	if err != nil {

@@ -1,14 +1,16 @@
-package system
+package system_test
 
 import (
 	"fmt"
 	"regexp"
 	"runtime"
 	"testing"
+
+	"pkgstats-cli/internal/system"
 )
 
 func TestGetMachine(t *testing.T) {
-	system := System{}
+	system := system.System{}
 
 	arch, err := system.GetArchitecture()
 

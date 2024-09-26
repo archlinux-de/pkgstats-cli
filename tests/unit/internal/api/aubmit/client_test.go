@@ -1,4 +1,4 @@
-package submit
+package submit_test
 
 import (
 	"encoding/json"
@@ -8,6 +8,7 @@ import (
 	"strings"
 	"testing"
 
+	"pkgstats-cli/internal/api/submit"
 	"pkgstats-cli/internal/build"
 )
 
@@ -29,8 +30,8 @@ func TestSendRequest(t *testing.T) {
 	}))
 	defer server.Close()
 
-	client := Client{server.Client(), server.URL}
-	request := NewRequest()
+	client := submit.Client{Client: server.Client(), BaseURL: server.URL}
+	request := submit.NewRequest()
 	request.Pacman.Packages = []string{"pacman", "linux"}
 	request.System.Architecture = ARCH_X86_64
 	request.OS.Architecture = ARCH_I686
@@ -52,7 +53,7 @@ func validateRequest(t *testing.T, req *http.Request) {
 		t.Error("Invalid User-Agent", req.UserAgent())
 	}
 
-	request := Request{}
+	request := submit.Request{}
 	body, err := io.ReadAll(req.Body)
 	if err != nil {
 		t.Errorf("Could not read request body %s", err)
@@ -97,8 +98,8 @@ func TestSendRequestFollowsRedirect(t *testing.T) {
 	}))
 	defer server.Close()
 
-	client := Client{server.Client(), server.URL}
-	request := NewRequest()
+	client := submit.Client{Client: server.Client(), BaseURL: server.URL}
+	request := submit.NewRequest()
 	request.Pacman.Packages = []string{"pacman", "linux"}
 	request.System.Architecture = ARCH_X86_64
 	request.OS.Architecture = ARCH_I686

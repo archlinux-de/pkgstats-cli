@@ -1,14 +1,16 @@
-package request
+package request_test
 
 import (
 	"bytes"
 	"regexp"
 	"testing"
+
+	"pkgstats-cli/internal/api/request"
 )
 
 func TestPrintPackagePopularities(t *testing.T) {
 	var buffer bytes.Buffer
-	PrintPackagePopularities(&buffer, PackagePopularityList{Total: 1, Count: 1, PackagePopularities: []PackagePopularity{{Name: "foo", Popularity: 12.34}}})
+	request.PrintPackagePopularities(&buffer, request.PackagePopularityList{Total: 1, Count: 1, PackagePopularities: []request.PackagePopularity{{Name: "foo", Popularity: 12.34}}})
 
 	output := buffer.String()
 
@@ -19,7 +21,7 @@ func TestPrintPackagePopularities(t *testing.T) {
 
 func TestPrintSearchURL(t *testing.T) {
 	var buffer bytes.Buffer
-	PrintSearchURL(&buffer, "/foo", "bar")
+	request.PrintSearchURL(&buffer, "/foo", "bar")
 
 	output := buffer.String()
 
@@ -30,7 +32,7 @@ func TestPrintSearchURL(t *testing.T) {
 
 func TestPrintShowURL(t *testing.T) {
 	var buffer bytes.Buffer
-	PrintShowURL(&buffer, "/foo", []string{"bar", "baz"})
+	request.PrintShowURL(&buffer, "/foo", []string{"bar", "baz"})
 
 	output := buffer.String()
 
