@@ -1,0 +1,13 @@
+linters:
+#  enable-all: false
+  enable:
+    - bodyclose
+    - goconst
+    - gocritic
+    - gofumpt
+    - mnd
+    - musttag
+    - usestdlibvars
+linters-settings:
+  gofumpt:
+    module-path: "pkgstats-cli"
