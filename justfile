@@ -36,7 +36,7 @@ golangci-lint *args='run':
     golangci-lint {{ args }}
 
 # run gofumpt
-gofumpt *args='-w':
+gofumpt *args='-w .':
     gofumpt {{ args }}
 
 # check go format

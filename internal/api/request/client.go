@@ -41,11 +41,10 @@ func NewClient(baseURL string) *Client {
 		Timeout: timeout,
 	}
 
-	client := Client{}
-	client.Client = httpClient
-	client.baseURL = baseURL
-
-	return &client
+	return &Client{
+		Client:  httpClient,
+		baseURL: baseURL,
+	}
 }
 
 func (client *Client) query(path string, params url.Values) ([]byte, error) {
