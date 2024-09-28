@@ -7,6 +7,8 @@ import (
 	"regexp"
 	"slices"
 
+	"pkgstats-cli/internal/api/request"
+	"pkgstats-cli/internal/api/submit"
 	"pkgstats-cli/internal/system"
 )
 
@@ -39,13 +41,13 @@ func handleSubmit(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	var request map[string]interface{}
+	var request submit.Request
 	if err := json.Unmarshal(body, &request); err != nil {
 		http.Error(w, "Invalid JSON", http.StatusBadRequest)
 		return
 	}
 
-	if isValidRequest(request) {
+	if isValidSubmitRequest(&request) {
 		w.WriteHeader(http.StatusNoContent)
 	} else {
 		http.Error(w, "TEST FAILED", http.StatusBadRequest)
@@ -53,30 +55,24 @@ func handleSubmit(w http.ResponseWriter, r *http.Request) {
 }
 
 func handlePackages(w http.ResponseWriter, r *http.Request) {
-	response := map[string]interface{}{
-		"total": 42,
-		"count": 2,
-		"packagePopularities": []map[string]interface{}{
-			{"name": "php", "popularity": 56.78},
-			{"name": "php-fpm", "popularity": 12.34},
+	response := request.PackagePopularityList{
+		Total: 42,
+		Count: 2,
+		PackagePopularities: []request.PackagePopularity{
+			{Name: "php", Popularity: 56.78},
+			{Name: "php-fpm", Popularity: 12.34},
 		},
 	}
 	_ = json.NewEncoder(w).Encode(response)
 }
 
 func handlePackagesPacman(w http.ResponseWriter, r *http.Request) {
-	response := map[string]interface{}{
-		"name":       "pacman",
-		"popularity": 12.34,
-	}
+	response := request.PackagePopularity{Name: "pacman", Popularity: 12.34}
 	_ = json.NewEncoder(w).Encode(response)
 }
 
 func handlePackagesPhp(w http.ResponseWriter, r *http.Request) {
-	response := map[string]interface{}{
-		"name":       "php",
-		"popularity": 56.78,
-	}
+	response := request.PackagePopularity{Name: "php", Popularity: 56.78}
 	_ = json.NewEncoder(w).Encode(response)
 }
 
@@ -84,15 +80,15 @@ func handleDefault(w http.ResponseWriter, r *http.Request) {
 	http.Error(w, "Unknown request", http.StatusBadRequest)
 }
 
-func isValidRequest(request map[string]interface{}) bool {
+func isValidSubmitRequest(request *submit.Request) bool {
 	system := system.NewSystem()
 	osArchitecture, _ := system.GetArchitecture()
 	cpuArchitecture, _ := system.GetCpuArchitecture()
 
-	return request["version"] == "3" &&
-		request["os"].(map[string]interface{})["architecture"] == osArchitecture &&
-		request["system"].(map[string]interface{})["architecture"] == cpuArchitecture &&
-		regexp.MustCompile(`^https?://.+$`).MatchString(request["pacman"].(map[string]interface{})["mirror"].(string)) &&
-		len(request["pacman"].(map[string]interface{})["packages"].([]interface{})) > 1 &&
-		slices.Contains(request["pacman"].(map[string]interface{})["packages"].([]interface{}), "pacman-mirrorlist")
+	return request.Version == "3" &&
+		request.OS.Architecture == osArchitecture &&
+		request.System.Architecture == cpuArchitecture &&
+		regexp.MustCompile(`^https?://.+$`).MatchString(request.Pacman.Mirror) &&
+		len(request.Pacman.Packages) > 1 &&
+		slices.Contains(request.Pacman.Packages, "pacman-mirrorlist")
 }

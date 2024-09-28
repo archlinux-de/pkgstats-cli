@@ -7,6 +7,7 @@ import (
 	"strings"
 	"testing"
 
+	"pkgstats-cli/internal/api/submit"
 	"pkgstats-cli/internal/system"
 )
 
@@ -51,23 +52,23 @@ func TestShowInformationToBeSent(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to run command: %v", err)
 	}
-	var result map[string]interface{}
-	if err := json.Unmarshal([]byte(output), &result); err != nil {
+	var request submit.Request
+	if err := json.Unmarshal([]byte(output), &request); err != nil {
 		t.Fatalf("Failed to unmarshal JSON: %v", err)
 	}
-	if result["version"] != "3" {
-		t.Errorf("Expected version 3, got %v", result["version"])
+	if request.Version != "3" {
+		t.Errorf("Expected version 3, got %v", request.Version)
 	}
-	if result["system"].(map[string]interface{})["architecture"] != cpuArchitecture {
-		t.Errorf("Expected system architecture '%s', got %v", cpuArchitecture, result["system"].(map[string]interface{})["architecture"])
+	if request.System.Architecture != cpuArchitecture {
+		t.Errorf("Expected system architecture '%s', got %v", cpuArchitecture, request.System.Architecture)
 	}
-	if result["os"].(map[string]interface{})["architecture"] != osArchitecture {
-		t.Errorf("Expected OS architecture '%s', got %v", osArchitecture, result["os"].(map[string]interface{})["architecture"])
+	if request.OS.Architecture != osArchitecture {
+		t.Errorf("Expected OS architecture '%s', got %v", osArchitecture, request.OS.Architecture)
 	}
-	if !strings.HasPrefix(result["pacman"].(map[string]interface{})["mirror"].(string), "https://") {
-		t.Errorf("Expected pacman mirror to start with 'https://', got %v", result["pacman"].(map[string]interface{})["mirror"])
+	if !strings.HasPrefix(request.Pacman.Mirror, "https://") {
+		t.Errorf("Expected pacman mirror to start with 'https://', got %v", request.Pacman.Mirror)
 	}
-	if !slices.Contains(result["pacman"].(map[string]interface{})["packages"].([]interface{}), "pacman-mirrorlist") {
+	if !slices.Contains(request.Pacman.Packages, "pacman-mirrorlist") {
 		t.Errorf("Expected pacman packages to contain 'pacman-mirrorlist'")
 	}
 }
