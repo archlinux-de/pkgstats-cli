@@ -2,6 +2,7 @@ package request
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -66,6 +67,10 @@ func (client *Client) query(path string, params url.Values) ([]byte, error) {
 	response, err := client.Client.Do(req)
 	if err != nil {
 		return nil, err
+	}
+
+	if response.StatusCode != http.StatusOK {
+		return nil, errors.New(http.StatusText(response.StatusCode))
 	}
 
 	defer response.Body.Close()
