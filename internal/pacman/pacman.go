@@ -9,44 +9,42 @@ import (
 	"time"
 )
 
-const timeout = 10 * time.Second
+const (
+	timeout           = 10 * time.Second
+	pacmanCommand     = "pacman"
+	pacmanConfCommand = "pacman-conf"
+	repository        = "core"
+)
+
+type CommandExecutor interface {
+	Execute(name string, arg ...string) ([]byte, error)
+}
+
+type osCommandExecutor struct{}
+
+func (r osCommandExecutor) Execute(name string, arg ...string) ([]byte, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	return exec.CommandContext(ctx, name, arg...).Output()
+}
 
 type Pacman struct {
-	Timeout    time.Duration
-	Pacman     string
-	PacmanConf string
-	Repository string
-	Env        []string
+	Executor CommandExecutor
 }
 
 func NewPacman() Pacman {
-	return Pacman{
-		Timeout:    timeout,
-		Pacman:     "pacman",
-		PacmanConf: "pacman-conf",
-		Repository: "core",
-	}
+	return Pacman{Executor: osCommandExecutor{}}
 }
 
 func (pacman *Pacman) GetInstalledPackages() ([]string, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), pacman.Timeout)
-	defer cancel()
-
-	cmd := exec.CommandContext(ctx, pacman.Pacman, "-Qq")
-	cmd.Env = pacman.Env
-	out, err := cmd.Output()
+	out, err := pacman.Executor.Execute(pacmanCommand, "-Qq")
 
 	return strings.Split(strings.TrimSpace(string(out)), "\n"), err
 }
 
 func (pacman *Pacman) GetServer() (string, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), pacman.Timeout)
-	defer cancel()
-
-	cmd := exec.CommandContext(ctx, pacman.PacmanConf, "--repo", pacman.Repository, "Server")
-	cmd.Env = pacman.Env
-
-	out, err := cmd.Output()
+	out, err := pacman.Executor.Execute(pacmanConfCommand, "--repo", repository, "Server")
 
 	servers := strings.Split(strings.TrimSpace(string(out)), "\n")
 	mirror := ""
