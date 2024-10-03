@@ -2,7 +2,6 @@ package integration_test
 
 import (
 	"encoding/json"
-	"os/exec"
 	"slices"
 	"strings"
 	"testing"
@@ -11,18 +10,8 @@ import (
 	"pkgstats-cli/internal/system"
 )
 
-func requiresPacman(t *testing.T) {
-	t.Helper()
-	if _, err := exec.LookPath("pacman"); err != nil {
-		t.Skip("tests require pacman to be installed")
-	}
-	if _, err := exec.LookPath("pacman-conf"); err != nil {
-		t.Skip("tests require pacman-conf to be installed")
-	}
-}
-
 func TestShowHelp(t *testing.T) {
-	output, err := pkgstats("help")
+	output, err := pkgstats(t, "help")
 	if err != nil {
 		t.Fatalf("Failed to run command: %v", err)
 	}
@@ -32,7 +21,7 @@ func TestShowHelp(t *testing.T) {
 }
 
 func TestShowVersion(t *testing.T) {
-	output, err := pkgstats("version")
+	output, err := pkgstats(t, "version")
 	if err != nil {
 		t.Fatalf("Failed to run command: %v", err)
 	}
@@ -42,13 +31,17 @@ func TestShowVersion(t *testing.T) {
 }
 
 func TestShowInformationToBeSent(t *testing.T) {
-	requiresPacman(t)
-
 	system := system.NewSystem()
-	osArchitecture, _ := system.GetArchitecture()
-	cpuArchitecture, _ := system.GetCpuArchitecture()
+	osArchitecture, err := system.GetArchitecture()
+	if err != nil {
+		t.Fatal(err)
+	}
+	cpuArchitecture, err := system.GetCpuArchitecture()
+	if err != nil {
+		t.Fatal(err)
+	}
 
-	output, err := pkgstats("submit", "--dump-json")
+	output, err := pkgstats(t, "submit", "--dump-json")
 	if err != nil {
 		t.Fatalf("Failed to run command: %v", err)
 	}
@@ -74,9 +67,7 @@ func TestShowInformationToBeSent(t *testing.T) {
 }
 
 func TestSetQuietMode(t *testing.T) {
-	requiresPacman(t)
-
-	output, err := pkgstats("submit", "--quiet")
+	output, err := pkgstats(t, "submit", "--quiet")
 	if err != nil {
 		t.Fatalf("Failed to run command: %v", err)
 	}
@@ -86,9 +77,7 @@ func TestSetQuietMode(t *testing.T) {
 }
 
 func TestSendInformation(t *testing.T) {
-	requiresPacman(t)
-
-	output, err := pkgstats("submit")
+	output, err := pkgstats(t, "submit")
 	if err != nil {
 		t.Fatalf("Failed to run command: %v", err)
 	}
@@ -105,7 +94,7 @@ func TestSendInformation(t *testing.T) {
 }
 
 func TestSearchPackages(t *testing.T) {
-	output, err := pkgstats("search", "php")
+	output, err := pkgstats(t, "search", "php")
 	if err != nil {
 		t.Fatalf("Failed to run command: %v", err)
 	}
@@ -119,7 +108,7 @@ func TestSearchPackages(t *testing.T) {
 }
 
 func TestShowPackages(t *testing.T) {
-	output, err := pkgstats("show", "php", "pacman")
+	output, err := pkgstats(t, "show", "php", "pacman")
 	if err != nil {
 		t.Fatalf("Failed to run command: %v", err)
 	}

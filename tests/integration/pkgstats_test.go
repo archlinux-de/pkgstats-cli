@@ -3,6 +3,7 @@ package integration_test
 import (
 	"bytes"
 	"net/http/httptest"
+	"testing"
 
 	"pkgstats-cli/cmd"
 
@@ -10,9 +11,13 @@ import (
 	"github.com/spf13/pflag"
 )
 
-func pkgstats(args ...string) (output string, err error) {
+func pkgstats(t *testing.T, args ...string) (output string, err error) {
+	t.Helper()
+
+	requiresPacman(t)
+
 	rootCmd := cmd.GetRootCmd()
-	defer resetFlags(rootCmd)
+	defer resetFlags(t, rootCmd)
 
 	server := httptest.NewServer(NewServer())
 	defer server.Close()
@@ -28,11 +33,15 @@ func pkgstats(args ...string) (output string, err error) {
 	return buf.String(), err
 }
 
-func resetFlags(cmd *cobra.Command) {
+func resetFlags(t *testing.T, cmd *cobra.Command) {
+	t.Helper()
+
 	cmd.Flags().VisitAll(func(flag *pflag.Flag) {
-		_ = flag.Value.Set(flag.DefValue)
+		if err := flag.Value.Set(flag.DefValue); err != nil {
+			t.Fatal(err)
+		}
 	})
 	for _, subCmd := range cmd.Commands() {
-		resetFlags(subCmd)
+		resetFlags(t, subCmd)
 	}
 }
