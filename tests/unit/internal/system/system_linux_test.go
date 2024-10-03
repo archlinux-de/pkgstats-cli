@@ -1,9 +1,8 @@
 package system_test
 
 import (
-	"fmt"
-	"regexp"
 	"runtime"
+	"slices"
 	"testing"
 
 	"pkgstats-cli/internal/system"
@@ -14,24 +13,24 @@ func TestGetMachine(t *testing.T) {
 
 	arch, err := system.GetArchitecture()
 
-	expectedArch := fmt.Sprintf("^%s$", runtime.GOARCH)
+	expectedArch := []string{runtime.GOARCH}
 	switch runtime.GOARCH {
 	case "amd64":
-		expectedArch = "^x86_64$"
+		expectedArch = []string{"x86_64"}
 	case "386":
-		expectedArch = "^i686$"
+		expectedArch = []string{"i386", "i486", "i586", "i686"}
 	case "arm":
-		expectedArch = "^armv(5|6|7)"
+		expectedArch = []string{"arm", "armv4l", "armv5l", "armv5tejl", "armv6l", "armv7l", "armv7hl", "armv8l"}
 	case "arm64":
-		expectedArch = "^aarch64$"
+		expectedArch = []string{"aarch64", "aarch64_be"}
 	case "loong64":
-		expectedArch = "^loongarch64$"
+		expectedArch = []string{"loongarch64"}
 	}
 
 	if err != nil {
 		t.Error(err)
 	}
-	if !regexp.MustCompile(expectedArch).MatchString(arch) {
+	if !slices.Contains(expectedArch, arch) {
 		t.Error(arch)
 	}
 }

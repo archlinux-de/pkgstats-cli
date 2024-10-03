@@ -1,7 +1,7 @@
 package system_test
 
 import (
-	"regexp"
+	"slices"
 	"testing"
 
 	"pkgstats-cli/internal/system"
@@ -14,7 +14,7 @@ func TestGetCpuArchitecture(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if !regexp.MustCompile("^x86_64(_v(2|3|4))?$").MatchString(cpuArch) {
+	if !slices.Contains([]string{"x86_64", "x86_64_v2", "x86_64_v3", "x86_64_v4"}, cpuArch) {
 		t.Error(cpuArch)
 	}
 }

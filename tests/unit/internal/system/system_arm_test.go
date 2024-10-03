@@ -1,7 +1,7 @@
 package system_test
 
 import (
-	"regexp"
+	"slices"
 	"testing"
 
 	"pkgstats-cli/internal/system"
@@ -14,7 +14,7 @@ func TestGetCpuArchitecture(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if !regexp.MustCompile("^(armv(5|6|7)|aarch64)$").MatchString(cpuArch) {
+	if !slices.Contains([]string{"armv5", "armv6", "armv7", "aarch64"}, cpuArch) {
 		t.Error(cpuArch)
 	}
 }
