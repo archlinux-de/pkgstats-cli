@@ -25,24 +25,27 @@ test:
 
 # install pkgstats and its configuration
 install *DESTDIR='':
-	@# cli
+	#!/usr/bin/env bash
+	set -euo pipefail
+
+	# cli
 	install -D pkgstats -m755 "{{DESTDIR}}/usr/bin/pkgstats"
 
-	@# systemd timer
-	for service in pkgstats.service pkgstats.timer; do \
-		install -Dt "{{DESTDIR}}/usr/lib/systemd/system" -m644 init/${service} ; \
+	# systemd timer
+	for service in pkgstats.service pkgstats.timer; do
+		install -Dt "{{DESTDIR}}/usr/lib/systemd/system" -m644 init/${service}
 	done
 	install -d "{{DESTDIR}}/usr/lib/systemd/system/timers.target.wants"
-	cd "{{DESTDIR}}/usr/lib/systemd/system/timers.target.wants" && ln -s ../pkgstats.timer
+	pushd "{{DESTDIR}}/usr/lib/systemd/system/timers.target.wants" && ln -s ../pkgstats.timer && popd
 
-	@# bash completions
+	# bash completions
 	install -d "{{DESTDIR}}/usr/share/bash-completion/completions"
 	./pkgstats completion bash > "{{DESTDIR}}/usr/share/bash-completion/completions/pkgstats"
 
-	@# zsh completions
+	# zsh completions
 	install -d "{{DESTDIR}}/usr/share/zsh/site-functions/"
 	./pkgstats completion zsh > "{{DESTDIR}}/usr/share/zsh/site-functions/_pkgstats"
 
-	@# fish completions
+	# fish completions
 	install -d "{{DESTDIR}}/usr/share/fish/vendor_completions.d"
 	./pkgstats completion fish > "{{DESTDIR}}/usr/share/fish/vendor_completions.d/pkgstats.fish"
