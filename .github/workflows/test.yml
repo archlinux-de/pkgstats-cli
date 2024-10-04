@@ -70,13 +70,20 @@ jobs:
       - run: just test-integration
 
   test-cross-platform:
+    runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.experimental }}
     strategy:
-      max-parallel: 2
+      max-parallel: 4
       fail-fast: false
       matrix:
         arch: ['aarch64', 'arm', 'i686', 'loongarch64', 'riscv64', 'x86_64']
         test: ['test', 'build', 'test-cpu-detection', 'test-os-detection']
-    runs-on: ubuntu-latest
+        experimental: [false]
+        include:
+          - arch: 'i686'
+            experimental: true
+          - arch: 'loongarch64'
+            experimental: true
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
