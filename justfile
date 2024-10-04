@@ -1,4 +1,4 @@
-import 'dev.just'
+import 'just/dev.just'
 
 export CGO_CPPFLAGS := env_var_or_default('CPPFLAGS', '')
 export CGO_CFLAGS := env_var_or_default('CFLAGS', '')
