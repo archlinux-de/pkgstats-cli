@@ -2,6 +2,7 @@ package integration_test
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"regexp"
@@ -12,19 +13,44 @@ import (
 	"pkgstats-cli/internal/system"
 )
 
+type PackagePopularityListMock struct {
+	request.PackagePopularityList
+}
+
+func NewPackagePopularityListMock() *PackagePopularityListMock {
+	return &PackagePopularityListMock{
+		request.PackagePopularityList{
+			Total: 4,
+			Count: 3,
+			PackagePopularities: []request.PackagePopularity{
+				{Name: "php", Popularity: 56.78},
+				{Name: "php-fpm", Popularity: 12.34},
+				{Name: "pacman", Popularity: 10.78},
+			},
+		},
+	}
+}
+
+func (p *PackagePopularityListMock) getByName(name string) (request.PackagePopularity, error) {
+	for _, pkg := range p.PackagePopularities {
+		if pkg.Name == name {
+			return pkg, nil
+		}
+	}
+	return request.PackagePopularity{}, fmt.Errorf("package %s not found", name)
+}
+
 func NewServer() *http.ServeMux {
 	mux := http.NewServeMux()
 	mux.HandleFunc("POST /api/submit", handleSubmit)
 	mux.HandleFunc("GET /api/packages", handlePackages)
-	mux.HandleFunc("GET /api/packages/pacman", handlePackagesPacman)
-	mux.HandleFunc("GET /api/packages/php", handlePackagesPhp)
-	mux.HandleFunc("/", handleDefault)
+	mux.HandleFunc("GET /api/packages/{package}", handlePackage)
 	return mux
 }
 
 func handleSubmit(w http.ResponseWriter, r *http.Request) {
 	if !regexp.MustCompile(`^pkgstats/[\w.-]+$`).MatchString(r.Header.Get("User-Agent")) {
-		http.Error(w, "Invalid user agent", http.StatusBadRequest)
+		http.Error(w, fmt.Sprintf("Invalid user agent %s", r.Header.Get("User-Agent")), http.StatusBadRequest)
 		return
 	}
 
@@ -36,59 +62,76 @@ func handleSubmit(w http.ResponseWriter, r *http.Request) {
 
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	defer r.Body.Close()
 
 	var request submit.Request
 	if err := json.Unmarshal(body, &request); err != nil {
-		http.Error(w, "Invalid JSON", http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	if isValidSubmitRequest(&request) {
-		w.WriteHeader(http.StatusNoContent)
-	} else {
-		http.Error(w, "TEST FAILED", http.StatusBadRequest)
-	}
+	validateSubmitRequest(w, &request)
 }
 
 func handlePackages(w http.ResponseWriter, r *http.Request) {
-	response := request.PackagePopularityList{
-		Total: 42,
-		Count: 2,
-		PackagePopularities: []request.PackagePopularity{
-			{Name: "php", Popularity: 56.78},
-			{Name: "php-fpm", Popularity: 12.34},
-		},
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(NewPackagePopularityListMock()); err != nil {
+		http.Error(w, fmt.Sprintf("Error encoding response: %v", err), http.StatusInternalServerError)
 	}
-	_ = json.NewEncoder(w).Encode(response)
 }
 
-func handlePackagesPacman(w http.ResponseWriter, r *http.Request) {
-	response := request.PackagePopularity{Name: "pacman", Popularity: 12.34}
-	_ = json.NewEncoder(w).Encode(response)
+func handlePackage(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	p, err := NewPackagePopularityListMock().getByName(r.PathValue("package"))
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Error fetching package: %v", err), http.StatusInternalServerError)
+		return
+	}
+	if err := json.NewEncoder(w).Encode(p); err != nil {
+		http.Error(w, fmt.Sprintf("Error encoding response: %v", err), http.StatusInternalServerError)
+	}
 }
 
-func handlePackagesPhp(w http.ResponseWriter, r *http.Request) {
-	response := request.PackagePopularity{Name: "php", Popularity: 56.78}
-	_ = json.NewEncoder(w).Encode(response)
-}
+func validateSubmitRequest(w http.ResponseWriter, request *submit.Request) {
+	s := system.NewSystem()
+	osArchitecture, err := s.GetArchitecture()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	cpuArchitecture, err := s.GetCpuArchitecture()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
-func handleDefault(w http.ResponseWriter, r *http.Request) {
-	http.Error(w, "Unknown request", http.StatusBadRequest)
-}
+	if request.Version != "3" {
+		http.Error(w, fmt.Sprintf("Expected version 3, got %s", request.Version), http.StatusBadRequest)
+		return
+	}
+	if request.OS.Architecture != osArchitecture {
+		http.Error(w, fmt.Sprintf("Expected OS architecture %s, got %s", osArchitecture, request.OS.Architecture), http.StatusBadRequest)
+		return
+	}
+	if request.System.Architecture != cpuArchitecture {
+		http.Error(w, fmt.Sprintf("Expected CPU architecture %s, got %s", cpuArchitecture, request.System.Architecture), http.StatusBadRequest)
+		return
+	}
+	if !regexp.MustCompile(`^https?://.+$`).MatchString(request.Pacman.Mirror) {
+		http.Error(w, fmt.Sprintf("Invalid HTTP mirror URL: %s", request.Pacman.Mirror), http.StatusBadRequest)
+		return
+	}
+	if len(request.Pacman.Packages) <= 1 {
+		http.Error(w, "Expected more than 1 package", http.StatusBadRequest)
+		return
+	}
+	if !slices.Contains(request.Pacman.Packages, "pacman-mirrorlist") {
+		http.Error(w, "Expected pacakge list to contain pacman-mirrorlist", http.StatusBadRequest)
+		return
+	}
 
-func isValidSubmitRequest(request *submit.Request) bool {
-	system := system.NewSystem()
-	osArchitecture, _ := system.GetArchitecture()
-	cpuArchitecture, _ := system.GetCpuArchitecture()
-
-	return request.Version == "3" &&
-		request.OS.Architecture == osArchitecture &&
-		request.System.Architecture == cpuArchitecture &&
-		regexp.MustCompile(`^https?://.+$`).MatchString(request.Pacman.Mirror) &&
-		len(request.Pacman.Packages) > 1 &&
-		slices.Contains(request.Pacman.Packages, "pacman-mirrorlist")
+	w.WriteHeader(http.StatusNoContent)
 }

@@ -2,6 +2,8 @@ package integration_test
 
 import (
 	"encoding/json"
+	"fmt"
+	"regexp"
 	"slices"
 	"strings"
 	"testing"
@@ -31,12 +33,12 @@ func TestShowVersion(t *testing.T) {
 }
 
 func TestShowInformationToBeSent(t *testing.T) {
-	system := system.NewSystem()
-	osArchitecture, err := system.GetArchitecture()
+	s := system.NewSystem()
+	osArchitecture, err := s.GetArchitecture()
 	if err != nil {
 		t.Fatal(err)
 	}
-	cpuArchitecture, err := system.GetCpuArchitecture()
+	cpuArchitecture, err := s.GetCpuArchitecture()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -93,18 +95,22 @@ func TestSendInformation(t *testing.T) {
 	}
 }
 
+func linesContainsPackageStatistic(t *testing.T, lines []string, packages []string) {
+	t.Helper()
+	for _, e := range packages {
+		matcher := regexp.MustCompile(fmt.Sprintf(`^%s\s+\d+\.\d+$`, regexp.QuoteMeta(e)))
+		if !slices.ContainsFunc(lines, func(v string) bool { return matcher.MatchString(v) }) {
+			t.Errorf("Expected to find '%s' in %v", e, lines)
+		}
+	}
+}
+
 func TestSearchPackages(t *testing.T) {
 	output, err := pkgstats(t, "search", "php")
 	if err != nil {
 		t.Fatalf("Failed to run command: %v", err)
 	}
-	lines := strings.Split(output, "\n")
-	if !strings.Contains(lines[0], "php") {
-		t.Errorf("Expected 'php', got %s", lines[0])
-	}
-	if !strings.Contains(lines[1], "php-fpm") {
-		t.Errorf("Expected 'php-fpm', got %s", lines[1])
-	}
+	linesContainsPackageStatistic(t, strings.Split(output, "\n"), []string{"php", "php-fpm"})
 }
 
 func TestShowPackages(t *testing.T) {
@@ -112,11 +118,39 @@ func TestShowPackages(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to run command: %v", err)
 	}
-	lines := strings.Split(output, "\n")
-	if !strings.Contains(lines[0], "php") {
-		t.Errorf("Expected 'php', got %s", lines[0])
+	linesContainsPackageStatistic(t, strings.Split(output, "\n"), []string{"php", "pacman"})
+}
+
+func TestSohwOsArchitecture(t *testing.T) {
+	output, err := pkgstats(t, "arch", "os")
+	if err != nil {
+		t.Fatalf("Failed to run command: %v", err)
 	}
-	if !strings.Contains(lines[1], "pacman") {
-		t.Errorf("Expected 'pacman', got %s", lines[1])
+
+	s := system.NewSystem()
+	osArchitecture, err := s.GetArchitecture()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if strings.TrimSpace(output) != osArchitecture {
+		t.Fatalf("Expected OS architecture %s, but got %s", osArchitecture, strings.TrimSpace(output))
+	}
+}
+
+func TestSohwCpuArchitecture(t *testing.T) {
+	output, err := pkgstats(t, "arch", "cpu")
+	if err != nil {
+		t.Fatalf("Failed to run command: %v", err)
+	}
+
+	s := system.NewSystem()
+	cpuArchitecture, err := s.GetCpuArchitecture()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if strings.TrimSpace(output) != cpuArchitecture {
+		t.Fatalf("Expected CPU architecture %s, but got %s", cpuArchitecture, strings.TrimSpace(output))
 	}
 }
