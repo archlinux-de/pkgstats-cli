@@ -32,11 +32,11 @@ install *DESTDIR='':
 	install -D pkgstats -m755 "{{DESTDIR}}/usr/bin/pkgstats"
 
 	# systemd timer
-	for service in pkgstats.service pkgstats.timer; do
+	for service in pkgstats.{service,timer}; do
 		install -Dt "{{DESTDIR}}/usr/lib/systemd/system" -m644 init/${service}
 	done
 	install -d "{{DESTDIR}}/usr/lib/systemd/system/timers.target.wants"
-	pushd "{{DESTDIR}}/usr/lib/systemd/system/timers.target.wants" && ln -s ../pkgstats.timer && popd
+	ln -s ../pkgstats.timer -t "{{DESTDIR}}/usr/lib/systemd/system/timers.target.wants"
 
 	# bash completions
 	install -d "{{DESTDIR}}/usr/share/bash-completion/completions"
