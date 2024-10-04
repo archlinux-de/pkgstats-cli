@@ -14,11 +14,22 @@ var architectureCmd = &cobra.Command{
 	Short:   "Shows information about CPU and OS architecture",
 	Hidden:  true,
 	Args:    cobra.NoArgs,
-	Run: func(cmd *cobra.Command, args []string) {
-		system := system.NewSystem()
-		osArchitecture, _ := system.GetArchitecture()
-		systemArchitecture, _ := system.GetCpuArchitecture()
+	RunE: func(cmd *cobra.Command, args []string) error {
+		s := system.NewSystem()
+
+		osArchitecture, err := s.GetArchitecture()
+		if err != nil {
+			return fmt.Errorf("could not get OS architecture: %v", err)
+		}
+
+		systemArchitecture, err := s.GetCpuArchitecture()
+		if err != nil {
+			return fmt.Errorf("could not get CPU architecture: %v", err)
+		}
+
 		fmt.Fprintf(cmd.OutOrStdout(), "You are using a %s CPU on a %s OS\n", systemArchitecture, osArchitecture)
+
+		return nil
 	},
 }
 
@@ -26,10 +37,17 @@ var osArchitectureCommand = &cobra.Command{
 	Use:   "os",
 	Short: "Shows OS architecture",
 	Args:  cobra.NoArgs,
-	Run: func(cmd *cobra.Command, args []string) {
-		system := system.NewSystem()
-		osArchitecture, _ := system.GetArchitecture()
+	RunE: func(cmd *cobra.Command, args []string) error {
+		s := system.NewSystem()
+
+		osArchitecture, err := s.GetArchitecture()
+		if err != nil {
+			return fmt.Errorf("could not get OS architecture: %v", err)
+		}
+
 		fmt.Fprintln(cmd.OutOrStdout(), osArchitecture)
+
+		return nil
 	},
 }
 
@@ -38,10 +56,17 @@ var systemArchitectureCommand = &cobra.Command{
 	Aliases: []string{"cpu"},
 	Short:   "Shows CPU architecture",
 	Args:    cobra.NoArgs,
-	Run: func(cmd *cobra.Command, args []string) {
-		system := system.NewSystem()
-		systemArchitecture, _ := system.GetCpuArchitecture()
+	RunE: func(cmd *cobra.Command, args []string) error {
+		s := system.NewSystem()
+
+		systemArchitecture, err := s.GetCpuArchitecture()
+		if err != nil {
+			return fmt.Errorf("could not get CPU architecture: %v", err)
+		}
+
 		fmt.Fprintln(cmd.OutOrStdout(), systemArchitecture)
+
+		return nil
 	},
 }
 
