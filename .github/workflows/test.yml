@@ -71,6 +71,8 @@ jobs:
 
   test-cross-platform:
     strategy:
+      max-parallel: 2
+      fail-fast: false
       matrix:
         arch: ['aarch64', 'arm', 'i686', 'loongarch64', 'riscv64', 'x86_64']
         test: ['test', 'build', 'test-cpu-detection', 'test-os-detection']
