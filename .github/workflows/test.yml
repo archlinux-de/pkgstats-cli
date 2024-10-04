@@ -56,24 +56,6 @@ jobs:
           go-version: '1.23'
       - run: just test
 
-  test-build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Install Just
-        uses: extractions/setup-just@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Setup Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: '1.23'
-      - run: just test-build
-      - run: just build
-
   test-integration:
     runs-on: ubuntu-latest
     steps:
@@ -88,6 +70,10 @@ jobs:
       - run: just test-integration
 
   test-cross-platform:
+    strategy:
+      matrix:
+        arch: ['aarch64', 'arm', 'i686', 'loongarch64', 'riscv64', 'x86_64']
+        test: ['test', 'build', 'test-cpu-detection', 'test-os-detection']
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -104,23 +90,5 @@ jobs:
         run: sudo apt-get update
       - name: Install Qemu
         run: sudo apt-get install qemu-user
-      - run: just test-cross-platform
-
-  test-cpu-detection:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Install Just
-        uses: extractions/setup-just@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Setup Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: '1.23'
-      - name: Update APT
-        run: sudo apt-get update
-      - name: Install Qemu
-        run: sudo apt-get install qemu-user
-      - run: just test-cpu-detection
+      - name: ${{ matrix.test }} on ${{ matrix.arch }}
+        run: just ${{ matrix.arch }} ${{ matrix.test }}
