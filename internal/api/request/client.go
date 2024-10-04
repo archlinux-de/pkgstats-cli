@@ -111,7 +111,7 @@ func (client *Client) GetPackages(packages ...string) (PackagePopularityList, er
 func (client *Client) GetPackage(p string) (PackagePopularity, error) {
 	var pp PackagePopularity
 
-	response, err := client.query(fmt.Sprintf("/api/packages/%s", url.QueryEscape(p)), url.Values{})
+	response, err := client.query(fmt.Sprintf("/api/packages/%s", url.PathEscape(p)), url.Values{})
 	if err != nil {
 		return pp, err
 	}
