@@ -5,3 +5,4 @@
 /tests/build/*
 !/tests/build/.gitkeep
 /*.out
+/qemu_*.core
