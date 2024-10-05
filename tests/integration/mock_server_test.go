@@ -129,7 +129,7 @@ func validateSubmitRequest(w http.ResponseWriter, request *submit.Request) {
 		return
 	}
 	if !slices.Contains(request.Pacman.Packages, "pacman-mirrorlist") {
-		http.Error(w, "Expected pacakge list to contain pacman-mirrorlist", http.StatusBadRequest)
+		http.Error(w, "Expected package list to contain pacman-mirrorlist", http.StatusBadRequest)
 		return
 	}
 

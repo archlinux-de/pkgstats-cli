@@ -1,5 +1,4 @@
 linters:
-#  enable-all: false
   enable:
     - bodyclose
     - goconst
@@ -8,6 +7,7 @@ linters:
     - mnd
     - musttag
     - usestdlibvars
+    - misspell
 linters-settings:
   gofumpt:
     module-path: "pkgstats-cli"
