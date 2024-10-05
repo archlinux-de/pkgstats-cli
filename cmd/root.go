@@ -14,9 +14,10 @@ const baseUrlParam = "base-url"
 var (
 	baseURL = "https://pkgstats.archlinux.de"
 	rootCmd = &cobra.Command{
-		Use:     "pkgstats",
-		Short:   "pkgstats client",
-		Version: build.Version,
+		Use:          "pkgstats",
+		Short:        "pkgstats client",
+		Version:      build.Version,
+		SilenceUsage: true,
 	}
 )
 
