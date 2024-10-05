@@ -8,24 +8,20 @@ import (
 
 var (
 	validPackageNames   = []string{"pacman", "@pacman", "_pacman", "+pacman", "pacman-contrib", "pacman_foo", "pacman@7", "pacman+bar", "pacman.bar"}
-	invalidPackageNames = []string{"-pacman", ".pacman", "ö", "", "pacman-ö"}
+	invalidPackageNames = []string{"-pacman", ".pacman", "ö", "", "pacman-ö", "🐱", "🐱nip"}
 )
 
 func TestValidPackageName(t *testing.T) {
 	for _, name := range validPackageNames {
-		result := request.ValidatePackageName(name)
-
-		if !result {
-			t.Error("name should be valid:", name)
+		if err := request.ValidatePackageName(name); err != nil {
+			t.Error("name should be valid:", name, err)
 		}
 	}
 }
 
 func TestInvalidPackageName(t *testing.T) {
 	for _, name := range invalidPackageNames {
-		result := request.ValidatePackageName(name)
-
-		if result {
+		if err := request.ValidatePackageName(name); err == nil {
 			t.Error("name should be invalid")
 		}
 	}
@@ -33,19 +29,15 @@ func TestInvalidPackageName(t *testing.T) {
 
 func TestValidPackageNames(t *testing.T) {
 	for _, name := range validPackageNames {
-		result := request.ValidatePackageNames(append([]string{"foo"}, name))
-
-		if !result {
-			t.Error("names should be valid")
+		if err := request.ValidatePackageNames(append([]string{"foo"}, name)); err != nil {
+			t.Error("names should be valid", name, err)
 		}
 	}
 }
 
 func TestInvalidPackageNames(t *testing.T) {
 	for _, name := range invalidPackageNames {
-		result := request.ValidatePackageNames(append([]string{"foo"}, name))
-
-		if result {
+		if err := request.ValidatePackageNames(append([]string{"foo"}, name)); err == nil {
 			t.Error("names should be invalid")
 		}
 	}

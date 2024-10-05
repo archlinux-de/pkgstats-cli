@@ -1,37 +1,47 @@
 package request
 
 import (
+	"fmt"
 	"strings"
+	"unicode/utf8"
 )
 
-func ValidatePackageName(name string) bool {
-	const alpha_numeric = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	const special = "@_+"
-	const delimiter = ".-"
+const (
+	minLength      = 1
+	maxLength      = 190
+	alphaNumeric   = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	special        = "@_+"
+	delimiter      = ".-"
+	validFirstChar = alphaNumeric + special
+	validChars     = validFirstChar + delimiter
+)
 
-	if len(name) < 1 || len(name) > 190 {
-		return false
+func ValidatePackageName(name string) error {
+	length := len(name)
+	if length < minLength || length > maxLength {
+		return fmt.Errorf("length must be between %d and %d characters, %d were given", minLength, maxLength, length)
 	}
 
-	if !strings.ContainsAny(name[0:1], alpha_numeric) && !strings.ContainsAny(name[0:1], special) {
-		return false
+	firstChar, _ := utf8.DecodeRuneInString(name)
+	if !strings.ContainsRune(validFirstChar, firstChar) {
+		return fmt.Errorf("invalid character '%c'", firstChar)
 	}
 
 	for _, char := range name[1:] {
-		if !strings.ContainsRune(alpha_numeric, char) && !strings.ContainsRune(special, char) && !strings.ContainsRune(delimiter, char) {
-			return false
+		if !strings.ContainsRune(validChars, char) {
+			return fmt.Errorf("invalid character '%c'", char)
 		}
 	}
 
-	return true
+	return nil
 }
 
-func ValidatePackageNames(names []string) bool {
+func ValidatePackageNames(names []string) error {
 	for _, name := range names {
-		if !ValidatePackageName(name) {
-			return false
+		if err := ValidatePackageName(name); err != nil {
+			return fmt.Errorf("'%s' is invalid: %v", name, err)
 		}
 	}
 
-	return true
+	return nil
 }
