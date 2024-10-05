@@ -7,5 +7,12 @@ import (
 )
 
 func (system *System) GetArchitecture() (string, error) {
-	return runtime.GOARCH, nil
+	switch runtime.GOARCH {
+	case "amd64":
+		return "x86_64", nil
+	case "arm64":
+		return "aarch64", nil
+	default:
+		return runtime.GOARCH, nil
+	}
 }
