@@ -70,10 +70,9 @@ jobs:
       - run: just test-integration
 
   test-cross-platform:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     continue-on-error: ${{ matrix.experimental }}
     strategy:
-      max-parallel: 4
       fail-fast: false
       matrix:
         arch: ['aarch64', 'arm', 'i686', 'loongarch64', 'riscv64', 'x86_64']
