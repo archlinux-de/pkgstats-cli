@@ -10,6 +10,7 @@ update:
     sed -E '/^go\s+[0-9\.]+$/d' -i go.mod
     go get -u -t all
     go mod tidy
+    sed -E 's/^go ([0-9]+\.[0-9]+)\.[0-9]+/go \1/' -i go.mod
 
 # run go vet
 check-vet:
