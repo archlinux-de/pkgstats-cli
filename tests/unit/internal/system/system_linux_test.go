@@ -20,7 +20,7 @@ func TestGetMachine(t *testing.T) {
 	case "386":
 		expectedArch = []string{"i386", "i486", "i586", "i686"}
 	case "arm":
-		expectedArch = []string{"arm", "armv4l", "armv5l", "armv5tejl", "armv6l", "armv7l", "armv7hl", "armv8l"}
+		expectedArch = []string{"arm", "armv4l", "armv5l", "armv5tejl", "armv5tel", "armv6l", "armv7l", "armv7hl", "armv8l"}
 	case "arm64":
 		expectedArch = []string{"aarch64", "aarch64_be"}
 	case "loong64":
