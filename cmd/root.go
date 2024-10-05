@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 
+	"pkgstats-cli/internal/build"
+
 	"github.com/spf13/cobra"
 )
 
@@ -12,12 +14,12 @@ const baseUrlParam = "base-url"
 var (
 	baseURL = "https://pkgstats.archlinux.de"
 	rootCmd = &cobra.Command{
-		Use:   "pkgstats",
-		Short: "pkgstats client",
+		Use:     "pkgstats",
+		Short:   "pkgstats client",
+		Version: build.Version,
 	}
 )
 
-// Execute executes the root command.
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
