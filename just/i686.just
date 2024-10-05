@@ -11,8 +11,8 @@ build:
     #!/usr/bin/env bash
     set -euo pipefail
     cd ../
-    CGO_ENABLED=0 GOARCH=386 go build -buildvcs=false -o tests/build/pkgstats-i686-sse2
-    CGO_ENABLED=0 GOARCH=386 GO386=softfloat go build -buildvcs=false -o tests/build/pkgstats-i686
+    CGO_ENABLED=0 GOARCH=386 go build -buildvcs=false -a -o /dev/null
+    CGO_ENABLED=0 GOARCH=386 GO386=softfloat go build -buildvcs=false -a -o /dev/null
 
 test-cpu-detection:
     #!/usr/bin/env bash
