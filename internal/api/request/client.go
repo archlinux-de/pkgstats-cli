@@ -53,7 +53,7 @@ func (client *Client) query(path string, params url.Values) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	u.Path = path
+	u = u.JoinPath(path)
 
 	u.RawQuery = params.Encode()
 

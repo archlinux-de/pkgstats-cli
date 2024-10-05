@@ -40,7 +40,7 @@ func (client *Client) SendRequest(request Request) error {
 	if err != nil {
 		return err
 	}
-	u.Path = "/api/submit"
+	u = u.JoinPath("/api/submit")
 
 	req, err := http.NewRequest(http.MethodPost, u.String(), bytes.NewReader(payload))
 	if err != nil {
