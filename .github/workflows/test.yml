@@ -71,18 +71,11 @@ jobs:
 
   test-cross-platform:
     runs-on: ubuntu-24.04
-    continue-on-error: ${{ matrix.experimental }}
     strategy:
       fail-fast: false
       matrix:
         arch: ['aarch64', 'arm', 'i686', 'loongarch64', 'riscv64', 'x86_64']
         test: ['test', 'build', 'test-cpu-detection', 'test-os-detection']
-        experimental: [false]
-        include:
-          - arch: 'i686'
-            experimental: true
-          - arch: 'loongarch64'
-            experimental: true
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
