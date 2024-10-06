@@ -31,11 +31,12 @@ func TestSendRequest(t *testing.T) {
 	defer server.Close()
 
 	client := submit.Client{Client: server.Client(), BaseURL: server.URL}
-	request := submit.NewRequest()
-	request.Pacman.Packages = []string{"pacman", "linux"}
-	request.System.Architecture = ARCH_X86_64
-	request.OS.Architecture = ARCH_I686
-	request.Pacman.Mirror = MIRROR
+	request := &submit.Request{
+		Version: submit.Version,
+		System:  submit.System{Architecture: ARCH_X86_64},
+		OS:      submit.OS{Architecture: ARCH_I686},
+		Pacman:  submit.Pacman{Packages: []string{"pacman", "linux"}, Mirror: MIRROR},
+	}
 	err := client.SendRequest(*request)
 	if err != nil {
 		t.Error(err)
@@ -63,7 +64,7 @@ func validateRequest(t *testing.T, req *http.Request) {
 		t.Errorf("Could not decode JSON: %s", err)
 	}
 
-	if request.Version != "3" {
+	if request.Version != submit.Version {
 		t.Error("Invalid version value")
 	}
 	if strings.Join(request.Pacman.Packages, ",") != "pacman,linux" {
@@ -99,11 +100,12 @@ func TestSendRequestFollowsRedirect(t *testing.T) {
 	defer server.Close()
 
 	client := submit.Client{Client: server.Client(), BaseURL: server.URL}
-	request := submit.NewRequest()
-	request.Pacman.Packages = []string{"pacman", "linux"}
-	request.System.Architecture = ARCH_X86_64
-	request.OS.Architecture = ARCH_I686
-	request.Pacman.Mirror = MIRROR
+	request := &submit.Request{
+		Version: submit.Version,
+		System:  submit.System{Architecture: ARCH_X86_64},
+		OS:      submit.OS{Architecture: ARCH_I686},
+		Pacman:  submit.Pacman{Packages: []string{"pacman", "linux"}, Mirror: MIRROR},
+	}
 	err := client.SendRequest(*request)
 	if err != nil {
 		t.Error(err)

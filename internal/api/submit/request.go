@@ -25,58 +25,33 @@ type Request struct {
 	Pacman  Pacman `json:"pacman"`
 }
 
-type result[T any] struct {
-	res T
-	err error
-}
-
-func NewRequest() *Request {
-	return &Request{
-		Version: "3",
-	}
-}
+const Version = "3"
 
 func CreateRequest() (*Request, error) {
-	pacman := pacman.NewPacman()
-	packageChannel := async(pacman.GetInstalledPackages)
-	mirrorChannel := async(pacman.GetServer)
-
-	system := system.NewSystem()
-	cpuArchitectureChannel := async(system.GetCpuArchitecture)
-	architectureChannel := async(system.GetArchitecture)
-
-	packages := <-packageChannel
-	if packages.err != nil {
-		return nil, packages.err
+	p := pacman.NewPacman()
+	packages, err := p.GetInstalledPackages()
+	if err != nil {
+		return nil, err
 	}
-	mirror := <-mirrorChannel
-	if mirror.err != nil {
-		return nil, mirror.err
-	}
-	cpuArchitecture := <-cpuArchitectureChannel
-	if cpuArchitecture.err != nil {
-		return nil, cpuArchitecture.err
-	}
-	architecture := <-architectureChannel
-	if architecture.err != nil {
-		return nil, architecture.err
+	mirror, err := p.GetServer()
+	if err != nil {
+		return nil, err
 	}
 
-	request := NewRequest()
-	request.System.Architecture = cpuArchitecture.res
-	request.OS.Architecture = architecture.res
-	request.Pacman.Mirror = mirror.res
-	request.Pacman.Packages = packages.res
+	s := system.NewSystem()
+	cpuArchitecture, err := s.GetCpuArchitecture()
+	if err != nil {
+		return nil, err
+	}
+	architecture, err := s.GetArchitecture()
+	if err != nil {
+		return nil, err
+	}
 
-	return request, nil
-}
-
-func async[T any](f func() (T, error)) chan result[T] {
-	c := make(chan result[T])
-	go func() {
-		v, e := f()
-		c <- result[T]{v, e}
-	}()
-
-	return c
+	return &Request{
+		Version: Version,
+		System:  System{Architecture: cpuArchitecture},
+		OS:      OS{Architecture: architecture},
+		Pacman:  Pacman{Packages: packages, Mirror: mirror},
+	}, nil
 }
