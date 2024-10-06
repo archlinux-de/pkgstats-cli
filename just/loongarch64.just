@@ -8,7 +8,7 @@ build:
     #!/usr/bin/env bash
     set -euo pipefail
     cd ../
-    CGO_ENABLED=0 GOARCH=loong64 go build -buildvcs=false -a -o /dev/null
+    CGO_ENABLED=0 GOARCH=loong64 go build -buildvcs=false -o /dev/null
 
 test-cpu-detection:
     #!/usr/bin/env bash
