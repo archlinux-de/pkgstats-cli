@@ -3,6 +3,7 @@ package pacman
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/url"
 	"os/exec"
 	"strings"
@@ -45,39 +46,37 @@ func (pacman *Pacman) GetInstalledPackages() ([]string, error) {
 
 func (pacman *Pacman) GetServer() (string, error) {
 	out, err := pacman.Executor.Execute(pacmanConfCommand, "--repo", repository, "Server")
+	if err != nil {
+		return "", err
+	}
 
+	mirror, err := getFirstServer(out)
+	if err != nil {
+		return "", err
+	}
+
+	return NormalizeMirrorUrl(mirror)
+}
+
+func getFirstServer(out []byte) (string, error) {
 	servers := strings.Split(strings.TrimSpace(string(out)), "\n")
-	mirror := ""
-	if len(servers) > 0 {
-		mirror = servers[0]
-	} else {
-		return mirror, errors.New("no server found")
+	if len(servers) == 0 {
+		return "", errors.New("no server found")
 	}
 
-	mirrorUrl, _ := url.Parse(mirror)
-	path := extractMirrorPath(mirrorUrl.Path)
-	port := extractMirrorPort(mirrorUrl.Port())
-
-	return mirrorUrl.Scheme + "://" + mirrorUrl.Hostname() + port + path, err
+	return servers[0], nil
 }
 
-func extractMirrorPort(input string) string {
-	port := ""
-	if input != "" {
-		port = ":" + input
+func NormalizeMirrorUrl(mirror string) (string, error) {
+	mirrorUrl, err := url.Parse(mirror)
+	if err != nil {
+		return "", err
 	}
 
-	return port
-}
-
-func extractMirrorPath(input string) string {
-	const directoryPattern = 3
-	directories := strings.Split(input, "/")
-	path := ""
-	if len(directories) > directoryPattern {
-		path = strings.Join(directories[:len(directories)-directoryPattern], "/")
+	if !mirrorUrl.IsAbs() {
+		return "", fmt.Errorf("URL '%s' is not absolute", mirrorUrl.Redacted())
 	}
-	path += "/"
 
-	return path
+	// strip the core/os/x86_64 path
+	return mirrorUrl.JoinPath("../../../").Redacted(), nil
 }
