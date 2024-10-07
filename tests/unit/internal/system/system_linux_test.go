@@ -9,9 +9,7 @@ import (
 )
 
 func TestGetMachine(t *testing.T) {
-	system := system.System{}
-
-	arch, err := system.GetArchitecture()
+	arch, err := system.NewSystem().GetArchitecture()
 
 	expectedArch := []string{runtime.GOARCH}
 	switch runtime.GOARCH {

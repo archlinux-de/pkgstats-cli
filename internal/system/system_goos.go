@@ -6,7 +6,7 @@ import (
 	"runtime"
 )
 
-func (system *System) GetArchitecture() (string, error) {
+func (s *System) GetArchitecture() (string, error) {
 	switch runtime.GOARCH {
 	case "amd64":
 		return "x86_64", nil

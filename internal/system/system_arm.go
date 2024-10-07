@@ -4,7 +4,7 @@ import (
 	. "golang.org/x/sys/cpu"
 )
 
-func (system *System) GetCpuArchitecture() (string, error) {
+func (s *System) GetCpuArchitecture() (string, error) {
 	// https://github.com/lpereira/hardinfo/blob/master/modules/devices/arm/processor.c#L180
 	// https://github.com/golang/go/issues/38987#issuecomment-626513091
 	// https://community.arm.com/developer/tools-software/oss-platforms/b/android-blog/posts/runtime-detection-of-cpu-features-on-an-armv8-a-cpu

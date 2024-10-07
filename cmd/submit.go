@@ -6,6 +6,8 @@ import (
 	"fmt"
 
 	"pkgstats-cli/internal/api/submit"
+	"pkgstats-cli/internal/pacman"
+	"pkgstats-cli/internal/system"
 
 	"github.com/spf13/cobra"
 )
@@ -29,7 +31,7 @@ var submitCmd = &cobra.Command{
 			fmt.Fprintln(cmd.OutOrStdout(), "Collecting data...")
 		}
 
-		request, err := submit.CreateRequest()
+		request, err := submit.CreateRequest(pacman.NewPacman(), system.NewSystem())
 		if err != nil {
 			return err
 		}

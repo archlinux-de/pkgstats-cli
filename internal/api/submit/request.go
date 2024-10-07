@@ -1,10 +1,5 @@
 package submit
 
-import (
-	"pkgstats-cli/internal/pacman"
-	"pkgstats-cli/internal/system"
-)
-
 type System struct {
 	Architecture string `json:"architecture"`
 }
@@ -27,8 +22,17 @@ type Request struct {
 
 const Version = "3"
 
-func CreateRequest() (*Request, error) {
-	p := pacman.NewPacman()
+type PackageManager interface {
+	GetInstalledPackages() ([]string, error)
+	GetServer() (string, error)
+}
+
+type SystemInfo interface {
+	GetCpuArchitecture() (string, error)
+	GetArchitecture() (string, error)
+}
+
+func CreateRequest(p PackageManager, s SystemInfo) (*Request, error) {
 	packages, err := p.GetInstalledPackages()
 	if err != nil {
 		return nil, err
@@ -38,7 +42,6 @@ func CreateRequest() (*Request, error) {
 		return nil, err
 	}
 
-	s := system.NewSystem()
 	cpuArchitecture, err := s.GetCpuArchitecture()
 	if err != nil {
 		return nil, err

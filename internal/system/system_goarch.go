@@ -6,6 +6,6 @@ import (
 	"runtime"
 )
 
-func (system *System) GetCpuArchitecture() (string, error) {
+func (s *System) GetCpuArchitecture() (string, error) {
 	return runtime.GOARCH, nil
 }

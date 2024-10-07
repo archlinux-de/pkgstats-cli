@@ -6,7 +6,7 @@ import (
 	"golang.org/x/sys/unix"
 )
 
-func (system *System) GetArchitecture() (string, error) {
+func (s *System) GetArchitecture() (string, error) {
 	var utsname unix.Utsname
 	err := unix.Uname(&utsname)
 	if err != nil {

@@ -34,8 +34,8 @@ type Pacman struct {
 	Executor CommandExecutor
 }
 
-func NewPacman() Pacman {
-	return Pacman{Executor: osCommandExecutor{}}
+func NewPacman() *Pacman {
+	return &Pacman{Executor: osCommandExecutor{}}
 }
 
 func (pacman *Pacman) GetInstalledPackages() ([]string, error) {

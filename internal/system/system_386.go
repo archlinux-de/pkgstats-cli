@@ -4,7 +4,7 @@ import (
 	"golang.org/x/sys/cpu"
 )
 
-func (system *System) GetCpuArchitecture() (string, error) {
+func (s *System) GetCpuArchitecture() (string, error) {
 	// Check if we are on i686; otherwiese we know it is i586 with MMX as Go does require MMX instructions
 	isI686 := hasCMOV()
 	// We need to check for LM (Long Mode) as there are CPUs that support SSE2 but not x86_64 (e.g. Core Duo)

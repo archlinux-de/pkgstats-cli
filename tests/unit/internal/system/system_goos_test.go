@@ -10,9 +10,7 @@ import (
 )
 
 func TestGetArchitecture(t *testing.T) {
-	system := system.System{}
-
-	cpuArch, err := system.GetArchitecture()
+	cpuArch, err := system.NewSystem().GetCpuArchitecture()
 	if err != nil {
 		t.Error(err)
 	}
