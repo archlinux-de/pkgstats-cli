@@ -57,9 +57,12 @@ func (client *Client) SendRequest(request Request) error {
 	defer response.Body.Close()
 
 	if response.StatusCode != http.StatusNoContent {
-		body, _ := io.ReadAll(response.Body)
-		err = fmt.Errorf("server error: %s", string(body))
+		body, err := io.ReadAll(response.Body)
+		if err != nil {
+			return err
+		}
+		return fmt.Errorf("server error: %s", string(body))
 	}
 
-	return err
+	return nil
 }

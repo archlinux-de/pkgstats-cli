@@ -75,9 +75,12 @@ func (client *Client) query(path string, params url.Values) ([]byte, error) {
 
 	defer response.Body.Close()
 
-	body, _ := io.ReadAll(response.Body)
+	body, err := io.ReadAll(response.Body)
+	if err != nil {
+		return nil, err
+	}
 
-	return body, err
+	return body, nil
 }
 
 func (client *Client) GetPackages(packages ...string) (PackagePopularityList, error) {
