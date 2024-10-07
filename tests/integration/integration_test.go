@@ -51,8 +51,8 @@ func TestShowInformationToBeSent(t *testing.T) {
 	if err := json.Unmarshal([]byte(output), &request); err != nil {
 		t.Fatalf("Failed to unmarshal JSON: %v", err)
 	}
-	if request.Version != "3" {
-		t.Errorf("Expected version 3, got %v", request.Version)
+	if request.Version != submit.Version {
+		t.Errorf("Expected version %s, got %v", submit.Version, request.Version)
 	}
 	if request.System.Architecture != cpuArchitecture {
 		t.Errorf("Expected system architecture '%s', got %v", cpuArchitecture, request.System.Architecture)
@@ -75,6 +75,12 @@ func TestSetQuietMode(t *testing.T) {
 	}
 	if len(output) != 0 {
 		t.Errorf("Expected no output in quiet mode, got %s", output)
+	}
+}
+
+func TestSetQuietModeAndDumpCannotBeUsedTogether(t *testing.T) {
+	if _, err := pkgstats(t, "submit", "--dump-json", "--quiet"); err == nil {
+		t.Fatal("Command should fail")
 	}
 }
 

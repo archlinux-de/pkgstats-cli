@@ -10,6 +10,7 @@ import (
 
 	"pkgstats-cli/internal/api/request"
 	"pkgstats-cli/internal/api/submit"
+	"pkgstats-cli/internal/build"
 	"pkgstats-cli/internal/system"
 )
 
@@ -49,7 +50,7 @@ func NewServer() *http.ServeMux {
 }
 
 func handleSubmit(w http.ResponseWriter, r *http.Request) {
-	if !regexp.MustCompile(`^pkgstats/[\w.-]+$`).MatchString(r.Header.Get("User-Agent")) {
+	if r.Header.Get("User-Agent") != fmt.Sprintf("pkgstats/%s", build.Version) {
 		http.Error(w, fmt.Sprintf("Invalid user agent %s", r.Header.Get("User-Agent")), http.StatusBadRequest)
 		return
 	}
@@ -108,8 +109,8 @@ func validateSubmitRequest(w http.ResponseWriter, request *submit.Request) {
 		return
 	}
 
-	if request.Version != "3" {
-		http.Error(w, fmt.Sprintf("Expected version 3, got %s", request.Version), http.StatusBadRequest)
+	if request.Version != submit.Version {
+		http.Error(w, fmt.Sprintf("Expected version %s, got %s", submit.Version, request.Version), http.StatusBadRequest)
 		return
 	}
 	if request.OS.Architecture != osArchitecture {
