@@ -11,7 +11,7 @@ import (
 	"github.com/spf13/pflag"
 )
 
-func pkgstats(t *testing.T, args ...string) (output string, err error) {
+func pkgstats(t *testing.T, args ...string) (string, error) {
 	t.Helper()
 
 	requiresPacman(t)
@@ -29,8 +29,11 @@ func pkgstats(t *testing.T, args ...string) (output string, err error) {
 	rootCmd.SetErr(buf)
 	rootCmd.SetArgs(args)
 
-	err = rootCmd.Execute()
-	return buf.String(), err
+	err := rootCmd.Execute()
+	if err != nil {
+		return "", err
+	}
+	return buf.String(), nil
 }
 
 func resetFlags(t *testing.T, cmd *cobra.Command) {

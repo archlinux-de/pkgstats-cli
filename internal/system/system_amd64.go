@@ -4,7 +4,7 @@ import (
 	"golang.org/x/sys/cpu"
 )
 
-func (system *System) GetCpuArchitecture() (architecture string, err error) {
+func (system *System) GetCpuArchitecture() (string, error) {
 	// https://gitlab.com/x86-psABIs/x86-64-ABI/-/blob/master/x86-64-ABI/low-level-sys-info.tex
 	// https://unix.stackexchange.com/questions/43539/what-do-the-flags-in-proc-cpuinfo-mean/43540#43540
 	isX86_64V2 := cpu.X86.HasPOPCNT && cpu.X86.HasSSE3 && cpu.X86.HasSSE41 && cpu.X86.HasSSE42 && cpu.X86.HasSSSE3
@@ -13,14 +13,12 @@ func (system *System) GetCpuArchitecture() (architecture string, err error) {
 
 	switch {
 	case isX86_64V4:
-		architecture = "x86_64_v4"
+		return "x86_64_v4", nil
 	case isX86_64V3:
-		architecture = "x86_64_v3"
+		return "x86_64_v3", nil
 	case isX86_64V2:
-		architecture = "x86_64_v2"
+		return "x86_64_v2", nil
 	default:
-		architecture = "x86_64"
+		return "x86_64", nil
 	}
-
-	return
 }
