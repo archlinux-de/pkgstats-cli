@@ -61,3 +61,11 @@ test-all: check test test-cross-platform test-build test-cpu-detection test-os-d
 # remove any untracked and generated files
 clean:
     git clean -fdqx -e .idea
+
+coverage:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    COVER_FILE=$(mktemp)
+    go test -coverprofile "$COVER_FILE" ./...
+    go tool cover -html="$COVER_FILE"
+    rm -f "$COVER_FILE"

@@ -121,8 +121,29 @@ func TestShowPackages(t *testing.T) {
 	linesContainsPackageStatistic(t, strings.Split(output, "\n"), []string{"php", "pacman"})
 }
 
+func TestSohwArchitecture(t *testing.T) {
+	output, err := pkgstats(t, "architecture")
+	if err != nil {
+		t.Fatalf("Failed to run command: %v", err)
+	}
+
+	s := system.NewSystem()
+	osArchitecture, err := s.GetArchitecture()
+	if err != nil {
+		t.Fatal(err)
+	}
+	cpuArchitecture, err := s.GetCpuArchitecture()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !strings.Contains(output, osArchitecture) || !strings.Contains(output, cpuArchitecture) {
+		t.Fatalf("Expected OS and CPU architecture %s and %s, but got %s", osArchitecture, cpuArchitecture, strings.TrimSpace(output))
+	}
+}
+
 func TestSohwOsArchitecture(t *testing.T) {
-	output, err := pkgstats(t, "arch", "os")
+	output, err := pkgstats(t, "architecture", "os")
 	if err != nil {
 		t.Fatalf("Failed to run command: %v", err)
 	}
@@ -138,8 +159,8 @@ func TestSohwOsArchitecture(t *testing.T) {
 	}
 }
 
-func TestSohwCpuArchitecture(t *testing.T) {
-	output, err := pkgstats(t, "arch", "cpu")
+func TestSohwSystemArchitecture(t *testing.T) {
+	output, err := pkgstats(t, "architecture", "system")
 	if err != nil {
 		t.Fatalf("Failed to run command: %v", err)
 	}
