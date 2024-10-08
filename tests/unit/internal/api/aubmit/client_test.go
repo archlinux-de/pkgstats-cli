@@ -10,13 +10,10 @@ import (
 
 	"pkgstats-cli/internal/api/submit"
 	"pkgstats-cli/internal/build"
+	"pkgstats-cli/internal/system"
 )
 
-const (
-	ARCH_X86_64 = "x86_64"
-	ARCH_I686   = "i686"
-	MIRROR      = "https://geo.mirror.pkgbuild.com/"
-)
+const mirror = "https://geo.mirror.pkgbuild.com/"
 
 func TestSendRequest(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
@@ -33,9 +30,9 @@ func TestSendRequest(t *testing.T) {
 	client := submit.Client{Client: server.Client(), BaseURL: server.URL}
 	request := &submit.Request{
 		Version: submit.Version,
-		System:  submit.System{Architecture: ARCH_X86_64},
-		OS:      submit.OS{Architecture: ARCH_I686},
-		Pacman:  submit.Pacman{Packages: []string{"pacman", "linux"}, Mirror: MIRROR},
+		System:  submit.System{Architecture: system.X86_64},
+		OS:      submit.OS{Architecture: system.I686},
+		Pacman:  submit.Pacman{Packages: []string{"pacman", "linux"}, Mirror: mirror},
 	}
 	err := client.SendRequest(*request)
 	if err != nil {
@@ -70,13 +67,13 @@ func validateRequest(t *testing.T, req *http.Request) {
 	if strings.Join(request.Pacman.Packages, ",") != "pacman,linux" {
 		t.Error("Invalid packages value")
 	}
-	if request.System.Architecture != ARCH_X86_64 {
+	if request.System.Architecture != system.X86_64 {
 		t.Error("Invalid cpuarch value")
 	}
-	if request.OS.Architecture != ARCH_I686 {
+	if request.OS.Architecture != system.I686 {
 		t.Error("Invalid arch value")
 	}
-	if request.Pacman.Mirror != MIRROR {
+	if request.Pacman.Mirror != mirror {
 		t.Error("Invalid mirror value")
 	}
 }
@@ -102,9 +99,9 @@ func TestSendRequestFollowsRedirect(t *testing.T) {
 	client := submit.Client{Client: server.Client(), BaseURL: server.URL}
 	request := &submit.Request{
 		Version: submit.Version,
-		System:  submit.System{Architecture: ARCH_X86_64},
-		OS:      submit.OS{Architecture: ARCH_I686},
-		Pacman:  submit.Pacman{Packages: []string{"pacman", "linux"}, Mirror: MIRROR},
+		System:  submit.System{Architecture: system.X86_64},
+		OS:      submit.OS{Architecture: system.I686},
+		Pacman:  submit.Pacman{Packages: []string{"pacman", "linux"}, Mirror: mirror},
 	}
 	err := client.SendRequest(*request)
 	if err != nil {

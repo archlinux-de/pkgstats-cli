@@ -12,7 +12,7 @@ func TestGetCpuArchitecture(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if !slices.Contains([]string{"x86_64", "x86_64_v2", "x86_64_v3", "x86_64_v4"}, cpuArch) {
+	if !slices.Contains([]string{system.X86_64, system.X86_64_V2, system.X86_64_V3, system.X86_64_V4}, cpuArch) {
 		t.Error(cpuArch)
 	}
 }

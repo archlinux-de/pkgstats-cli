@@ -9,9 +9,9 @@ import (
 func (s *System) GetArchitecture() (string, error) {
 	switch runtime.GOARCH {
 	case "amd64":
-		return "x86_64", nil
+		return X86_64, nil
 	case "arm64":
-		return "aarch64", nil
+		return AARCH64, nil
 	default:
 		return runtime.GOARCH, nil
 	}

@@ -11,12 +11,12 @@ func (s *System) GetCpuArchitecture() (string, error) {
 	// https://developer.arm.com/documentation/dui0471/m/key-features-of-arm-architecture-versions/arm-architecture-v7-a?lang=en
 	switch {
 	case ARM.HasPMULL || ARM.HasCRC32 || ARM.HasAES || ARM.HasSHA1 || ARM.HasSHA2:
-		return "aarch64", nil
+		return AARCH64, nil
 	case ARM.HasVFPv3 && ARM.HasTHUMBEE:
-		return "armv7", nil
+		return ARMV7, nil
 	case ARM.HasVFP && ARM.HasTHUMB:
-		return "armv6", nil
+		return ARMV6, nil
 	default:
-		return "armv5", nil
+		return ARMV5, nil
 	}
 }

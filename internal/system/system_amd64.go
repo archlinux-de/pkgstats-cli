@@ -13,12 +13,12 @@ func (s *System) GetCpuArchitecture() (string, error) {
 
 	switch {
 	case isX86_64V4:
-		return "x86_64_v4", nil
+		return X86_64_V4, nil
 	case isX86_64V3:
-		return "x86_64_v3", nil
+		return X86_64_V3, nil
 	case isX86_64V2:
-		return "x86_64_v2", nil
+		return X86_64_V2, nil
 	default:
-		return "x86_64", nil
+		return X86_64, nil
 	}
 }

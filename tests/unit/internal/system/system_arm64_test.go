@@ -11,7 +11,7 @@ func TestGetCpuArchitecture(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if cpuArch != "aarch64" {
+	if cpuArch != system.AARCH64 {
 		t.Error(cpuArch)
 	}
 }

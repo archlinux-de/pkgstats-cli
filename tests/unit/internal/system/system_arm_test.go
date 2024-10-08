@@ -12,7 +12,7 @@ func TestGetCpuArchitecture(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if !slices.Contains([]string{"armv5", "armv6", "armv7", "aarch64"}, cpuArch) {
+	if !slices.Contains([]string{system.ARMV5, system.ARMV6, system.ARMV7, system.AARCH64}, cpuArch) {
 		t.Error(cpuArch)
 	}
 }

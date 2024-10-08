@@ -37,19 +37,35 @@ check: check-fmt check-vet check-static
 
 # run unit tests on different CPU architectures
 test-cross-platform:
-    @for a in aarch64 arm i686 loongarch64 riscv64 x86_64; do echo -n "$a "; just -v $a test; done
+    #!/usr/bin/env bash
+    set -euo pipefail
+    for a in aarch64 arm i686 loongarch64 riscv64 x86_64; do
+        echo -n "$a "; just -v $a test
+    done
 
 # build for different CPU architectures
 test-build:
-    @for a in aarch64 arm i686 loongarch64 riscv64 x86_64; do echo -n "$a "; just -v $a build; done
+    #!/usr/bin/env bash
+    set -euo pipefail
+    for a in aarch64 arm i686 loongarch64 riscv64 x86_64; do
+        echo -n "$a "; just -v $a build
+    done
 
 # test cpu architecture detection on different CPUs
 test-cpu-detection:
-    @for a in aarch64 arm i686 loongarch64 riscv64 x86_64; do echo -n "$a "; just -v $a test-cpu-detection; done
+    #!/usr/bin/env bash
+    set -euo pipefail
+    for a in aarch64 arm i686 loongarch64 riscv64 x86_64; do
+        echo -n "$a "; just -v $a test-cpu-detection
+    done
 
 # test os architecture detection on different CPUs
 test-os-detection:
-    @for a in aarch64 arm i686 loongarch64 riscv64 x86_64; do echo -n "$a "; just -v $a test-os-detection; done
+    #!/usr/bin/env bash
+    set -euo pipefail
+    for a in aarch64 arm i686 loongarch64 riscv64 x86_64; do
+        echo -n "$a "; just -v $a test-os-detection
+    done
 
 # run integration tests with a mocked API server
 test-integration:

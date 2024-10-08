@@ -3,6 +3,7 @@ package system_test
 import (
 	"runtime"
 	"slices"
+	"strings"
 	"testing"
 
 	"pkgstats-cli/internal/system"
@@ -11,24 +12,24 @@ import (
 func TestGetMachine(t *testing.T) {
 	arch, err := system.NewSystem().GetArchitecture()
 
-	expectedArch := []string{runtime.GOARCH}
+	expectedArch := func(arch string) bool { return arch == runtime.GOARCH }
 	switch runtime.GOARCH {
 	case "amd64":
-		expectedArch = []string{"x86_64"}
+		expectedArch = func(arch string) bool { return strings.HasPrefix(arch, system.X86_64) }
 	case "386":
-		expectedArch = []string{"i386", "i486", "i586", "i686"}
+		expectedArch = func(arch string) bool { return slices.Contains([]string{system.I586, system.I686}, arch) }
 	case "arm":
-		expectedArch = []string{"arm", "armv4l", "armv5l", "armv5tejl", "armv5tel", "armv6l", "armv7l", "armv7hl", "armv8l"}
+		expectedArch = func(arch string) bool { return strings.HasPrefix(arch, "armv") }
 	case "arm64":
-		expectedArch = []string{"aarch64", "aarch64_be"}
+		expectedArch = func(arch string) bool { return arch == system.AARCH64 }
 	case "loong64":
-		expectedArch = []string{"loongarch64"}
+		expectedArch = func(arch string) bool { return arch == "loongarch64" }
 	}
 
 	if err != nil {
 		t.Error(err)
 	}
-	if !slices.Contains(expectedArch, arch) {
+	if !expectedArch(arch) {
 		t.Error(arch)
 	}
 }
