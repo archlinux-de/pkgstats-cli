@@ -2,7 +2,7 @@ test:
     #!/usr/bin/env bash
     set -euo pipefail
     cd ../
-    CGO_ENABLED=0 GOARCH=arm64 go test -v -exec qemu-aarch64 ./...
+    CGO_ENABLED=0 GOARCH=arm64 go test -v -exec qemu-aarch64 ./tests/...
 
 build:
     #!/usr/bin/env bash

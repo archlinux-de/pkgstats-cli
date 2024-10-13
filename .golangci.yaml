@@ -1,13 +1,17 @@
 linters:
   enable:
     - bodyclose
+    - errorlint
     - goconst
     - gocritic
     - gofumpt
+    - gosec
+    - misspell
     - mnd
     - musttag
+    - testpackage
+    - unparam
     - usestdlibvars
-    - misspell
 linters-settings:
   gofumpt:
     module-path: "pkgstats-cli"

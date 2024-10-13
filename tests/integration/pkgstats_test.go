@@ -3,6 +3,7 @@ package integration_test
 import (
 	"bytes"
 	"net/http/httptest"
+	"os"
 	"testing"
 
 	"pkgstats-cli/cmd"
@@ -14,8 +15,6 @@ import (
 func pkgstats(t *testing.T, args ...string) (string, error) {
 	t.Helper()
 
-	requiresPacman(t)
-
 	rootCmd := cmd.GetRootCmd()
 	defer resetFlags(t, rootCmd)
 
@@ -24,13 +23,18 @@ func pkgstats(t *testing.T, args ...string) (string, error) {
 
 	args = append(args, "--base-url", server.URL)
 
+	if os.Getenv("INTEGRATION_TEST") != "1" {
+		args = append(args, "--pacman-conf", createPacmanConf(t))
+	} else {
+		t.Log("Using actual pacman in integration test")
+	}
+
 	buf := new(bytes.Buffer)
 	rootCmd.SetOut(buf)
 	rootCmd.SetErr(buf)
 	rootCmd.SetArgs(args)
 
-	err := rootCmd.Execute()
-	if err != nil {
+	if err := rootCmd.Execute(); err != nil {
 		return "", err
 	}
 	return buf.String(), nil

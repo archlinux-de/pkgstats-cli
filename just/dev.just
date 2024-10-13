@@ -33,7 +33,7 @@ check-fmt:
     test -z $(gofmt -l .)
 
 # run all static checks
-check: check-fmt check-vet check-static
+check: check-fmt check-vet check-static golangci-lint
 
 # run unit tests on different CPU architectures
 test-cross-platform:

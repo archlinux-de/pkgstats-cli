@@ -3,55 +3,156 @@
 package pacman_test
 
 import (
-	"errors"
+	"fmt"
+	"os"
+	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
 
 	"pkgstats-cli/internal/pacman"
 )
 
-type mockCommandExecutor struct {
-	Output map[string]string
-	Err    error
+const (
+	SERVER = "https://mirror.rackspace.com/archlinux/"
+	MIRROR = SERVER + "core/os/x86_64"
+)
+
+func createPacmanDb(t *testing.T, packages []string) string {
+	t.Helper()
+
+	dbPath := t.TempDir()
+	localDir := filepath.Join(dbPath, "local")
+	if err := os.Mkdir(localDir, 0o700); err != nil {
+		t.Fatalf("Failed to create local directory: %v", err)
+	}
+
+	for _, dir := range packages {
+		if err := os.Mkdir(filepath.Join(localDir, dir), 0o700); err != nil {
+			t.Fatalf("Failed to create subdirectory %s: %v", dir, err)
+		}
+	}
+
+	return dbPath
 }
 
-func (m mockCommandExecutor) Execute(name string, arg ...string) ([]byte, error) {
-	key := name + " " + strings.Join(arg, " ")
-	if output, ok := m.Output[key]; ok {
-		return []byte(output), m.Err
+func createPacmanConf(t *testing.T, dbPath string, servers []string) string {
+	t.Helper()
+
+	pacmanConfFile := filepath.Join(t.TempDir(), "pacman.conf")
+
+	var conf strings.Builder
+	if dbPath != "" {
+		conf.WriteString(fmt.Sprintf("[options]\nDBPath=%s\n", dbPath))
 	}
-	return nil, errors.New("command not found")
+
+	if len(servers) > 0 {
+		conf.WriteString("[core]\n")
+		for _, server := range servers {
+			conf.WriteString(fmt.Sprintf("Server=%s\n", server))
+		}
+	}
+
+	if err := os.WriteFile(pacmanConfFile, []byte(conf.String()), 0o600); err != nil {
+		t.Fatalf("Failed to create pacman.conf: %v", err)
+	}
+
+	return pacmanConfFile
 }
 
 func TestGetInstalledPackages(t *testing.T) {
-	pacman := pacman.Pacman{Executor: mockCommandExecutor{
-		Output: map[string]string{
-			"pacman -Qq": "pacman\nlinux",
-		},
-	}}
+	dbPath := createPacmanDb(t, []string{"pacman-1.0-1", "go-2.0-2", "php-fpm-8-8.3-32"})
+	pacmanConfFile := createPacmanConf(t, dbPath, []string{MIRROR})
 
-	out, err := pacman.GetInstalledPackages()
+	p, err := pacman.Parse(pacmanConfFile)
 	if err != nil {
-		t.Error(err, out)
+		t.Fatal(err)
 	}
-	if strings.Join(out, ",") != "pacman,linux" {
-		t.Error(out)
+	out, err := p.GetInstalledPackages()
+	if err != nil {
+		t.Fatal(err, out)
+	}
+
+	for _, p := range []string{"pacman", "go", "php-fpm-8"} {
+		if !slices.Contains(out, p) {
+			t.Errorf("could not find package %s in %v", p, out)
+		}
 	}
 }
 
 func TestGetServer(t *testing.T) {
-	pacman := pacman.Pacman{Executor: mockCommandExecutor{
-		Output: map[string]string{
-			"pacman-conf --repo core Server": "https://mirror.rackspace.com/archlinux/core/os/x86_64\nhttps://geo.mirror.pkgbuild.com/core/os/x86_64",
-		},
-	}}
+	pacmanConfFile := createPacmanConf(t, "", []string{MIRROR, "https://geo.mirror.pkgbuild.com/core/os/x86_64"})
 
-	out, err := pacman.GetServer()
+	p, err := pacman.Parse(pacmanConfFile)
 	if err != nil {
-		t.Error(err, out)
+		t.Fatal(err)
+	}
+	out, err := p.GetServer()
+	if err != nil {
+		t.Fatal(err, out)
 	}
 	if out != "https://mirror.rackspace.com/archlinux/" {
 		t.Error(out)
+	}
+}
+
+func TestPacmanConfIncludes(t *testing.T) {
+	pacmanConfFile := filepath.Join(t.TempDir(), "pacman.conf")
+	pacmanConfFileInclude1 := filepath.Join(t.TempDir(), "pacman-include1.conf")
+	pacmanConfFileInclude2 := filepath.Join(t.TempDir(), "pacman-include2.conf")
+
+	if err := os.WriteFile(pacmanConfFile, []byte(fmt.Sprintf("[core]\nInclude=%s\n", pacmanConfFileInclude1)), 0o600); err != nil {
+		t.Fatalf("Failed to create pacman.conf: %v", err)
+	}
+	if err := os.WriteFile(pacmanConfFileInclude1, []byte(fmt.Sprintf("Include=%s\nInclude=%s\n", pacmanConfFileInclude2, pacmanConfFileInclude2)), 0o600); err != nil {
+		t.Fatalf("Failed to create pacman.conf: %v", err)
+	}
+	if err := os.WriteFile(pacmanConfFileInclude2, []byte(fmt.Sprintf("Server=%s\n", MIRROR)), 0o600); err != nil {
+		t.Fatalf("Failed to create pacman.conf: %v", err)
+	}
+
+	p, err := pacman.Parse(pacmanConfFile)
+	if err != nil {
+		t.Fatal(err)
+	}
+	out, err := p.GetServer()
+	if err != nil {
+		t.Fatal(err, out)
+	}
+	if out != "https://mirror.rackspace.com/archlinux/" {
+		t.Error(out)
+	}
+}
+
+func TestPacmanConfComments(t *testing.T) {
+	pacmanConfFile := filepath.Join(t.TempDir(), "pacman.conf")
+	if err := os.WriteFile(pacmanConfFile, []byte(fmt.Sprintf("[core]\n#Server=invalid\nServer=%s\n", MIRROR)), 0o600); err != nil {
+		t.Fatalf("Failed to create pacman.conf: %v", err)
+	}
+
+	p, err := pacman.Parse(pacmanConfFile)
+	if err != nil {
+		t.Fatal(err)
+	}
+	s, err := p.GetServer()
+	if err != nil || s != SERVER {
+		t.Fatal(err, s)
+	}
+}
+
+func TestPacmanConfEmptySections(t *testing.T) {
+	pacmanConfFile := filepath.Join(t.TempDir(), "pacman.conf")
+	if err := os.WriteFile(pacmanConfFile, []byte(fmt.Sprintf("[]\n[core]\nServer=%s\n", MIRROR)), 0o600); err != nil {
+		t.Fatalf("Failed to create pacman.conf: %v", err)
+	}
+
+	p, err := pacman.Parse(pacmanConfFile)
+	if err != nil {
+		t.Fatal(err)
+	}
+	s, err := p.GetServer()
+	if err != nil || s != SERVER {
+		t.Fatal(err, s)
 	}
 }
 

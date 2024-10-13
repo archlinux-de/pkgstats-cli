@@ -39,7 +39,7 @@ func ValidatePackageName(name string) error {
 func ValidatePackageNames(names []string) error {
 	for _, name := range names {
 		if err := ValidatePackageName(name); err != nil {
-			return fmt.Errorf("'%s' is invalid: %v", name, err)
+			return fmt.Errorf("'%s' is invalid: %w", name, err)
 		}
 	}
 

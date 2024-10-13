@@ -9,11 +9,15 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const baseUrlParam = "base-url"
+const (
+	baseUrlParam    = "base-url"
+	pacmanConfParam = "pacman-conf"
+)
 
 var (
-	baseURL = "https://pkgstats.archlinux.de"
-	rootCmd = &cobra.Command{
+	baseURL    = "https://pkgstats.archlinux.de"
+	pacmanConf = "/etc/pacman.conf"
+	rootCmd    = &cobra.Command{
 		Use:          "pkgstats",
 		Short:        "pkgstats client",
 		Version:      build.Version,
@@ -30,6 +34,12 @@ func Execute() {
 func init() {
 	rootCmd.PersistentFlags().StringVar(&baseURL, baseUrlParam, baseURL, "base url of the pkgstats server")
 	if err := rootCmd.PersistentFlags().MarkHidden(baseUrlParam); err != nil {
+		fmt.Fprintln(rootCmd.ErrOrStderr(), err)
+		os.Exit(1)
+	}
+
+	rootCmd.PersistentFlags().StringVar(&pacmanConf, pacmanConfParam, pacmanConf, "path to pacman.conf")
+	if err := rootCmd.PersistentFlags().MarkHidden(pacmanConfParam); err != nil {
 		fmt.Fprintln(rootCmd.ErrOrStderr(), err)
 		os.Exit(1)
 	}

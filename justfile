@@ -21,7 +21,7 @@ build:
 
 # run unit tests
 test:
-    go test -v ./...
+    go test -v ./tests/...
 
 # install pkgstats and its configuration
 install *DESTDIR='':

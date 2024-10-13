@@ -19,12 +19,12 @@ var architectureCmd = &cobra.Command{
 
 		osArchitecture, err := s.GetArchitecture()
 		if err != nil {
-			return fmt.Errorf("could not get OS architecture: %v", err)
+			return fmt.Errorf("could not get OS architecture: %w", err)
 		}
 
 		systemArchitecture, err := s.GetCpuArchitecture()
 		if err != nil {
-			return fmt.Errorf("could not get CPU architecture: %v", err)
+			return fmt.Errorf("could not get CPU architecture: %w", err)
 		}
 
 		fmt.Fprintf(cmd.OutOrStdout(), "You are using a %s CPU on a %s OS\n", systemArchitecture, osArchitecture)
@@ -42,7 +42,7 @@ var osArchitectureCommand = &cobra.Command{
 
 		osArchitecture, err := s.GetArchitecture()
 		if err != nil {
-			return fmt.Errorf("could not get OS architecture: %v", err)
+			return fmt.Errorf("could not get OS architecture: %w", err)
 		}
 
 		fmt.Fprintln(cmd.OutOrStdout(), osArchitecture)
@@ -61,7 +61,7 @@ var systemArchitectureCommand = &cobra.Command{
 
 		systemArchitecture, err := s.GetCpuArchitecture()
 		if err != nil {
-			return fmt.Errorf("could not get CPU architecture: %v", err)
+			return fmt.Errorf("could not get CPU architecture: %w", err)
 		}
 
 		fmt.Fprintln(cmd.OutOrStdout(), systemArchitecture)

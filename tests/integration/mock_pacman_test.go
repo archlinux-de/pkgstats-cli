@@ -3,59 +3,51 @@ package integration_test
 import (
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
-	"strings"
 	"testing"
 
 	"pkgstats-cli/internal/system"
 )
 
-func requiresPacman(t *testing.T) {
+func createPacmanConf(t *testing.T) string {
 	t.Helper()
 
-	checkAndMockCommand(t, "pacman", "pacman", "pacman-mirrorlist")
-	checkAndMockCommand(t, "pacman-conf", func() string {
-		s := system.NewSystem()
-		osArchitecture, err := s.GetArchitecture()
-		if err != nil {
-			t.Fatal(err)
-		}
-		return fmt.Sprintf("https://geo.mirror.pkgbuild.com/core/os/%s", osArchitecture)
-	}())
-}
-
-func checkAndMockCommand(t *testing.T, name string, output ...string) {
-	t.Helper()
-
-	if _, err := exec.LookPath(name); err != nil {
-		if _, err := exec.LookPath("/bin/sh"); err != nil {
-			t.Skipf("%s was not found and could not be mocked", name)
-		}
-
-		t.Logf("Using mocked version of %s", name)
-		mockCommand(t, name, output...)
-	}
-}
-
-func mockCommand(t *testing.T, name string, output ...string) {
-	t.Helper()
-	tempDir := t.TempDir()
-	mockPath := filepath.Join(tempDir, name)
-
-	file, err := os.Create(mockPath)
+	s := system.NewSystem()
+	osArchitecture, err := s.GetArchitecture()
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer file.Close()
+	dbPath := createPacmanDBPath(t)
 
-	if _, err := fmt.Fprintf(file, "#!/bin/sh\necho '%s'", strings.Join(output, "\n")); err != nil {
-		t.Fatal(err)
+	pacmanConfFile := filepath.Join(t.TempDir(), "pacman.conf")
+	if err := os.WriteFile(pacmanConfFile, []byte(fmt.Sprintf("[options]\nDBPath=%s\n[core]\nServer=https://geo.mirror.pkgbuild.com/core/os/%s", dbPath, osArchitecture)), 0o600); err != nil {
+		t.Fatalf("Failed to create pacman.conf: %v", err)
 	}
 
-	if err := os.Chmod(mockPath, 0o755); err != nil {
-		t.Fatal(err)
+	return pacmanConfFile
+}
+
+func createPacmanDBPath(t *testing.T) string {
+	t.Helper()
+
+	dbPath := t.TempDir()
+	localDir := filepath.Join(dbPath, "local")
+	if err := os.Mkdir(localDir, 0o700); err != nil {
+		t.Fatalf("Failed to create local directory: %v", err)
 	}
 
-	t.Setenv("PATH", fmt.Sprintf("%s%c%s", tempDir, os.PathListSeparator, os.Getenv("PATH")))
+	subdirs := []string{
+		"pacman-1.0-1",
+		"pacman-mirrorlist-2.0-2",
+	}
+
+	for _, dir := range subdirs {
+		subdirPath := filepath.Join(localDir, dir)
+		err := os.Mkdir(subdirPath, 0o700)
+		if err != nil {
+			t.Fatalf("Failed to create subdirectory %s: %v", dir, err)
+		}
+	}
+
+	return dbPath
 }

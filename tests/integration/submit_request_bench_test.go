@@ -10,7 +10,11 @@ import (
 
 func BenchmarkCreateRequest(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		request, err := submit.CreateRequest(pacman.NewPacman(), system.NewSystem())
+		p, err := pacman.Parse("/etc/pacman.conf")
+		if err != nil {
+			b.Errorf("Parsing pacman.conf failed: %v", err)
+		}
+		request, err := submit.CreateRequest(p, system.NewSystem())
 		if err != nil {
 			b.Errorf("CreateRequest failed: %v", err)
 		}

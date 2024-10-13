@@ -31,7 +31,11 @@ var submitCmd = &cobra.Command{
 			fmt.Fprintln(cmd.OutOrStdout(), "Collecting data...")
 		}
 
-		request, err := submit.CreateRequest(pacman.NewPacman(), system.NewSystem())
+		p, err := pacman.Parse(pacmanConf)
+		if err != nil {
+			return err
+		}
+		request, err := submit.CreateRequest(p, system.NewSystem())
 		if err != nil {
 			return err
 		}
