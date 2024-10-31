@@ -4,5 +4,5 @@ Description=Weekly pkgstats submission
 [Timer]
 OnCalendar=weekly
 AccuracySec=1d
-RandomizedDelaySec=3d
+RandomizedDelaySec=7d
 Persistent=true
