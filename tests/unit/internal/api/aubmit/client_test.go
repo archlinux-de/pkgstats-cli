@@ -2,6 +2,7 @@ package submit_test
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -106,5 +107,32 @@ func TestSendRequestFollowsRedirect(t *testing.T) {
 	err := client.SendRequest(*request)
 	if err != nil {
 		t.Error(err)
+	}
+}
+
+func TestReturnServerErrorOnFailure(t *testing.T) {
+	const errorMessage = "Expected server failure"
+	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		if req.URL.String() != "/api/submit" {
+			t.Error("/api/submit was not called")
+		}
+
+		validateRequest(t, req)
+
+		rw.WriteHeader(http.StatusBadRequest)
+		fmt.Fprint(rw, errorMessage)
+	}))
+	defer server.Close()
+
+	client := submit.Client{Client: server.Client(), BaseURL: server.URL}
+	request := &submit.Request{
+		Version: submit.Version,
+		System:  submit.System{Architecture: system.X86_64},
+		OS:      submit.OS{Architecture: system.I686},
+		Pacman:  submit.Pacman{Packages: []string{"pacman", "linux"}, Mirror: mirror},
+	}
+	err := client.SendRequest(*request)
+	if err != nil && !strings.Contains(err.Error(), errorMessage) {
+		t.Errorf("Expected failed request, got %v", err)
 	}
 }

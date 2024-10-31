@@ -61,7 +61,7 @@ func (client *Client) SendRequest(request Request) error {
 		if err != nil {
 			return err
 		}
-		return fmt.Errorf("server error: %s", string(body))
+		return fmt.Errorf("server error %d: %s", response.StatusCode, string(body))
 	}
 
 	return nil
