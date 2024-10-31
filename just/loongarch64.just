@@ -2,7 +2,7 @@ test:
     #!/usr/bin/env bash
     set -euo pipefail
     cd ../
-    CGO_ENABLED=0 GOARCH=loong64 go test -v -exec qemu-loongarch64 ./tests/...
+    CGO_ENABLED=0 GOARCH=loong64 go test -exec qemu-loongarch64 ./tests/...
 
 build:
     #!/usr/bin/env bash

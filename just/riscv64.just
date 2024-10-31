@@ -2,7 +2,7 @@ test:
     #!/usr/bin/env bash
     set -euo pipefail
     cd ../
-    CGO_ENABLED=0 GOARCH=riscv64 go test -v -exec qemu-riscv64 ./tests/...
+    CGO_ENABLED=0 GOARCH=riscv64 go test -exec qemu-riscv64 ./tests/...
 
 build:
     #!/usr/bin/env bash
