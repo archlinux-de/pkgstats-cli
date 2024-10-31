@@ -33,7 +33,7 @@ check-fmt:
     test -z $(gofmt -l .)
 
 # run all static checks
-check: check-fmt check-vet check-static golangci-lint
+check: check-fmt check-vet check-static
 
 # run unit tests on different CPU architectures
 test-cross-platform:
@@ -72,7 +72,7 @@ test-integration:
     docker buildx build --pull . -f tests/integration/Dockerfile -t pkgstats-test-integration
 
 # run all available tests
-test-all: check test test-cross-platform test-build test-cpu-detection test-os-detection test-integration
+test-all: check golangci-lint test test-cross-platform test-build test-cpu-detection test-os-detection test-integration
 
 # remove any untracked and generated files
 clean:
