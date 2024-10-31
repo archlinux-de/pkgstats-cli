@@ -3,7 +3,6 @@ package request
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -112,7 +111,7 @@ func (client *Client) GetPackages(packages ...string) (PackagePopularityList, er
 }
 
 func (client *Client) GetPackage(p string) (PackagePopularity, error) {
-	response, err := client.query(fmt.Sprintf("/api/packages/%s", url.PathEscape(p)), url.Values{})
+	response, err := client.query("/api/packages/"+url.PathEscape(p), url.Values{})
 	if err != nil {
 		return PackagePopularity{}, err
 	}

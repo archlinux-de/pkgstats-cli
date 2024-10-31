@@ -2,6 +2,7 @@ package pacman
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -56,7 +57,7 @@ func (parser *parser) parseConfigFile(configPath string, defaultDBPath string) (
 	}
 	server, ok := confMap.Get(repository, "Server")
 	if !ok {
-		return nil, fmt.Errorf("server not found")
+		return nil, errors.New("server not found")
 	}
 	return &config{
 		dbPath: dbPath,

@@ -20,7 +20,7 @@ var (
 var submitCmd = &cobra.Command{
 	Use:   "submit",
 	Short: "Submit a list of your installed packages to the pkgstats project",
-	Long:  fmt.Sprintf("Submit a list of your installed packages, your system architecture\nand the mirror you are using to the pkgstats project.\n\nStatistics are available at %s", baseURL),
+	Long:  "Submit a list of your installed packages, your system architecture\nand the mirror you are using to the pkgstats project.\n\nStatistics are available at " + baseURL,
 	Args:  cobra.NoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if dumpJSON && quiet {
