@@ -17,7 +17,7 @@ const timeout = 5 * time.Second
 
 type Client struct {
 	Client  *http.Client
-	baseURL string
+	BaseURL string
 }
 
 type PackagePopularity struct {
@@ -43,12 +43,12 @@ func NewClient(baseURL string) *Client {
 
 	return &Client{
 		Client:  httpClient,
-		baseURL: baseURL,
+		BaseURL: baseURL,
 	}
 }
 
 func (client *Client) query(path string, params url.Values) ([]byte, error) {
-	u, err := url.Parse(client.baseURL)
+	u, err := url.Parse(client.BaseURL)
 	if err != nil {
 		return nil, err
 	}
