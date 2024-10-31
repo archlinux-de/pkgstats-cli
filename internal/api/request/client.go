@@ -99,7 +99,7 @@ func (client *Client) GetPackages(packages ...string) (PackagePopularityList, er
 	for i := range packages {
 		res := <-ch
 		if res.err != nil {
-			return ppl, res.err
+			return PackagePopularityList{}, res.err
 		}
 		ppl.PackagePopularities[i] = res.pp
 	}
@@ -112,37 +112,35 @@ func (client *Client) GetPackages(packages ...string) (PackagePopularityList, er
 }
 
 func (client *Client) GetPackage(p string) (PackagePopularity, error) {
-	var pp PackagePopularity
-
 	response, err := client.query(fmt.Sprintf("/api/packages/%s", url.PathEscape(p)), url.Values{})
 	if err != nil {
-		return pp, err
+		return PackagePopularity{}, err
 	}
 
+	var pp PackagePopularity
 	err = json.Unmarshal(response, &pp)
 	if err != nil {
-		return pp, err
+		return PackagePopularity{}, err
 	}
 
 	return pp, nil
 }
 
 func (client *Client) SearchPackages(query string, limit int) (PackagePopularityList, error) {
-	var ppl PackagePopularityList
-
 	params := url.Values{}
 	params.Add("limit", strconv.Itoa(limit))
 	params.Add("query", query)
 
 	response, err := client.query("/api/packages", params)
 	if err != nil {
-		return ppl, err
+		return PackagePopularityList{}, err
 	}
 
+	var ppl PackagePopularityList
 	err = json.Unmarshal(response, &ppl)
 	if err != nil {
-		return ppl, err
+		return PackagePopularityList{}, err
 	}
 
-	return ppl, err
+	return ppl, nil
 }
