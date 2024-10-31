@@ -63,7 +63,7 @@ func (client *Client) query(path string, params url.Values) ([]byte, error) {
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
-	req.Header.Set("User-Agent", fmt.Sprintf("pkgstats/%s", build.Version))
+	req.Header.Set("User-Agent", build.UserAgent)
 	response, err := client.Client.Do(req)
 	if err != nil {
 		return nil, err

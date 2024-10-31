@@ -48,7 +48,7 @@ func validateRequest(t *testing.T, req *http.Request) {
 	if req.Header.Get("Accept") != "application/json" {
 		t.Error("Invalid Accept Header", req.Header.Get("Accept"))
 	}
-	if req.UserAgent() != "pkgstats/"+build.Version {
+	if req.UserAgent() != build.UserAgent {
 		t.Error("Invalid User-Agent", req.UserAgent())
 	}
 

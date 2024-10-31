@@ -50,7 +50,7 @@ func NewServer() *http.ServeMux {
 }
 
 func handleSubmit(w http.ResponseWriter, r *http.Request) {
-	if r.Header.Get("User-Agent") != fmt.Sprintf("pkgstats/%s", build.Version) {
+	if r.Header.Get("User-Agent") != build.UserAgent {
 		http.Error(w, fmt.Sprintf("Invalid user agent %s", r.Header.Get("User-Agent")), http.StatusBadRequest)
 		return
 	}
