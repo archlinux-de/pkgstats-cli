@@ -20,7 +20,7 @@ func (p *Pacman) GetInstalledPackages() ([]string, error) {
 		return nil, fmt.Errorf("failed to read package names: %w", err)
 	}
 
-	// Reuse the memeory of packages
+	// Reuse the memory of packages
 	filteredPackages := packages[:0]
 	for _, pkg := range packages {
 		hyphenCount := 0
