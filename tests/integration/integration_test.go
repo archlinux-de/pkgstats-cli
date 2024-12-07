@@ -127,7 +127,7 @@ func TestShowPackages(t *testing.T) {
 	linesContainsPackageStatistic(t, strings.Split(output, "\n"), []string{"php", "pacman"})
 }
 
-func TestSohwArchitecture(t *testing.T) {
+func TestShowArchitecture(t *testing.T) {
 	output, err := pkgstats(t, "architecture")
 	if err != nil {
 		t.Fatalf("Failed to run command: %v", err)
@@ -148,7 +148,7 @@ func TestSohwArchitecture(t *testing.T) {
 	}
 }
 
-func TestSohwOsArchitecture(t *testing.T) {
+func TestShowOsArchitecture(t *testing.T) {
 	output, err := pkgstats(t, "architecture", "os")
 	if err != nil {
 		t.Fatalf("Failed to run command: %v", err)
@@ -165,7 +165,7 @@ func TestSohwOsArchitecture(t *testing.T) {
 	}
 }
 
-func TestSohwSystemArchitecture(t *testing.T) {
+func TestShowSystemArchitecture(t *testing.T) {
 	output, err := pkgstats(t, "architecture", "system")
 	if err != nil {
 		t.Fatalf("Failed to run command: %v", err)

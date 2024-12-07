@@ -55,11 +55,11 @@ var submitCmd = &cobra.Command{
 				fmt.Fprintln(cmd.OutOrStdout(), "Data were successfully sent")
 			}
 		} else {
-			formatedRequest, err := json.MarshalIndent(request, "", "  ")
+			formattedRequest, err := json.MarshalIndent(request, "", "  ")
 			if err != nil {
 				return err
 			}
-			fmt.Fprintln(cmd.OutOrStdout(), string(formatedRequest))
+			fmt.Fprintln(cmd.OutOrStdout(), string(formattedRequest))
 		}
 
 		return nil

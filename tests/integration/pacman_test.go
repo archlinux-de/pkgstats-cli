@@ -35,12 +35,12 @@ func TestGetInstalledPackagesMatchesPacman(t *testing.T) {
 	if err != nil {
 		t.Fatal(err, out)
 	}
-	pacmanPacakges := strings.Split(strings.TrimSpace(string(out)), "\n")
+	pacmanPackages := strings.Split(strings.TrimSpace(string(out)), "\n")
 
 	slices.Sort(parsedPackages)
-	slices.Sort(pacmanPacakges)
+	slices.Sort(pacmanPackages)
 
-	if slices.Compare(parsedPackages, pacmanPacakges) != 0 {
+	if slices.Compare(parsedPackages, pacmanPackages) != 0 {
 		t.Fatalf("pacman and pkgstats disagree")
 	}
 }
