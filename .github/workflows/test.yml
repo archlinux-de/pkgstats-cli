@@ -18,7 +18,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.23'
+          go-version: '1.24'
       - name: Staticcheck
         uses: dominikh/staticcheck-action@v1.3.1
         with:
@@ -33,7 +33,7 @@ jobs:
         - name: Setup Go
           uses: actions/setup-go@v5
           with:
-            go-version: '1.23'
+            go-version: '1.24'
         - name: golangci-lint
           uses: golangci/golangci-lint-action@v6
           with:
@@ -53,7 +53,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.23'
+          go-version: '1.24'
       - run: just test
 
   test-integration:
@@ -86,7 +86,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.23'
+          go-version: '1.24'
       - name: Update APT
         run: sudo apt-get update
       - name: Install Qemu
