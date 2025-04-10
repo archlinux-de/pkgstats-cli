@@ -1,13 +1,12 @@
+version: "2"
 linters:
   enable:
     - bodyclose
     - dupl
-    - errcheck
     - errorlint
     - goconst
     - gocritic
     - gocyclo
-    - gofumpt
     - gosec
     - misspell
     - mnd
@@ -16,11 +15,30 @@ linters:
     - testpackage
     - unparam
     - usestdlibvars
-linters-settings:
-  gofumpt:
-    module-path: "pkgstats-cli"
-issues:
-  exclude-rules:
-    - path: _test\.go
-      linters:
-        - perfsprint
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    rules:
+      - linters:
+          - perfsprint
+        path: _test\.go
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+formatters:
+  enable:
+    - gofumpt
+  settings:
+    gofumpt:
+      module-path: pkgstats-cli
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
