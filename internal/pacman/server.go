@@ -19,6 +19,9 @@ func NormalizeMirrorUrl(mirror string) (string, error) {
 		return "", fmt.Errorf("URL '%s' is not absolute", mirrorUrl.Redacted())
 	}
 
+	// remove login information
+	mirrorUrl.User = nil
+
 	// strip the core/os/x86_64 path
 	return mirrorUrl.JoinPath("../../../").Redacted(), nil
 }
