@@ -20,7 +20,7 @@ func createPacmanConf(t *testing.T) string {
 	dbPath := createPacmanDBPath(t)
 
 	pacmanConfFile := filepath.Join(t.TempDir(), "pacman.conf")
-	if err := os.WriteFile(pacmanConfFile, []byte(fmt.Sprintf("[options]\nDBPath=%s\n[core]\nServer=https://geo.mirror.pkgbuild.com/core/os/%s", dbPath, osArchitecture)), 0o600); err != nil {
+	if err := os.WriteFile(pacmanConfFile, fmt.Appendf(nil, "[options]\nDBPath=%s\n[core]\nServer=https://geo.mirror.pkgbuild.com/core/os/%s", dbPath, osArchitecture), 0o600); err != nil {
 		t.Fatalf("Failed to create pacman.conf: %v", err)
 	}
 

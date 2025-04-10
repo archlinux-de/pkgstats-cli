@@ -89,7 +89,7 @@ func TestGetServer(t *testing.T) {
 	if err != nil {
 		t.Fatal(err, out)
 	}
-	if out != "https://mirror.rackspace.com/archlinux/" {
+	if out != SERVER {
 		t.Error(out)
 	}
 }
@@ -99,13 +99,13 @@ func TestPacmanConfIncludes(t *testing.T) {
 	pacmanConfFileInclude1 := filepath.Join(t.TempDir(), "pacman-include1.conf")
 	pacmanConfFileInclude2 := filepath.Join(t.TempDir(), "pacman-include2.conf")
 
-	if err := os.WriteFile(pacmanConfFile, []byte(fmt.Sprintf("[core]\nInclude=%s\n", pacmanConfFileInclude1)), 0o600); err != nil {
+	if err := os.WriteFile(pacmanConfFile, fmt.Appendf(nil, "[core]\nInclude=%s\n", pacmanConfFileInclude1), 0o600); err != nil {
 		t.Fatalf("Failed to create pacman.conf: %v", err)
 	}
-	if err := os.WriteFile(pacmanConfFileInclude1, []byte(fmt.Sprintf("Include=%s\nInclude=%s\n", pacmanConfFileInclude2, pacmanConfFileInclude2)), 0o600); err != nil {
+	if err := os.WriteFile(pacmanConfFileInclude1, fmt.Appendf(nil, "Include=%s\nInclude=%s\n", pacmanConfFileInclude2, pacmanConfFileInclude2), 0o600); err != nil {
 		t.Fatalf("Failed to create pacman.conf: %v", err)
 	}
-	if err := os.WriteFile(pacmanConfFileInclude2, []byte(fmt.Sprintf("Server=%s\n", MIRROR)), 0o600); err != nil {
+	if err := os.WriteFile(pacmanConfFileInclude2, fmt.Appendf(nil, "Server=%s\n", MIRROR), 0o600); err != nil {
 		t.Fatalf("Failed to create pacman.conf: %v", err)
 	}
 
@@ -117,7 +117,7 @@ func TestPacmanConfIncludes(t *testing.T) {
 	if err != nil {
 		t.Fatal(err, out)
 	}
-	if out != "https://mirror.rackspace.com/archlinux/" {
+	if out != SERVER {
 		t.Error(out)
 	}
 }
@@ -128,13 +128,13 @@ func TestPacmanConfIncludesGlob(t *testing.T) {
 	pacmanConfFileInclude1 := filepath.Join(d, "pacman-include1.conf")
 	pacmanConfFileInclude2 := filepath.Join(d, "pacman-include2.conf")
 
-	if err := os.WriteFile(pacmanConfFile, []byte(fmt.Sprintf("[core]\nInclude=%s/pacman-*.conf\n", d)), 0o600); err != nil {
+	if err := os.WriteFile(pacmanConfFile, fmt.Appendf(nil, "[core]\nInclude=%s/pacman-*.conf\n", d), 0o600); err != nil {
 		t.Fatalf("Failed to create pacman.conf: %v", err)
 	}
 	if err := os.WriteFile(pacmanConfFileInclude1, []byte(""), 0o600); err != nil {
 		t.Fatalf("Failed to create pacman.conf: %v", err)
 	}
-	if err := os.WriteFile(pacmanConfFileInclude2, []byte(fmt.Sprintf("Server=%s\n", MIRROR)), 0o600); err != nil {
+	if err := os.WriteFile(pacmanConfFileInclude2, fmt.Appendf(nil, "Server=%s\n", MIRROR), 0o600); err != nil {
 		t.Fatalf("Failed to create pacman.conf: %v", err)
 	}
 
@@ -146,14 +146,14 @@ func TestPacmanConfIncludesGlob(t *testing.T) {
 	if err != nil {
 		t.Fatal(err, out)
 	}
-	if out != "https://mirror.rackspace.com/archlinux/" {
+	if out != SERVER {
 		t.Error(out)
 	}
 }
 
 func TestPacmanConfComments(t *testing.T) {
 	pacmanConfFile := filepath.Join(t.TempDir(), "pacman.conf")
-	if err := os.WriteFile(pacmanConfFile, []byte(fmt.Sprintf("[core]\n#Server=invalid\nServer=%s\n", MIRROR)), 0o600); err != nil {
+	if err := os.WriteFile(pacmanConfFile, fmt.Appendf(nil, "[core]\n#Server=invalid\nServer=%s\n", MIRROR), 0o600); err != nil {
 		t.Fatalf("Failed to create pacman.conf: %v", err)
 	}
 
@@ -169,7 +169,7 @@ func TestPacmanConfComments(t *testing.T) {
 
 func TestPacmanConfEmptySections(t *testing.T) {
 	pacmanConfFile := filepath.Join(t.TempDir(), "pacman.conf")
-	if err := os.WriteFile(pacmanConfFile, []byte(fmt.Sprintf("[]\n[core]\nServer=%s\n", MIRROR)), 0o600); err != nil {
+	if err := os.WriteFile(pacmanConfFile, fmt.Appendf(nil, "[]\n[core]\nServer=%s\n", MIRROR), 0o600); err != nil {
 		t.Fatalf("Failed to create pacman.conf: %v", err)
 	}
 
