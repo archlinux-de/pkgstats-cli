@@ -9,7 +9,7 @@ import (
 )
 
 func BenchmarkCreateRequest(b *testing.B) {
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		p, err := pacman.Parse("/etc/pacman.conf")
 		if err != nil {
 			b.Errorf("Parsing pacman.conf failed: %v", err)
