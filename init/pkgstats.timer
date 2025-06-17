@@ -6,3 +6,6 @@ OnCalendar=weekly
 AccuracySec=1d
 RandomizedDelaySec=7d
 Persistent=true
+
+[Install]
+WantedBy=default.target
