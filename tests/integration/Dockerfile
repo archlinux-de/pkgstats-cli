@@ -9,5 +9,6 @@ RUN just prepare
 RUN just build
 RUN just test
 RUN just install
+RUN systemctl is-enabled -q pkgstats.timer
 
 ENTRYPOINT ["/usr/bin/pkgstats"]
