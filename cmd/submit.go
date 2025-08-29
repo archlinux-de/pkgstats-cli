@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 
 	"pkgstats-cli/internal/api/submit"
 	"pkgstats-cli/internal/pacman"
@@ -35,35 +36,44 @@ var submitCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		request, err := submit.CreateRequest(p, system.NewSystem())
+		req, err := submit.CreateRequest(p, system.NewSystem())
 		if err != nil {
 			return err
 		}
 
-		if !dumpJSON {
-			if !quiet {
-				fmt.Fprintln(cmd.OutOrStdout(), "Submitting data...")
-			}
-			client := submit.NewClient(baseURL)
-
-			err := client.SendRequest(*request)
-			if err != nil {
-				return err
-			}
-
-			if !quiet {
-				fmt.Fprintln(cmd.OutOrStdout(), "Data were successfully sent")
-			}
+		if dumpJSON {
+			return dumpRequest(cmd.OutOrStdout(), req)
 		} else {
-			formattedRequest, err := json.MarshalIndent(request, "", "  ")
-			if err != nil {
-				return err
-			}
-			fmt.Fprintln(cmd.OutOrStdout(), string(formattedRequest))
+			return submitRequest(cmd.OutOrStdout(), req)
 		}
-
-		return nil
 	},
+}
+
+func dumpRequest(writer io.Writer, req *submit.Request) error {
+	formattedRequest, err := json.MarshalIndent(req, "", "  ")
+	if err != nil {
+		return err
+	}
+	fmt.Fprintln(writer, string(formattedRequest))
+	return nil
+}
+
+func submitRequest(writer io.Writer, req *submit.Request) error {
+	if !quiet {
+		fmt.Fprintln(writer, "Submitting data...")
+	}
+
+	client := submit.NewClient(baseURL)
+
+	if err := client.SendRequest(*req); err != nil {
+		return err
+	}
+
+	if !quiet {
+		fmt.Fprintln(writer, "Data were successfully sent")
+	}
+
+	return nil
 }
 
 func init() {
