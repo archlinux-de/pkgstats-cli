@@ -27,14 +27,18 @@ var searchCmd = &cobra.Command{
 			return err
 		}
 
-		client := request.NewClient(baseURL)
+		searchFunc := func(client *request.Client, args []string) (request.PackagePopularityList, []error) {
+			ppl, err := client.SearchPackages(args[0], limit)
+			if err != nil {
+				return request.PackagePopularityList{}, []error{err}
+			}
+			return ppl, nil
+		}
 
-		ppl, err := client.SearchPackages(args[0], limit)
-		if err != nil {
+		if err := handleRequest(cmd.OutOrStdout(), args, searchFunc); err != nil {
 			return err
 		}
 
-		request.PrintPackagePopularities(cmd.OutOrStdout(), ppl)
 		fmt.Fprintln(cmd.OutOrStdout())
 		request.PrintSearchURL(cmd.OutOrStdout(), baseURL, args[0])
 

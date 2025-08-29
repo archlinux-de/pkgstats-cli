@@ -22,14 +22,14 @@ var showCmd = &cobra.Command{
 			return err
 		}
 
-		client := request.NewClient(baseURL)
+		showFunc := func(client *request.Client, args []string) (request.PackagePopularityList, []error) {
+			return client.GetPackages(args...)
+		}
 
-		ppl, err := client.GetPackages(args...)
-		if err != nil {
+		if err := handleRequest(cmd.OutOrStdout(), args, showFunc); err != nil {
 			return err
 		}
 
-		request.PrintPackagePopularities(cmd.OutOrStdout(), ppl)
 		fmt.Fprintln(cmd.OutOrStdout())
 		request.PrintShowURL(cmd.OutOrStdout(), baseURL, args)
 
