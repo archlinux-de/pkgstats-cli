@@ -32,19 +32,24 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.PersistentFlags().StringVar(&baseURL, baseUrlParam, baseURL, "base url of the pkgstats server")
-	if err := rootCmd.PersistentFlags().MarkHidden(baseUrlParam); err != nil {
+	if err := setupFlags(rootCmd); err != nil {
 		fmt.Fprintln(rootCmd.ErrOrStderr(), err)
 		os.Exit(1)
 	}
-
-	rootCmd.PersistentFlags().StringVar(&pacmanConf, pacmanConfParam, pacmanConf, "path to pacman.conf")
-	if err := rootCmd.PersistentFlags().MarkHidden(pacmanConfParam); err != nil {
-		fmt.Fprintln(rootCmd.ErrOrStderr(), err)
-		os.Exit(1)
-	}
-
 	rootCmd.CompletionOptions.HiddenDefaultCmd = true
+}
+
+func setupFlags(cmd *cobra.Command) error {
+	cmd.PersistentFlags().StringVar(&baseURL, baseUrlParam, baseURL, "base url of the pkgstats server")
+	if err := cmd.PersistentFlags().MarkHidden(baseUrlParam); err != nil {
+		return err
+	}
+
+	cmd.PersistentFlags().StringVar(&pacmanConf, pacmanConfParam, pacmanConf, "path to pacman.conf")
+	if err := cmd.PersistentFlags().MarkHidden(pacmanConfParam); err != nil {
+		return err
+	}
+	return nil
 }
 
 func GetRootCmd() *cobra.Command {
