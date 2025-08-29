@@ -8,12 +8,16 @@ import (
 	"net/url"
 	"sort"
 	"strconv"
+	"sync"
 	"time"
 
 	"pkgstats-cli/internal/build"
 )
 
-const timeout = 5 * time.Second
+const (
+	timeout        = 5 * time.Second
+	maxConcurrency = 4
+)
 
 type Client struct {
 	Client  *http.Client
@@ -82,32 +86,49 @@ func (client *Client) query(path string, params url.Values) ([]byte, error) {
 	return body, nil
 }
 
-func (client *Client) GetPackages(packages ...string) (PackagePopularityList, error) {
-	ppl := PackagePopularityList{}
-	ppl.PackagePopularities = make([]PackagePopularity, len(packages))
+func (client *Client) GetPackages(packages ...string) (PackagePopularityList, []error) {
+	var wg sync.WaitGroup
+	var errs []error
+	var mu sync.Mutex
 
-	ch := make(chan (packagePopularityResult))
+	jobs := make(chan string, len(packages))
+	results := make(chan packagePopularityResult, len(packages))
 
-	for _, p := range packages {
-		go func(p string, ch chan (packagePopularityResult)) {
-			res, err := client.GetPackage(p)
-			ch <- packagePopularityResult{res, err}
-		}(p, ch)
+	for i := 0; i < maxConcurrency; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for p := range jobs {
+				res, err := client.GetPackage(p)
+				results <- packagePopularityResult{res, err}
+			}
+		}()
 	}
 
-	for i := range packages {
-		res := <-ch
+	for _, p := range packages {
+		jobs <- p
+	}
+	close(jobs)
+
+	wg.Wait()
+	close(results)
+
+	ppl := PackagePopularityList{}
+	for res := range results {
 		if res.err != nil {
-			return PackagePopularityList{}, res.err
+			mu.Lock()
+			errs = append(errs, res.err)
+			mu.Unlock()
+		} else {
+			ppl.PackagePopularities = append(ppl.PackagePopularities, res.pp)
 		}
-		ppl.PackagePopularities[i] = res.pp
 	}
 
 	sort.Slice(ppl.PackagePopularities, func(i, j int) bool {
 		return ppl.PackagePopularities[i].Popularity > ppl.PackagePopularities[j].Popularity
 	})
 
-	return ppl, nil
+	return ppl, errs
 }
 
 func (client *Client) GetPackage(p string) (PackagePopularity, error) {

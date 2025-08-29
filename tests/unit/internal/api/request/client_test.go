@@ -20,9 +20,9 @@ func TestGetPackages(t *testing.T) {
 	defer server.Close()
 
 	client := request.Client{Client: server.Client(), BaseURL: server.URL}
-	_, err := client.GetPackages("foo", "bar")
-	if err != nil {
-		t.Error(err)
+	_, errs := client.GetPackages("foo", "bar")
+	if len(errs) > 0 {
+		t.Error(errs)
 	}
 }
 
@@ -66,8 +66,10 @@ func TestHandleServerError(t *testing.T) {
 	defer server.Close()
 
 	client := request.Client{Client: server.Client(), BaseURL: server.URL}
-	_, err := client.GetPackages("foo")
-	if err != nil && err.Error() != "Bad Request" {
-		t.Errorf("Expected Bad Request, got %v", err)
+	_, errs := client.GetPackages("foo")
+	if len(errs) == 0 {
+		t.Error("Expected error, got none")
+	} else if errs[0].Error() != "Bad Request" {
+		t.Errorf("Expected Bad Request, got %v", errs[0])
 	}
 }
