@@ -1,29 +1,37 @@
+set quiet := true
+
 import 'just/dev.just'
 
 export CGO_CPPFLAGS := env_var_or_default('CPPFLAGS', '')
 export CGO_CFLAGS := env_var_or_default('CFLAGS', '')
 export CGO_CXXFLAGS := env_var_or_default('CXXFLAGS', '')
 export CGO_LDFLAGS := env_var_or_default('LDFLAGS', '')
+export CGO_ENABLED := '0'
 
 # list all recipes
+[private]
 default:
     @just --list
 
 # Prepare sources in order to build offline
+[group('install')]
 prepare:
     go mod download
 
 # build pkgstats for production
+[group('install')]
 build:
-    go build -a -o pkgstats \
+    CGO_ENABLED=1 go build -a -o pkgstats \
        	-buildmode=pie -mod=readonly -modcacherw -buildvcs=false \
        	-ldflags '-compressdwarf=false -linkmode=external -s -w -X pkgstats-cli/internal/build.Version={{ `git describe --tags` }}'
 
 # run unit tests
+[group('test')]
 test:
     go test ./tests/...
 
 # install pkgstats and its configuration
+[group('install')]
 install *DESTDIR='':
     #!/usr/bin/env bash
     set -euo pipefail

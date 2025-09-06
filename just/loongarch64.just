@@ -1,23 +1,23 @@
+set quiet := true
+
+export GOARCH := 'loong64'
+
+[group('test')]
+[working-directory('../')]
 test:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    cd ../
-    CGO_ENABLED=0 GOARCH=loong64 go test -exec qemu-loongarch64 ./tests/...
+    go test -exec qemu-loongarch64 ./tests/...
 
+[group('test')]
+[working-directory('../')]
 build:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    cd ../
-    CGO_ENABLED=0 GOARCH=loong64 go build -buildvcs=false -o /dev/null
+    go build -buildvcs=false -o /dev/null
 
+[group('test')]
+[working-directory('../')]
 test-cpu-detection:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    cd ../
-    CGO_ENABLED=0 GOARCH=loong64 go run -exec 'qemu-loongarch64' main.go architecture system | grep -q '^loong64$'
+    go run -exec 'qemu-loongarch64' main.go architecture system | grep -q '^loong64$'
 
+[group('test')]
+[working-directory('../')]
 test-os-detection:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    cd ../
-    CGO_ENABLED=0 GOARCH=loong64 go run -exec 'qemu-loongarch64' main.go architecture os | grep -q '^loongarch64$'
+    go run -exec 'qemu-loongarch64' main.go architecture os | grep -q '^loongarch64$'
