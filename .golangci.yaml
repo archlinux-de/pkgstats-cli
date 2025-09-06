@@ -8,10 +8,12 @@ linters:
     - gocritic
     - gocyclo
     - gosec
+    - govet
     - misspell
     - mnd
     - musttag
     - perfsprint
+    - staticcheck
     - testpackage
     - unparam
     - usestdlibvars

@@ -12,28 +12,13 @@ update:
     go mod tidy
     sed -E 's/^go ([0-9]+\.[0-9]+)\.[0-9]+/go \1/' -i go.mod
 
-# run go vet
-check-vet:
-    go vet ./...
-
-# run static code checks
-check-static:
-    staticcheck ./...
-
 # run golangci-lint
-golangci-lint *args='run':
+lint *args='run':
     golangci-lint {{ args }}
 
-# run gofumpt
-gofumpt *args='-w .':
-    gofumpt {{ args }}
-
-# check go format
-check-fmt:
-    test -z $(gofmt -l .)
-
-# run all static checks
-check: check-fmt check-vet check-static
+# run golangci-lint fmt
+fmt *args='-w .':
+    golangci-lint fmt {{ args }}
 
 # run unit tests on different CPU architectures
 test-cross-platform:
@@ -72,7 +57,7 @@ test-integration:
     docker buildx build --pull . -f tests/integration/Dockerfile -t pkgstats-test-integration
 
 # run all available tests
-test-all: check golangci-lint test test-cross-platform test-build test-cpu-detection test-os-detection test-integration
+test-all: lint test test-cross-platform test-build test-cpu-detection test-os-detection test-integration
 
 # remove any untracked and generated files
 clean:
