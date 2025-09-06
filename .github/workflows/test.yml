@@ -20,7 +20,7 @@ jobs:
         - name: Setup Go
           uses: actions/setup-go@v6
           with:
-            go-version: '1.24'
+            go-version: '1.25'
         - name: golangci-lint
           uses: golangci/golangci-lint-action@v8
           with:
@@ -41,7 +41,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v6
         with:
-          go-version: '1.24'
+          go-version: '1.25'
       - run: just test
 
   test-integration:
@@ -74,7 +74,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v6
         with:
-          go-version: '1.24'
+          go-version: '1.25'
       - name: Update APT
         run: sudo apt-get update
       - name: Install Qemu
