@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"pkgstats-cli/internal/system"
 )
 
-func createPacmanConf(t *testing.T) string {
+func createPacmanConf(t *testing.T, mirror string) string {
 	t.Helper()
 
 	s := system.NewSystem()
@@ -19,8 +20,12 @@ func createPacmanConf(t *testing.T) string {
 	}
 	dbPath := createPacmanDBPath(t)
 
+	if mirror == "" {
+		mirror = "https://geo.mirror.pkgbuild.com/core/os/"
+	}
+
 	pacmanConfFile := filepath.Join(t.TempDir(), "pacman.conf")
-	if err := os.WriteFile(pacmanConfFile, fmt.Appendf(nil, "[options]\nDBPath=%s\n[core]\nServer=https://geo.mirror.pkgbuild.com/core/os/%s", dbPath, osArchitecture), 0o600); err != nil {
+	if err := os.WriteFile(pacmanConfFile, fmt.Appendf(nil, "[options]\nDBPath=%s\n[core]\nServer=%s%s", dbPath, mirror, osArchitecture), 0o600); err != nil {
 		t.Fatalf("Failed to create pacman.conf: %v", err)
 	}
 
@@ -39,6 +44,7 @@ func createPacmanDBPath(t *testing.T) string {
 	subdirs := []string{
 		"pacman-1.0-1",
 		"pacman-mirrorlist-2.0-2",
+		"secret-package-1.0.0-1",
 	}
 
 	for _, dir := range subdirs {
@@ -50,4 +56,26 @@ func createPacmanDBPath(t *testing.T) string {
 	}
 
 	return dbPath
+}
+
+func createPkgstatsConf(t *testing.T, packages []string, mirrors []string) string {
+	t.Helper()
+
+	var content strings.Builder
+	content.WriteString("blocklist:\n")
+	content.WriteString("  packages:\n")
+	for _, pkg := range packages {
+		content.WriteString(fmt.Sprintf("    - \"%s\"\n", pkg))
+	}
+	content.WriteString("  mirrors:\n")
+	for _, mirror := range mirrors {
+		content.WriteString(fmt.Sprintf("    - \"%s\"\n", mirror))
+	}
+
+	pkgstatsConfFile := filepath.Join(t.TempDir(), "pkgstats.yaml")
+	if err := os.WriteFile(pkgstatsConfFile, []byte(content.String()), 0o600); err != nil {
+		t.Fatalf("Failed to create pkgstats.conf: %v", err)
+	}
+
+	return pkgstatsConfFile
 }

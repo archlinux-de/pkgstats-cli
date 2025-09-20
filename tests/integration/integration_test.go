@@ -3,6 +3,7 @@ package integration_test
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 	"regexp"
 	"slices"
 	"strings"
@@ -13,7 +14,7 @@ import (
 )
 
 func TestShowHelp(t *testing.T) {
-	output, err := pkgstats(t, "help")
+	output, err := pkgstats(t, []string{"help"})
 	if err != nil {
 		t.Fatalf("Failed to run command: %v", err)
 	}
@@ -23,7 +24,7 @@ func TestShowHelp(t *testing.T) {
 }
 
 func TestShowVersion(t *testing.T) {
-	output, err := pkgstats(t, "version")
+	output, err := pkgstats(t, []string{"version"})
 	if err != nil {
 		t.Fatalf("Failed to run command: %v", err)
 	}
@@ -43,7 +44,7 @@ func TestShowInformationToBeSent(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	output, err := pkgstats(t, "submit", "--dump-json")
+	output, err := pkgstats(t, []string{"submit", "--dump-json"}, WithPkgBlocklist([]string{"secret-*"}), WithMirrorBlocklist([]string{"secret.com"}))
 	if err != nil {
 		t.Fatalf("Failed to run command: %v", err)
 	}
@@ -66,10 +67,90 @@ func TestShowInformationToBeSent(t *testing.T) {
 	if !slices.Contains(request.Pacman.Packages, "pacman-mirrorlist") {
 		t.Errorf("Expected pacman packages to contain 'pacman-mirrorlist'")
 	}
+	if slices.Contains(request.Pacman.Packages, "secret-package") {
+		t.Errorf("Expected pacman packages to not contain 'secret-package'")
+	}
+}
+
+func TestMirrorFiltering(t *testing.T) {
+	if os.Getenv("INTEGRATION_TEST") == "1" {
+		t.Skip("Skipping mirror filtering test in integration mode")
+	}
+
+	output, err := pkgstats(t, []string{"submit", "--dump-json"}, WithMirror("http://my.secret.mirror/"), WithMirrorBlocklist([]string{"my.secret.mirror"}))
+	if err != nil {
+		t.Fatalf("Failed to run command: %v", err)
+	}
+
+	var request submit.Request
+	if err := json.Unmarshal([]byte(output), &request); err != nil {
+		t.Fatalf("Failed to unmarshal JSON: %v", err)
+	}
+
+	if request.Pacman.Mirror != "" {
+		t.Errorf("Expected pacman mirror to be empty, got %v", request.Pacman.Mirror)
+	}
+}
+
+func TestMultipleBlocklists(t *testing.T) {
+	if os.Getenv("INTEGRATION_TEST") == "1" {
+		t.Skip("Skipping multiple blocklists test in integration mode")
+	}
+
+	output, err := pkgstats(t, []string{"submit", "--dump-json"},
+		WithPkgBlocklist([]string{"secret-*", "*-dev"}),
+		WithMirrorBlocklist([]string{"private.mirror.com", "*.internal.net"}),
+		WithMirror("http://private.mirror.com/archlinux/$repo/os/$arch"),
+	)
+	if err != nil {
+		t.Fatalf("Failed to run command: %v", err)
+	}
+
+	var request submit.Request
+	if err := json.Unmarshal([]byte(output), &request); err != nil {
+		t.Fatalf("Failed to unmarshal JSON: %v", err)
+	}
+
+	if request.Pacman.Mirror != "" {
+		t.Errorf("Expected pacman mirror to be empty, got %v", request.Pacman.Mirror)
+	}
+	if slices.Contains(request.Pacman.Packages, "secret-package") {
+		t.Errorf("Expected pacman packages to not contain 'secret-package'")
+	}
+	if slices.Contains(request.Pacman.Packages, "my-app-dev") {
+		t.Errorf("Expected pacman packages to not contain 'my-app-dev'")
+	}
+}
+
+func TestComplexGlobPatterns(t *testing.T) {
+	if os.Getenv("INTEGRATION_TEST") == "1" {
+		t.Skip("Skipping complex glob patterns test in integration mode")
+	}
+
+	output, err := pkgstats(t, []string{"submit", "--dump-json"},
+		WithPkgBlocklist([]string{"app-[0-9]*.pkg"}),
+		WithMirrorBlocklist([]string{"*.example.co", "*.example.net"}),
+		WithMirror("http://mirror.example.co/archlinux/$repo/os/$arch"),
+	)
+	if err != nil {
+		t.Fatalf("Failed to run command: %v", err)
+	}
+
+	var request submit.Request
+	if err := json.Unmarshal([]byte(output), &request); err != nil {
+		t.Fatalf("Failed to unmarshal JSON: %v", err)
+	}
+
+	if request.Pacman.Mirror != "" {
+		t.Errorf("Expected pacman mirror to be empty, got %v", request.Pacman.Mirror)
+	}
+	if slices.Contains(request.Pacman.Packages, "app-123.pkg") {
+		t.Errorf("Expected pacman packages to not contain 'app-123.pkg'")
+	}
 }
 
 func TestSetQuietMode(t *testing.T) {
-	output, err := pkgstats(t, "submit", "--quiet")
+	output, err := pkgstats(t, []string{"submit", "--quiet"})
 	if err != nil {
 		t.Fatalf("Failed to run command: %v", err)
 	}
@@ -79,13 +160,13 @@ func TestSetQuietMode(t *testing.T) {
 }
 
 func TestSetQuietModeAndDumpCannotBeUsedTogether(t *testing.T) {
-	if _, err := pkgstats(t, "submit", "--dump-json", "--quiet"); err == nil {
+	if _, err := pkgstats(t, []string{"submit", "--dump-json", "--quiet"}); err == nil {
 		t.Fatal("Command should fail")
 	}
 }
 
 func TestSendInformation(t *testing.T) {
-	output, err := pkgstats(t, "submit")
+	output, err := pkgstats(t, []string{"submit"})
 	if err != nil {
 		t.Fatalf("Failed to run command: %v", err)
 	}
@@ -112,7 +193,7 @@ func linesContainsPackageStatistic(t *testing.T, lines []string, packages []stri
 }
 
 func TestSearchPackages(t *testing.T) {
-	output, err := pkgstats(t, "search", "php")
+	output, err := pkgstats(t, []string{"search", "php"})
 	if err != nil {
 		t.Fatalf("Failed to run command: %v", err)
 	}
@@ -120,7 +201,7 @@ func TestSearchPackages(t *testing.T) {
 }
 
 func TestShowPackages(t *testing.T) {
-	output, err := pkgstats(t, "show", "php", "pacman")
+	output, err := pkgstats(t, []string{"show", "php", "pacman"})
 	if err != nil {
 		t.Fatalf("Failed to run command: %v", err)
 	}
@@ -128,7 +209,7 @@ func TestShowPackages(t *testing.T) {
 }
 
 func TestShowArchitecture(t *testing.T) {
-	output, err := pkgstats(t, "architecture")
+	output, err := pkgstats(t, []string{"architecture"})
 	if err != nil {
 		t.Fatalf("Failed to run command: %v", err)
 	}
@@ -149,7 +230,7 @@ func TestShowArchitecture(t *testing.T) {
 }
 
 func TestShowOsArchitecture(t *testing.T) {
-	output, err := pkgstats(t, "architecture", "os")
+	output, err := pkgstats(t, []string{"architecture", "os"})
 	if err != nil {
 		t.Fatalf("Failed to run command: %v", err)
 	}
@@ -166,7 +247,7 @@ func TestShowOsArchitecture(t *testing.T) {
 }
 
 func TestShowSystemArchitecture(t *testing.T) {
-	output, err := pkgstats(t, "architecture", "system")
+	output, err := pkgstats(t, []string{"architecture", "system"})
 	if err != nil {
 		t.Fatalf("Failed to run command: %v", err)
 	}

@@ -12,8 +12,39 @@ import (
 	"github.com/spf13/pflag"
 )
 
-func pkgstats(t *testing.T, args ...string) (string, error) {
+type pkgstatsOptions struct {
+	mirror          string
+	pkgBlocklist    []string
+	mirrorBlocklist []string
+}
+
+type PkgstatsOption func(*pkgstatsOptions)
+
+func WithMirror(mirror string) PkgstatsOption {
+	return func(o *pkgstatsOptions) {
+		o.mirror = mirror
+	}
+}
+
+func WithPkgBlocklist(list []string) PkgstatsOption {
+	return func(o *pkgstatsOptions) {
+		o.pkgBlocklist = list
+	}
+}
+
+func WithMirrorBlocklist(list []string) PkgstatsOption {
+	return func(o *pkgstatsOptions) {
+		o.mirrorBlocklist = list
+	}
+}
+
+func pkgstats(t *testing.T, args []string, opts ...PkgstatsOption) (string, error) {
 	t.Helper()
+
+	options := &pkgstatsOptions{}
+	for _, opt := range opts {
+		opt(options)
+	}
 
 	rootCmd := cmd.GetRootCmd()
 	defer resetFlags(t, rootCmd)
@@ -23,11 +54,13 @@ func pkgstats(t *testing.T, args ...string) (string, error) {
 
 	args = append(args, "--base-url", server.URL)
 
-	if os.Getenv("INTEGRATION_TEST") != "1" {
-		args = append(args, "--pacman-conf", createPacmanConf(t))
-	} else {
+	if os.Getenv("INTEGRATION_TEST") == "1" {
 		t.Log("Using actual pacman in integration test")
+	} else {
+		args = append(args, "--pacman-conf", createPacmanConf(t, options.mirror))
 	}
+
+	args = append(args, "--pkgstats-conf", createPkgstatsConf(t, options.pkgBlocklist, options.mirrorBlocklist))
 
 	buf := new(bytes.Buffer)
 	rootCmd.SetOut(buf)

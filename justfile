@@ -2,10 +2,10 @@ set quiet := true
 
 import 'just/dev.just'
 
-export CGO_CPPFLAGS := env_var_or_default('CPPFLAGS', '')
-export CGO_CFLAGS := env_var_or_default('CFLAGS', '')
-export CGO_CXXFLAGS := env_var_or_default('CXXFLAGS', '')
-export CGO_LDFLAGS := env_var_or_default('LDFLAGS', '')
+export CGO_CPPFLAGS := env('CPPFLAGS', '')
+export CGO_CFLAGS := env('CFLAGS', '')
+export CGO_CXXFLAGS := env('CXXFLAGS', '')
+export CGO_LDFLAGS := env('LDFLAGS', '')
 export CGO_ENABLED := '0'
 
 # list all recipes

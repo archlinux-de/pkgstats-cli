@@ -7,6 +7,8 @@ import (
 	"io"
 
 	"pkgstats-cli/internal/api/submit"
+	"pkgstats-cli/internal/config"
+	"pkgstats-cli/internal/filter"
 	"pkgstats-cli/internal/pacman"
 	"pkgstats-cli/internal/system"
 
@@ -36,7 +38,17 @@ var submitCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+
 		req, err := submit.CreateRequest(p, system.NewSystem())
+		if err != nil {
+			return err
+		}
+
+		c, err := config.Load(pkgstatsConf)
+		if err != nil {
+			return err
+		}
+		err = filter.FilterRequest(c, req)
 		if err != nil {
 			return err
 		}

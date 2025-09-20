@@ -54,6 +54,24 @@ Example:
 pkgstats show firefox chromium
 ```
 
+#### Configuration
+
+You can create a configuration file at `/etc/pkgstats.yaml` to filter packages and mirrors from being submitted.
+
+Example configuration:
+
+```yaml
+blocklist:
+  packages:
+    - "secret-*"
+    - "*-debug"
+  mirrors:
+    - "private.mirror.com"
+    - "*.internal.net"
+```
+
+The `packages` and `mirrors` fields support glob patterns. For mirrors, the pattern is matched against the hostname of the mirror URL.
+
 ## For Developers
 
 This project uses `just` as a command runner. To see all available commands, run:
