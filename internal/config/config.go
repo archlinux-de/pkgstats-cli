@@ -2,7 +2,7 @@ package config
 
 import (
 	"errors"
-	"os"
+	"fmt"
 
 	"github.com/spf13/viper"
 )
@@ -19,15 +19,15 @@ func parse(v *viper.Viper) (*Config, error) {
 
 	if err := v.ReadInConfig(); err != nil {
 		var configFileNotFoundError viper.ConfigFileNotFoundError
-		if errors.As(err, &configFileNotFoundError) || os.IsNotExist(err) {
+		if errors.As(err, &configFileNotFoundError) {
 			return &config, nil
 		} else {
-			return nil, err
+			return nil, fmt.Errorf("failed to read config file %s: %w", v.ConfigFileUsed(), err)
 		}
 	}
 
 	if err := v.UnmarshalExact(&config); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse config file %s: %w", v.ConfigFileUsed(), err)
 	}
 
 	return &config, nil

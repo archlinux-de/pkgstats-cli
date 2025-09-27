@@ -10,8 +10,6 @@ import (
 )
 
 func TestLoad(t *testing.T) {
-	t.Parallel()
-
 	tests := []struct {
 		name    string
 		content string
@@ -70,8 +68,6 @@ unknown_field: "value"
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-
 			tmpDir := t.TempDir()
 			configFile := filepath.Join(tmpDir, "pkgstats.yaml")
 
@@ -93,12 +89,17 @@ unknown_field: "value"
 	}
 
 	t.Run("missing config file", func(t *testing.T) {
-		t.Parallel()
-
 		tmpDir := t.TempDir()
 		configFile := filepath.Join(tmpDir, "nonexistent.yaml")
 
-		got, err := config.Load(configFile)
+		_, err := config.Load(configFile)
+		if err == nil {
+			t.Errorf("Load() error = %v, wantErr true", err)
+		}
+	})
+
+	t.Run("missing default config file", func(t *testing.T) {
+		got, err := config.Load("")
 		if err != nil {
 			t.Errorf("Load() error = %v, wantErr false", err)
 		}
