@@ -19,6 +19,7 @@ func TestIsFilteredPackage(t *testing.T) {
 		{"super-secret-package", []string{"*secret*"}, true, false},
 		{"debug-info", []string{"*-debug", "debug-*"}, true, false},
 		{"package", []string{"package"}, true, false},
+		{"package-debug", []string{"*-debug"}, true, false},
 
 		// Unfiltered inputs
 		{"my-package", []string{"secret-*"}, false, false},

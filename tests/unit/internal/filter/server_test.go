@@ -28,6 +28,8 @@ func TestFilterMirrorUrl(t *testing.T) {
 		{"example.com", []string{"*"}, true, false},
 		{"http://example.com/path/to/mirror", []string{"example.*"}, true, false},
 		{"http://example.com/path/to/mirror", []string{"example*"}, true, false},
+		{"http://mirror.example.com/path/to/mirror", []string{"mirror.example.com"}, true, false},
+		{"http://my.mirror.lan/path/to/mirror", []string{"*.lan"}, true, false},
 
 		// Unfiltered inputs
 		{"http://example.com/path/to/mirror", []string{"*.example.*"}, false, false},
