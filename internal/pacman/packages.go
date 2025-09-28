@@ -3,13 +3,12 @@ package pacman
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 )
 
 func (p *Pacman) GetInstalledPackages() ([]string, error) {
 	const verParts = 2
 
-	db, err := os.Open(filepath.Join(p.config.dbPath, "local"))
+	db, err := os.OpenInRoot(p.config.dbPath, "local")
 	if err != nil {
 		return nil, fmt.Errorf("failed to open pacman DB: %w", err)
 	}

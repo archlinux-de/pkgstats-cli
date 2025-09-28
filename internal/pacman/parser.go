@@ -25,11 +25,17 @@ type Pacman struct {
 }
 
 type parser struct {
+	baseDir          *os.Root
 	includeFileCache map[string][]string
 }
 
 func Parse(pacmanConfPath string) (*Pacman, error) {
-	conf, err := newParser().parseConfigFile(pacmanConfPath, defaultDBPath)
+	baseDir, err := os.OpenRoot(filepath.Dir(pacmanConfPath))
+	if err != nil {
+		return nil, err
+	}
+
+	conf, err := newParser(baseDir).parseConfigFile(pacmanConfPath, defaultDBPath)
 	if err != nil {
 		return nil, err
 	}
@@ -37,10 +43,19 @@ func Parse(pacmanConfPath string) (*Pacman, error) {
 	return &Pacman{config: conf}, nil
 }
 
-func newParser() *parser {
+func newParser(baseDir *os.Root) *parser {
 	return &parser{
+		baseDir:          baseDir,
 		includeFileCache: make(map[string][]string),
 	}
+}
+
+func (parser *parser) openFile(name string) (*os.File, error) {
+	fileName, ok := strings.CutPrefix(name, parser.baseDir.Name()+"/")
+	if !ok {
+		return nil, fmt.Errorf("filename %s is not relative to %s", name, parser.baseDir.Name())
+	}
+	return parser.baseDir.Open(fileName)
 }
 
 func (parser *parser) parseConfigFile(configPath string, defaultDBPath string) (*config, error) {
@@ -69,7 +84,7 @@ func (parser *parser) readConfigFile(fileName string, depth int) ([]string, erro
 	if depth >= configMaxRecursion {
 		return nil, fmt.Errorf("reached maximum Include depth of %d", depth)
 	}
-	readFile, err := os.Open(fileName)
+	readFile, err := parser.openFile(fileName)
 	if err != nil {
 		return nil, err
 	}

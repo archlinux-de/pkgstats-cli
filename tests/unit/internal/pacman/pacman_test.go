@@ -95,9 +95,10 @@ func TestGetServer(t *testing.T) {
 }
 
 func TestPacmanConfIncludes(t *testing.T) {
-	pacmanConfFile := filepath.Join(t.TempDir(), "pacman.conf")
-	pacmanConfFileInclude1 := filepath.Join(t.TempDir(), "pacman-include1.conf")
-	pacmanConfFileInclude2 := filepath.Join(t.TempDir(), "pacman-include2.conf")
+	tempDir := t.TempDir()
+	pacmanConfFile := filepath.Join(tempDir, "pacman.conf")
+	pacmanConfFileInclude1 := filepath.Join(tempDir, "pacman-include1.conf")
+	pacmanConfFileInclude2 := filepath.Join(tempDir, "pacman-include2.conf")
 
 	if err := os.WriteFile(pacmanConfFile, fmt.Appendf(nil, "[core]\nInclude=%s\n", pacmanConfFileInclude1), 0o600); err != nil {
 		t.Fatalf("Failed to create pacman.conf: %v", err)
@@ -123,12 +124,13 @@ func TestPacmanConfIncludes(t *testing.T) {
 }
 
 func TestPacmanConfIncludesGlob(t *testing.T) {
-	pacmanConfFile := filepath.Join(t.TempDir(), "pacman.conf")
-	d := t.TempDir()
-	pacmanConfFileInclude1 := filepath.Join(d, "pacman-include1.conf")
-	pacmanConfFileInclude2 := filepath.Join(d, "pacman-include2.conf")
+	tempDir := t.TempDir()
 
-	if err := os.WriteFile(pacmanConfFile, fmt.Appendf(nil, "[core]\nInclude=%s/pacman-*.conf\n", d), 0o600); err != nil {
+	pacmanConfFile := filepath.Join(tempDir, "pacman.conf")
+	pacmanConfFileInclude1 := filepath.Join(tempDir, "pacman-include1.conf")
+	pacmanConfFileInclude2 := filepath.Join(tempDir, "pacman-include2.conf")
+
+	if err := os.WriteFile(pacmanConfFile, fmt.Appendf(nil, "[core]\nInclude=%s/pacman-*.conf\n", tempDir), 0o600); err != nil {
 		t.Fatalf("Failed to create pacman.conf: %v", err)
 	}
 	if err := os.WriteFile(pacmanConfFileInclude1, []byte(""), 0o600); err != nil {
