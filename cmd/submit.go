@@ -113,7 +113,7 @@ blocklist:
 
 func init() {
 	rootCmd.AddCommand(submitCmd)
-	submitCmd.Flags().BoolVarP(&configHelp, "config-help", "c", configHelp, "Show help for configuring blocklists in pkgstats.yaml.")
+	submitCmd.Flags().BoolVar(&configHelp, "config-help", configHelp, "Show help for configuring blocklists in pkgstats.yaml.")
 	submitCmd.Flags().BoolVarP(&dumpJSON, "dump-json", "d", dumpJSON, "Dump information that would be sent as JSON")
 	submitCmd.Flags().BoolVarP(&quiet, "quiet", "q", quiet, "Suppress any output except errors")
 }
