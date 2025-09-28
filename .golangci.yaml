@@ -1,4 +1,6 @@
 version: "2"
+run:
+  tests: true
 linters:
   enable:
     - bodyclose
@@ -19,28 +21,29 @@ linters:
     - usestdlibvars
   exclusions:
     generated: lax
-    presets:
-      - comments
-      - common-false-positives
-      - legacy
-      - std-error-handling
     rules:
-      - linters:
+      - path: _test\.go$
+        linters:
           - perfsprint
-        path: _test\.go
-    paths:
-      - third_party$
-      - builtin$
-      - examples$
+          - gosec
+      - path: _test\.go$
+        linters:
+          - gosec
+  settings:
+    errcheck:
+      exclude-functions:
+        - (*os.File).Close
+        - (*text/tabwriter.Writer).Flush
+        - (io.Closer).Close
+        - fmt.Fprint
+        - fmt.Fprintf
+        - fmt.Fprintln
+    gosec:
+      excludes:
+        - G104
 formatters:
   enable:
     - gofumpt
   settings:
     gofumpt:
       module-path: pkgstats-cli
-  exclusions:
-    generated: lax
-    paths:
-      - third_party$
-      - builtin$
-      - examples$
