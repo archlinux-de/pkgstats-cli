@@ -46,7 +46,7 @@ func init() {
 		os.Exit(1)
 	}
 
-	rootCmd.PersistentFlags().StringVar(&pkgstatsConf, pkgstatsConfParam, pkgstatsConf, "path to pkgstats config file")
+	rootCmd.PersistentFlags().StringVarP(&pkgstatsConf, pkgstatsConfParam, "c", pkgstatsConf, "path to pkgstats config file")
 	if err := rootCmd.PersistentFlags().MarkHidden(pkgstatsConfParam); err != nil {
 		fmt.Fprintln(rootCmd.ErrOrStderr(), err)
 		os.Exit(1)
