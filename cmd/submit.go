@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"slices"
 
 	"pkgstats-cli/internal/api/submit"
 	"pkgstats-cli/internal/config"
@@ -69,6 +70,7 @@ var submitCmd = &cobra.Command{
 }
 
 func dumpRequest(writer io.Writer, req *submit.Request) error {
+	slices.Sort(req.Pacman.Packages)
 	formattedRequest, err := json.MarshalIndent(req, "", "  ")
 	if err != nil {
 		return err
