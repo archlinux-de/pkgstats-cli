@@ -41,6 +41,7 @@ linters:
     gosec:
       excludes:
         - G104
+        - G304
 formatters:
   enable:
     - gofumpt

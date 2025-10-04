@@ -185,6 +185,100 @@ func TestPacmanConfEmptySections(t *testing.T) {
 	}
 }
 
+func TestPacmanConfWithRelativePath(t *testing.T) {
+	tempDir := t.TempDir()
+	currentDir, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		if err := os.Chdir(currentDir); err != nil {
+			t.Fatal(err)
+		}
+	}()
+
+	if err := os.Chdir(tempDir); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := os.WriteFile("pacman.conf", fmt.Appendf(nil, "[core]\nServer=%s\n", MIRROR), 0o600); err != nil {
+		t.Fatalf("Failed to create pacman.conf: %v", err)
+	}
+
+	p, err := pacman.Parse("pacman.conf")
+	if err != nil {
+		t.Fatal(err)
+	}
+	out, err := p.GetServer()
+	if err != nil {
+		t.Fatal(err, out)
+	}
+	if out != SERVER {
+		t.Error(out)
+	}
+}
+
+func TestPacmanConfWithIncludesInSubdirectory(t *testing.T) {
+	tempDir := t.TempDir()
+	pacmanConfFile := filepath.Join(tempDir, "pacman.conf")
+	pacmanDDir := filepath.Join(tempDir, "pacman.d")
+
+	if err := os.Mkdir(pacmanDDir, 0o755); err != nil {
+		t.Fatalf("Failed to create pacman.d directory: %v", err)
+	}
+
+	mirrorlistFile := filepath.Join(pacmanDDir, "mirrorlist.local")
+	if err := os.WriteFile(mirrorlistFile, fmt.Appendf(nil, "Server=%s\n", MIRROR), 0o600); err != nil {
+		t.Fatalf("Failed to create mirrorlist: %v", err)
+	}
+
+	if err := os.WriteFile(pacmanConfFile, fmt.Appendf(nil, "[core]\nInclude=%s\n", mirrorlistFile), 0o600); err != nil {
+		t.Fatalf("Failed to create pacman.conf: %v", err)
+	}
+
+	p, err := pacman.Parse(pacmanConfFile)
+	if err != nil {
+		t.Fatal(err)
+	}
+	out, err := p.GetServer()
+	if err != nil {
+		t.Fatal(err, out)
+	}
+	if out != SERVER {
+		t.Error(out)
+	}
+}
+
+func TestPacmanConfSymlink(t *testing.T) {
+	tempDir := t.TempDir()
+	realConfigDir := filepath.Join(tempDir, "real-location")
+	if err := os.Mkdir(realConfigDir, 0o755); err != nil {
+		t.Fatalf("Failed to create real config directory: %v", err)
+	}
+
+	realConfigFile := filepath.Join(realConfigDir, "pacman.conf")
+	if err := os.WriteFile(realConfigFile, fmt.Appendf(nil, "[core]\nServer=%s\n", MIRROR), 0o600); err != nil {
+		t.Fatalf("Failed to create real pacman.conf: %v", err)
+	}
+
+	symlinkFile := filepath.Join(tempDir, "pacman.conf")
+	if err := os.Symlink(realConfigFile, symlinkFile); err != nil {
+		t.Fatalf("Failed to create symlink: %v", err)
+	}
+
+	p, err := pacman.Parse(symlinkFile)
+	if err != nil {
+		t.Fatal(err)
+	}
+	out, err := p.GetServer()
+	if err != nil {
+		t.Fatal(err, out)
+	}
+	if out != SERVER {
+		t.Error(out)
+	}
+}
+
 func TestNormalizeMirrorUrl(t *testing.T) {
 	tests := []struct {
 		input    string
