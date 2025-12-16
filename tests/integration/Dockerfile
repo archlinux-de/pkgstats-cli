@@ -1,5 +1,6 @@
 FROM archlinux
 
+RUN mkdir /tmp/pacman-cache
 RUN pacman -Syu --noconfirm --cachedir /tmp/pacman-cache go just git gcc jq
 
 COPY . /app/
