@@ -43,6 +43,10 @@ func TestShowInformationToBeSent(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	osId, err := s.GetOSId()
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	output, err := pkgstats(t, []string{"submit", "--dump-json"}, WithPkgBlocklist([]string{"secret-*"}), WithMirrorBlocklist([]string{"secret.com"}))
 	if err != nil {
@@ -60,6 +64,9 @@ func TestShowInformationToBeSent(t *testing.T) {
 	}
 	if request.OS.Architecture != osArchitecture {
 		t.Errorf("Expected OS architecture '%s', got %v", osArchitecture, request.OS.Architecture)
+	}
+	if request.OS.Id != osId {
+		t.Errorf("Expected OS id '%s', got %v", osId, request.OS.Id)
 	}
 	if !strings.HasPrefix(request.Pacman.Mirror, "https://") {
 		t.Errorf("Expected pacman mirror to start with 'https://', got %v", request.Pacman.Mirror)

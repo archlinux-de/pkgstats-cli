@@ -108,6 +108,11 @@ func validateSubmitRequest(w http.ResponseWriter, request *submit.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	osId, err := s.GetOSId()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	if request.Version != submit.Version {
 		http.Error(w, fmt.Sprintf("Expected version %s, got %s", submit.Version, request.Version), http.StatusBadRequest)
@@ -115,6 +120,10 @@ func validateSubmitRequest(w http.ResponseWriter, request *submit.Request) {
 	}
 	if request.OS.Architecture != osArchitecture {
 		http.Error(w, fmt.Sprintf("Expected OS architecture %s, got %s", osArchitecture, request.OS.Architecture), http.StatusBadRequest)
+		return
+	}
+	if request.OS.Id != osId {
+		http.Error(w, fmt.Sprintf("Expected OS id %s, got %s", osId, request.OS.Id), http.StatusBadRequest)
 		return
 	}
 	if request.System.Architecture != cpuArchitecture {

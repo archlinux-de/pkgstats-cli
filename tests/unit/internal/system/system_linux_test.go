@@ -1,6 +1,7 @@
 package system_test
 
 import (
+	"os"
 	"runtime"
 	"slices"
 	"strings"
@@ -31,5 +32,26 @@ func TestGetMachine(t *testing.T) {
 	}
 	if !expectedArch(arch) {
 		t.Error(arch)
+	}
+}
+
+func TestGetOSId(t *testing.T) {
+	sys := system.NewSystem()
+	osId, err := sys.GetOSId()
+	if err != nil {
+		t.Fatalf("unexpected error getting OSId: %v", err)
+	}
+
+	_, err1 := os.Stat("/etc/os-release")
+	_, err2 := os.Stat("/usr/lib/os-release")
+
+	if os.IsNotExist(err1) && os.IsNotExist(err2) {
+		if osId != runtime.GOOS {
+			t.Errorf("expected OSId %q, got %q", runtime.GOOS, osId)
+		}
+	} else {
+		if osId == "" {
+			t.Error("expected a non-empty OSId, but it was empty")
+		}
 	}
 }

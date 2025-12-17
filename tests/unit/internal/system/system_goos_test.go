@@ -18,3 +18,13 @@ func TestGetArchitecture(t *testing.T) {
 		t.Error(cpuArch)
 	}
 }
+
+func TestGetOSId(t *testing.T) {
+	osId, err := system.NewSystem().GetOSId()
+	if err != nil {
+		t.Error(err)
+	}
+	if osId != runtime.GOOS {
+		t.Error(osId)
+	}
+}

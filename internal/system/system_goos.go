@@ -16,3 +16,7 @@ func (s *System) GetArchitecture() (string, error) {
 		return runtime.GOARCH, nil
 	}
 }
+
+func (s *System) GetOSId() (string, error) {
+	return runtime.GOOS, nil
+}

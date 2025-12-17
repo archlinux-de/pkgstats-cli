@@ -6,6 +6,7 @@ type System struct {
 
 type OS struct {
 	Architecture string `json:"architecture"`
+	Id           string `json:"id"`
 }
 
 type Pacman struct {
@@ -30,6 +31,7 @@ type PackageManager interface {
 type SystemInfo interface {
 	GetCpuArchitecture() (string, error)
 	GetArchitecture() (string, error)
+	GetOSId() (string, error)
 }
 
 func CreateRequest(p PackageManager, s SystemInfo) (*Request, error) {
@@ -51,10 +53,15 @@ func CreateRequest(p PackageManager, s SystemInfo) (*Request, error) {
 		return nil, err
 	}
 
+	osId, err := s.GetOSId()
+	if err != nil {
+		return nil, err
+	}
+
 	return &Request{
 		Version: Version,
 		System:  System{Architecture: cpuArchitecture},
-		OS:      OS{Architecture: architecture},
+		OS:      OS{Architecture: architecture, Id: osId},
 		Pacman:  Pacman{Packages: packages, Mirror: mirror},
 	}, nil
 }

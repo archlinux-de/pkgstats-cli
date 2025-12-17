@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"runtime"
 	"strings"
 	"testing"
 
@@ -32,7 +33,7 @@ func TestSendRequest(t *testing.T) {
 	request := &submit.Request{
 		Version: submit.Version,
 		System:  submit.System{Architecture: system.X86_64},
-		OS:      submit.OS{Architecture: system.I686},
+		OS:      submit.OS{Architecture: system.I686, Id: runtime.GOOS},
 		Pacman:  submit.Pacman{Packages: []string{"pacman", "linux"}, Mirror: mirror},
 	}
 	err := client.SendRequest(*request)
@@ -74,6 +75,9 @@ func validateRequest(t *testing.T, req *http.Request) {
 	if request.OS.Architecture != system.I686 {
 		t.Error("Invalid arch value")
 	}
+	if request.OS.Id != runtime.GOOS {
+		t.Error("Invalid id value")
+	}
 	if request.Pacman.Mirror != mirror {
 		t.Error("Invalid mirror value")
 	}
@@ -101,7 +105,7 @@ func TestSendRequestFollowsRedirect(t *testing.T) {
 	request := &submit.Request{
 		Version: submit.Version,
 		System:  submit.System{Architecture: system.X86_64},
-		OS:      submit.OS{Architecture: system.I686},
+		OS:      submit.OS{Architecture: system.I686, Id: runtime.GOOS},
 		Pacman:  submit.Pacman{Packages: []string{"pacman", "linux"}, Mirror: mirror},
 	}
 	err := client.SendRequest(*request)
@@ -128,7 +132,7 @@ func TestReturnServerErrorOnFailure(t *testing.T) {
 	request := &submit.Request{
 		Version: submit.Version,
 		System:  submit.System{Architecture: system.X86_64},
-		OS:      submit.OS{Architecture: system.I686},
+		OS:      submit.OS{Architecture: system.I686, Id: runtime.GOOS},
 		Pacman:  submit.Pacman{Packages: []string{"pacman", "linux"}, Mirror: mirror},
 	}
 	err := client.SendRequest(*request)
