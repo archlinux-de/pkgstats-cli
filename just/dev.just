@@ -50,7 +50,6 @@ test-integration:
 
 # run all available tests
 [group('test')]
-[parallel]
 test-all: lint test test-cross-platform test-build test-cpu-detection test-os-detection test-integration
 
 # remove any untracked and generated files
