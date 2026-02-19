@@ -65,11 +65,11 @@ func createPkgstatsConf(t *testing.T, packages []string, mirrors []string) strin
 	content.WriteString("blocklist:\n")
 	content.WriteString("  packages:\n")
 	for _, pkg := range packages {
-		content.WriteString(fmt.Sprintf("    - \"%s\"\n", pkg))
+		fmt.Fprintf(&content, "    - \"%s\"\n", pkg)
 	}
 	content.WriteString("  mirrors:\n")
 	for _, mirror := range mirrors {
-		content.WriteString(fmt.Sprintf("    - \"%s\"\n", mirror))
+		fmt.Fprintf(&content, "    - \"%s\"\n", mirror)
 	}
 
 	pkgstatsConfFile := filepath.Join(t.TempDir(), "pkgstats.yaml")

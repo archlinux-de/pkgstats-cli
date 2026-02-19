@@ -63,6 +63,7 @@ func (client *Client) query(path string, params url.Values) ([]byte, error) {
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", build.UserAgent)
+	// #nosec G704 -- baseURL is provided by the user via CLI flags
 	response, err := client.Client.Do(req)
 	if err != nil {
 		return nil, err

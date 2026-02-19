@@ -41,13 +41,13 @@ func createPacmanConf(t *testing.T, dbPath string, servers []string) string {
 
 	var conf strings.Builder
 	if dbPath != "" {
-		conf.WriteString(fmt.Sprintf("[options]\nDBPath=%s\n", dbPath))
+		fmt.Fprintf(&conf, "[options]\nDBPath=%s\n", dbPath)
 	}
 
 	if len(servers) > 0 {
 		conf.WriteString("[core]\n")
 		for _, server := range servers {
-			conf.WriteString(fmt.Sprintf("Server=%s\n", server))
+			fmt.Fprintf(&conf, "Server=%s\n", server)
 		}
 	}
 
