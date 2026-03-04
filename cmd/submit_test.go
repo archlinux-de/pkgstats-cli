@@ -166,3 +166,16 @@ func TestSendInformation(t *testing.T) {
 		t.Errorf("Expected 'Data were successfully sent', got %s", lines[2])
 	}
 }
+
+func TestShowConfigHelp(t *testing.T) {
+	output, err := pkgstats(t, []string{"submit", "--config-help"})
+	if err != nil {
+		t.Fatalf("Failed to run command: %v", err)
+	}
+	if !strings.Contains(output, "blocklist") {
+		t.Errorf("Expected config help to mention blocklist, got %s", output)
+	}
+	if !strings.Contains(output, "/etc/pkgstats.yaml") {
+		t.Errorf("Expected config help to mention config path, got %s", output)
+	}
+}

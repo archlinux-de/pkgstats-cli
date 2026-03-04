@@ -45,6 +45,8 @@ func createPacmanDBPath(t *testing.T) string {
 		"pacman-1.0-1",
 		"pacman-mirrorlist-2.0-2",
 		"secret-package-1.0.0-1",
+		"my-app-dev-2.0-1",
+		"app-123.pkg-1.0-1",
 	}
 
 	for _, dir := range subdirs {
