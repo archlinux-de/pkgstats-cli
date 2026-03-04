@@ -5,7 +5,7 @@ export GOARCH := 'loong64'
 [group('test')]
 [working-directory('../')]
 test:
-    go test -exec qemu-loongarch64 ./tests/...
+    go test -exec qemu-loongarch64 ./...
 
 [group('test')]
 [working-directory('../')]

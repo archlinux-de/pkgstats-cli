@@ -5,7 +5,7 @@ export GOARCH := 'arm64'
 [group('test')]
 [working-directory('../')]
 test:
-    go test -exec qemu-aarch64 ./tests/...
+    go test -exec qemu-aarch64 ./...
 
 [group('test')]
 [working-directory('../')]

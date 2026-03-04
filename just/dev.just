@@ -63,6 +63,6 @@ coverage:
     #!/usr/bin/env bash
     set -euo pipefail
     COVER_FILE=$(mktemp)
-    go test -coverpkg=./... -coverprofile "$COVER_FILE" ./tests/...
+    go test -coverpkg=./... -coverprofile "$COVER_FILE" ./...
     go tool cover -html="$COVER_FILE"
     rm -f "$COVER_FILE"

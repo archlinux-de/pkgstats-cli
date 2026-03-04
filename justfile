@@ -28,7 +28,7 @@ build:
 # run unit tests
 [group('test')]
 test:
-    go test ./tests/...
+    go test ./...
 
 # install pkgstats and its configuration
 [group('install')]

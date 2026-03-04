@@ -5,7 +5,7 @@ export GOARCH := 'riscv64'
 [group('test')]
 [working-directory('../')]
 test:
-    go test -exec qemu-riscv64 ./tests/...
+    go test -exec qemu-riscv64 ./...
 
 [group('test')]
 [working-directory('../')]
