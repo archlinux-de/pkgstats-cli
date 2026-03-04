@@ -172,4 +172,4 @@ The `pkgstats` project is structured as follows:
   - `system/`: Gathers system information like CPU architecture.
 - `main.go`: The main entry point of the application.
 - `justfile`: Contains the `just` commands for development and testing.
-- `tests/`: Contains the integration test Dockerfile.
+- `Dockerfile`: Integration test container used by `just test-integration`.

@@ -46,7 +46,7 @@ test-os-detection: aarch64::test-os-detection arm::test-os-detection i686::test-
 # run integration tests with a mocked API server
 [group('test')]
 test-integration:
-    docker buildx build --pull . -f tests/integration/Dockerfile -t pkgstats-test-integration
+    docker buildx build --pull . -t pkgstats-test-integration
 
 # run all available tests
 [group('test')]
