@@ -1,4 +1,4 @@
-package integration_test
+package pacman_test
 
 import (
 	"net/url"

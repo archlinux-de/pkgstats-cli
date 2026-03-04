@@ -119,7 +119,7 @@ To run the unit tests, run:
 just test
 ```
 
-This will run all unit tests alongside the source code in `internal/`.
+This will run all unit tests alongside the source code in `cmd/` and `internal/`.
 
 To generate a test coverage report, run:
 
@@ -172,4 +172,4 @@ The `pkgstats` project is structured as follows:
   - `system/`: Gathers system information like CPU architecture.
 - `main.go`: The main entry point of the application.
 - `justfile`: Contains the `just` commands for development and testing.
-- `tests/`: Contains the integration tests.
+- `tests/`: Contains the integration test Dockerfile.

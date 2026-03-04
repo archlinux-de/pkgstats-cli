@@ -1,4 +1,4 @@
-package integration_test
+package cmd_test
 
 import (
 	"encoding/json"

@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 
 	"pkgstats-cli/internal/build"
@@ -15,46 +14,42 @@ const (
 	pkgstatsConfParam = "pkgstats-conf"
 )
 
-var (
-	baseURL      = "https://pkgstats.archlinux.de"
-	pacmanConf   = "/etc/pacman.conf"
-	pkgstatsConf = ""
-	rootCmd      = &cobra.Command{
+func Execute() {
+	if err := NewRootCmd().Execute(); err != nil {
+		os.Exit(1)
+	}
+}
+
+func NewRootCmd() *cobra.Command {
+	var (
+		baseURL      = "https://pkgstats.archlinux.de"
+		pacmanConf   = "/etc/pacman.conf"
+		pkgstatsConf = ""
+	)
+
+	rootCmd := &cobra.Command{
 		Use:          "pkgstats",
 		Short:        "pkgstats client",
 		Version:      build.Version,
 		SilenceUsage: true,
 	}
-)
 
-func Execute() {
-	if err := rootCmd.Execute(); err != nil {
-		os.Exit(1)
-	}
-}
-
-func init() {
 	rootCmd.PersistentFlags().StringVar(&baseURL, baseUrlParam, baseURL, "base url of the pkgstats server")
-	if err := rootCmd.PersistentFlags().MarkHidden(baseUrlParam); err != nil {
-		fmt.Fprintln(rootCmd.ErrOrStderr(), err)
-		os.Exit(1)
-	}
+	_ = rootCmd.PersistentFlags().MarkHidden(baseUrlParam)
 
 	rootCmd.PersistentFlags().StringVar(&pacmanConf, pacmanConfParam, pacmanConf, "path to pacman.conf")
-	if err := rootCmd.PersistentFlags().MarkHidden(pacmanConfParam); err != nil {
-		fmt.Fprintln(rootCmd.ErrOrStderr(), err)
-		os.Exit(1)
-	}
+	_ = rootCmd.PersistentFlags().MarkHidden(pacmanConfParam)
 
 	rootCmd.PersistentFlags().StringVarP(&pkgstatsConf, pkgstatsConfParam, "c", pkgstatsConf, "path to pkgstats config file")
-	if err := rootCmd.PersistentFlags().MarkHidden(pkgstatsConfParam); err != nil {
-		fmt.Fprintln(rootCmd.ErrOrStderr(), err)
-		os.Exit(1)
-	}
+	_ = rootCmd.PersistentFlags().MarkHidden(pkgstatsConfParam)
 
 	rootCmd.CompletionOptions.HiddenDefaultCmd = true
-}
 
-func GetRootCmd() *cobra.Command {
+	rootCmd.AddCommand(newSubmitCmd(&baseURL, &pacmanConf, &pkgstatsConf))
+	rootCmd.AddCommand(newSearchCmd(&baseURL))
+	rootCmd.AddCommand(newShowCmd(&baseURL))
+	rootCmd.AddCommand(newArchitectureCmd())
+	rootCmd.AddCommand(newVersionCmd())
+
 	return rootCmd
 }

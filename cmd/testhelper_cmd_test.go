@@ -1,4 +1,4 @@
-package integration_test
+package cmd_test
 
 import (
 	"bytes"
@@ -7,9 +7,6 @@ import (
 	"testing"
 
 	"pkgstats-cli/cmd"
-
-	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
 )
 
 type pkgstatsOptions struct {
@@ -46,8 +43,7 @@ func pkgstats(t *testing.T, args []string, opts ...PkgstatsOption) (string, erro
 		opt(options)
 	}
 
-	rootCmd := cmd.GetRootCmd()
-	defer resetFlags(t, rootCmd)
+	rootCmd := cmd.NewRootCmd()
 
 	server := httptest.NewServer(NewServer())
 	defer server.Close()
@@ -71,17 +67,4 @@ func pkgstats(t *testing.T, args []string, opts ...PkgstatsOption) (string, erro
 		return "", err
 	}
 	return buf.String(), nil
-}
-
-func resetFlags(t *testing.T, cmd *cobra.Command) {
-	t.Helper()
-
-	cmd.Flags().VisitAll(func(flag *pflag.Flag) {
-		if err := flag.Value.Set(flag.DefValue); err != nil {
-			t.Fatal(err)
-		}
-	})
-	for _, subCmd := range cmd.Commands() {
-		resetFlags(t, subCmd)
-	}
 }

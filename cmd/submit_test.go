@@ -1,10 +1,8 @@
-package integration_test
+package cmd_test
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
-	"regexp"
 	"slices"
 	"strings"
 	"testing"
@@ -12,26 +10,6 @@ import (
 	"pkgstats-cli/internal/api/submit"
 	"pkgstats-cli/internal/system"
 )
-
-func TestShowHelp(t *testing.T) {
-	output, err := pkgstats(t, []string{"help"})
-	if err != nil {
-		t.Fatalf("Failed to run command: %v", err)
-	}
-	if !strings.Contains(output, "Usage:") {
-		t.Errorf("Expected help output to contain 'Usage:', got %s", output)
-	}
-}
-
-func TestShowVersion(t *testing.T) {
-	output, err := pkgstats(t, []string{"version"})
-	if err != nil {
-		t.Fatalf("Failed to run command: %v", err)
-	}
-	if !strings.Contains(output, "version") {
-		t.Errorf("Expected version output to contain 'version', got %s", output)
-	}
-}
 
 func TestShowInformationToBeSent(t *testing.T) {
 	s := system.NewSystem()
@@ -186,86 +164,5 @@ func TestSendInformation(t *testing.T) {
 	}
 	if !strings.Contains(lines[2], "Data were successfully sent") {
 		t.Errorf("Expected 'Data were successfully sent', got %s", lines[2])
-	}
-}
-
-func linesContainsPackageStatistic(t *testing.T, lines []string, packages []string) {
-	t.Helper()
-	for _, e := range packages {
-		matcher := regexp.MustCompile(fmt.Sprintf(`^%s\s+\d+\.\d+$`, regexp.QuoteMeta(e)))
-		if !slices.ContainsFunc(lines, func(v string) bool { return matcher.MatchString(v) }) {
-			t.Errorf("Expected to find '%s' in %v", e, lines)
-		}
-	}
-}
-
-func TestSearchPackages(t *testing.T) {
-	output, err := pkgstats(t, []string{"search", "php"})
-	if err != nil {
-		t.Fatalf("Failed to run command: %v", err)
-	}
-	linesContainsPackageStatistic(t, strings.Split(output, "\n"), []string{"php", "php-fpm"})
-}
-
-func TestShowPackages(t *testing.T) {
-	output, err := pkgstats(t, []string{"show", "php", "pacman"})
-	if err != nil {
-		t.Fatalf("Failed to run command: %v", err)
-	}
-	linesContainsPackageStatistic(t, strings.Split(output, "\n"), []string{"php", "pacman"})
-}
-
-func TestShowArchitecture(t *testing.T) {
-	output, err := pkgstats(t, []string{"architecture"})
-	if err != nil {
-		t.Fatalf("Failed to run command: %v", err)
-	}
-
-	s := system.NewSystem()
-	osArchitecture, err := s.GetArchitecture()
-	if err != nil {
-		t.Fatal(err)
-	}
-	cpuArchitecture, err := s.GetCpuArchitecture()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if !strings.Contains(output, osArchitecture) || !strings.Contains(output, cpuArchitecture) {
-		t.Fatalf("Expected OS and CPU architecture %s and %s, but got %s", osArchitecture, cpuArchitecture, strings.TrimSpace(output))
-	}
-}
-
-func TestShowOsArchitecture(t *testing.T) {
-	output, err := pkgstats(t, []string{"architecture", "os"})
-	if err != nil {
-		t.Fatalf("Failed to run command: %v", err)
-	}
-
-	s := system.NewSystem()
-	osArchitecture, err := s.GetArchitecture()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if strings.TrimSpace(output) != osArchitecture {
-		t.Fatalf("Expected OS architecture %s, but got %s", osArchitecture, strings.TrimSpace(output))
-	}
-}
-
-func TestShowSystemArchitecture(t *testing.T) {
-	output, err := pkgstats(t, []string{"architecture", "system"})
-	if err != nil {
-		t.Fatalf("Failed to run command: %v", err)
-	}
-
-	s := system.NewSystem()
-	cpuArchitecture, err := s.GetCpuArchitecture()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if strings.TrimSpace(output) != cpuArchitecture {
-		t.Fatalf("Expected CPU architecture %s, but got %s", cpuArchitecture, strings.TrimSpace(output))
 	}
 }
