@@ -28,17 +28,17 @@ func PrintPackagePopularities(writer io.Writer, ppl PackagePopularityList) {
 
 func PrintSearchURL(writer io.Writer, baseURL string, query string) {
 	if len(query) > 0 {
-		fmt.Fprintf(writer, "See more results at %s/packages#query=%s\n", baseURL, query)
+		fmt.Fprintf(writer, "See more results at %s/packages?query=%s\n", baseURL, url.QueryEscape(query))
 	}
 }
 
 func PrintShowURL(writer io.Writer, baseURL string, packages []string) {
 	if len(packages) > 0 {
 		for i, p := range packages {
-			packages[i] = url.QueryEscape(p)
+			packages[i] = url.PathEscape(p)
 		}
 
 		sort.StringSlice.Sort(packages)
-		fmt.Fprintf(writer, "See more results at %s/compare/packages#packages=%s\n", baseURL, strings.Join(packages, ","))
+		fmt.Fprintf(writer, "See more results at %s/compare/packages/%s\n", baseURL, strings.Join(packages, ","))
 	}
 }

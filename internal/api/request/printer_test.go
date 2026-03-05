@@ -25,7 +25,7 @@ func TestPrintSearchURL(t *testing.T) {
 
 	output := buffer.String()
 
-	if !regexp.MustCompile(`\s+/foo/packages#query=bar\s+`).MatchString(output) {
+	if !regexp.MustCompile(`\s+/foo/packages\?query=bar\s+`).MatchString(output) {
 		t.Errorf("Unexpected output %s", output)
 	}
 }
@@ -36,7 +36,7 @@ func TestPrintShowURL(t *testing.T) {
 
 	output := buffer.String()
 
-	if !regexp.MustCompile(`\s+/foo/compare/packages#packages=bar,baz\s+`).MatchString(output) {
+	if !regexp.MustCompile(`\s+/foo/compare/packages/bar,baz\s+`).MatchString(output) {
 		t.Errorf("Unexpected output %s", output)
 	}
 }
