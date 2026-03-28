@@ -7,54 +7,40 @@ on:
 
 jobs:
   lint:
-      runs-on: ubuntu-latest
-      steps:
-        - name: Checkout code
-          uses: actions/checkout@v5
-          with:
-            fetch-depth: 0
-        - name: Install Just
-          uses: extractions/setup-just@v3
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        - name: Setup Go
-          uses: actions/setup-go@v6
-          with:
-            go-version-file: "go.mod"
-        - name: golangci-lint
-          uses: golangci/golangci-lint-action@v8
-          with:
-            verify: false
-        - run: just lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Run Common Setup
+        uses: ./.github/actions/setup
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v8
+        with:
+          verify: false
+      - run: just lint
 
   test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - name: Install Just
-        uses: extractions/setup-just@v3
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Setup Go
-        uses: actions/setup-go@v6
-        with:
-          go-version-file: "go.mod"
+      - name: Run Common Setup
+        uses: ./.github/actions/setup
       - run: just test
 
   test-integration:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - name: Install Just
-        uses: extractions/setup-just@v3
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run Common Setup
+        uses: ./.github/actions/setup
       - run: just test-integration
 
   test-cross-platform:
@@ -66,18 +52,10 @@ jobs:
         test: ['test', 'build', 'test-cpu-detection', 'test-os-detection']
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
-      - name: Install Just
-        uses: extractions/setup-just@v3
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Setup Go
-        uses: actions/setup-go@v6
-        with:
-          go-version-file: "go.mod"
-      - name: Update APT
-        run: sudo apt-get update
+        uses: actions/checkout@v6
+      - name: Run Common Setup
+        uses: ./.github/actions/setup
       - name: Install Qemu
-        run: sudo apt-get install qemu-user
+        run: sudo apt-get update && sudo apt-get install -y qemu-user
       - name: ${{ matrix.test }} on ${{ matrix.arch }}
         run: just ${{ matrix.arch }} ${{ matrix.test }}
