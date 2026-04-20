@@ -2,10 +2,16 @@
 Description=Submit pkgstats
 After=network-online.target
 Wants=network-online.target
+StartLimitIntervalSec=1h
+StartLimitBurst=10
 
 [Service]
 Type=oneshot
 ExecStart=/usr/bin/pkgstats submit --quiet
+Restart=on-failure
+RestartSec=30s
+RestartSteps=4
+RestartMaxDelaySec=10min
 
 CapabilityBoundingSet=
 DevicePolicy=closed
