@@ -12,7 +12,9 @@ import (
 	"pkgstats-cli/internal/build"
 )
 
-const timeout = 15 * time.Second
+// Allow slow but successful server-side aggregation to complete before
+// systemd treats the submission as failed and retries it.
+const timeout = 60 * time.Second
 
 type Client struct {
 	Client  *http.Client
