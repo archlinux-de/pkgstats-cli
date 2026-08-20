@@ -87,10 +87,10 @@ func (client *Client) GetPackages(packages ...string) (PackagePopularityList, er
 	ppl := PackagePopularityList{}
 	ppl.PackagePopularities = make([]PackagePopularity, len(packages))
 
-	ch := make(chan (packagePopularityResult))
+	ch := make(chan packagePopularityResult)
 
 	for _, p := range packages {
-		go func(p string, ch chan (packagePopularityResult)) {
+		go func(p string, ch chan packagePopularityResult) {
 			res, err := client.GetPackage(p)
 			ch <- packagePopularityResult{res, err}
 		}(p, ch)
