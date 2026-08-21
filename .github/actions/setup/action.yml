@@ -13,8 +13,13 @@ runs:
       uses: extractions/setup-just@v3
       env:
         GITHUB_TOKEN: ${{ github.token }}
-    - name: Setup Go
+    - name: Setup Go (override)
       uses: actions/setup-go@v6
+      if: ${{ inputs.go-version }}
       with:
         go-version: ${{ inputs.go-version }}
-        go-version-file: ${{ inputs.go-version && '' || 'go.mod' }}
+    - name: Setup Go
+      uses: actions/setup-go@v6
+      if: ${{ !inputs.go-version }}
+      with:
+        go-version-file: go.mod
