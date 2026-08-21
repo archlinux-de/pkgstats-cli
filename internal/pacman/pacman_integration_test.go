@@ -73,7 +73,7 @@ func TestGetServerMatchesPacmanConf(t *testing.T) {
 	if err != nil {
 		t.Fatal(err, out)
 	}
-	pacmanConfServer := strings.Split(strings.TrimSpace(string(out)), "\n")[0]
+	pacmanConfServer, _, _ := strings.Cut(strings.TrimSpace(string(out)), "\n")
 	pacmanConfServerUrl, err := url.Parse(parsedServer)
 	if err != nil {
 		t.Fatal(err)

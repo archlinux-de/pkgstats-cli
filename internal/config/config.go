@@ -18,8 +18,7 @@ func parse(v *viper.Viper) (*Config, error) {
 	var config Config
 
 	if err := v.ReadInConfig(); err != nil {
-		var configFileNotFoundError viper.ConfigFileNotFoundError
-		if errors.As(err, &configFileNotFoundError) {
+		if _, ok := errors.AsType[viper.ConfigFileNotFoundError](err); ok {
 			return &config, nil
 		} else {
 			return nil, fmt.Errorf("failed to read config file %s: %w", v.ConfigFileUsed(), err)

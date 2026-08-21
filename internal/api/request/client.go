@@ -84,8 +84,9 @@ func (client *Client) query(path string, params url.Values) ([]byte, error) {
 }
 
 func (client *Client) GetPackages(packages ...string) (PackagePopularityList, error) {
-	ppl := PackagePopularityList{}
-	ppl.PackagePopularities = make([]PackagePopularity, len(packages))
+	ppl := PackagePopularityList{
+		PackagePopularities: make([]PackagePopularity, len(packages)),
+	}
 
 	ch := make(chan packagePopularityResult)
 
